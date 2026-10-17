@@ -35,7 +35,9 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
   const loadBriefing = (e) => e.target.open && briefing === undefined &&
     api.briefing(id).then(setBriefing).catch((err) => setBriefing(err.status === 404 ? null : { error: err.message }));
   const loadEconomics = (e) => e.target.open && !econ &&
-    api.economics(id).then(setEcon).catch((err) => setEcon({ error: err.message }));
+    Promise.all([api.economics(id), api.siteContracts(id).catch(() => null)])
+      .then(([e, contracts]) => setEcon({ ...e, contracts }))
+      .catch((err) => setEcon({ error: err.message }));
 
   const cs = summary.category_scores || {};
   const meta = cs._meta || {};
@@ -204,6 +206,30 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
               †Estimate: EIA-930 demand × that month's EIA-861M average retail price. ‡EAGLE-I customer-hours without power in
               the operator's site counties: the public stand-in for crew workload until real trip logs are loaded.
               Correlation is not causation.</p>
+            {econ.contracts?.contracts > 0 && (
+              <div className="contracts">
+                <h4>Field contracts in this county</h4>
+                <p className="small">{econ.contracts.contracts} federal field-construction contracts · {econ.contracts.disrupted} disrupted
+                  (terminated or 30+ days late) · <strong>{econ.contracts.weather_attributed} weather-caused</strong></p>
+                <ul className="crew-list">
+                  {econ.contracts.contracts_list.filter((k) => k.attributed).slice(0, 3).map((k) => (
+                    <li key={k.award_key}>
+                      <div>
+                        <strong>{k.recipient}</strong>
+                        <span className={`badge ${k.evidence === "documented_and_corroborated" ? "badge--live" : "badge--warn"}`}>
+                          {k.evidence === "documented_and_corroborated" ? "DOCUMENTED + NOAA" : "DOCUMENTED"}</span>
+                        <p className="small">{k.slip_days} days late · "{(k.weather_cited_text || "").slice(0, 90)}"</p>
+                        {k.storm_match && <p className="small muted">NOAA: {k.storm_match}</p>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <p className="small muted">Weather counts as the cause only when the contract's own change documents say so
+                  (and NOAA confirms the named storm when one is named). A storm merely overlapping a late contract isn't
+                  evidence: a tornado nearby predicted a documented weather delay in under 5% of disrupted contracts.
+                  Source: USAspending (federal contracts, a stand-in for utility crew contracts).</p>
+              </div>
+            )}
           </div>
         )}
       </details>

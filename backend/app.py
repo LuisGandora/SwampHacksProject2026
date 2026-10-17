@@ -241,6 +241,33 @@ def site_economics(site_id: int, weeks: int = Query(26, le=520)):
             "assumptions": many("SELECT * FROM economic_assumptions ORDER BY key")}
 
 
+@app.get("/economics/contract-disruption")
+def contract_disruption():
+    """Did weather disrupt field contracts, and did bad revenue quarters follow? (ml/contract_disruption.py)"""
+    path = Path(__file__).resolve().parent.parent / "ml" / "models" / "contract_disruption.json"
+    if not path.exists():
+        raise HTTPException(404, "Not computed yet: run python -m ml.contract_disruption")
+    return json.loads(path.read_text())
+
+
+@app.get("/sites/{site_id}/contracts")
+def site_contracts(site_id: int, limit: int = Query(20, le=200)):
+    """Field-construction contracts performed in the site's county (USAspending stand-in), weather-attributed
+    disruptions first, with the evidence: documented_and_corroborated / documented / storm_overlap_only / none."""
+    s = one("SELECT site_id, county_fips FROM sites WHERE site_id = %s", (site_id,))
+    rows = many("""SELECT f.award_key, f.recipient, f.agency, f.naics_description, f.description, f.city, f.start_date,
+                          f.original_end_date, f.final_end_date, f.potential_value_usd, f.terminated, f.slip_days,
+                          f.weather_cited_text, a.disrupted, a.attributed, a.evidence, a.storm_match, a.exposure
+                     FROM field_contracts f JOIN contract_weather_attribution a USING (award_key)
+                    WHERE f.county_fips = %s
+                    ORDER BY a.attributed DESC, a.disrupted DESC, f.start_date DESC LIMIT %s""", (s["county_fips"], limit))
+    totals = one("""SELECT count(*) AS contracts, count(*) FILTER (WHERE a.disrupted) AS disrupted,
+                           count(*) FILTER (WHERE a.attributed) AS weather_attributed
+                      FROM field_contracts f JOIN contract_weather_attribution a USING (award_key)
+                     WHERE f.county_fips = %s""", (s["county_fips"],))
+    return {**totals, "county_fips": s["county_fips"], "contracts_list": rows}
+
+
 @app.get("/economics/correlations")
 def economic_correlations(significant_only: bool = True):
     """Weather vs demand/sales correlations for every company (deseasonalized and raw)."""

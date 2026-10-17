@@ -120,6 +120,44 @@ Correlations are reported raw and **deseasonalized**, meaning each series minus 
 
 These are correlations, not proof of cause. The outage stand-in measures all restoration work in a county, not one company's crews.
 
+### Did weather disrupt a crew contract?
+
+**Hypothesis tested:** when a crew contract fails and a bad revenue quarter follows, a severe weather event (such as a tornado) near the work during the contract caused the disruption.
+
+```powershell
+python scraper/contract_data.py      # USAspending contracts, SEC quarterly revenue, OpenFEMA (no keys)
+python -m ml.contract_disruption     # load into Tiger, fit, attribute -> ml/models/contract_disruption.json
+```
+
+| Need | Public stand-in | Size |
+|---|---|---|
+| Crew contracts and their failures | **USAspending.gov**: federal field-construction contracts performed in FL/GA/AL since FY2016. Covers utility and power lines, heavy civil, electrical and site work. Includes every change to each contract: terminations (default, cause, convenience, cancellation), change orders and end-date changes, with the county the work was in. | 7,647 contracts (7,049 fully observed); 2,395 disrupted (terminated, or 30+ days late not counting planned option years) |
+| Revenue by quarter | **SEC EDGAR XBRL**: 8 public line-crew and field contractors (Quanta, MasTec, MYR, Dycom, Primoris, EMCOR, Granite, Sterling) and 4 utility parents (NextEra, Southern, Duke, Tampa Electric) | 34–49 quarters each |
+| Storm damage | **OpenFEMA**: disaster declarations by county, and Public Assistance utility-repair projects | 3,430 declarations, 5,407 projects |
+| Weather near the work | NOAA Storm Events files in `data/raw`, by county; zone events such as hurricanes are mapped to their counties | 2015–2026 |
+
+**Method** ([ml/contract_disruption.py](ml/contract_disruption.py)):
+1. Weather is counted during each contract's **originally planned** window. A late contract runs longer and would collect more storms *because* of the delay.
+2. A logistic model controls for planned length, size, type of work, agency, state, start year and season. It tests whether contracts exposed to each kind of weather were disrupted more often.
+3. **Evidence per contract.** A change document that names weather as the delay ("WEATHER TIME EXTENSION", "HURRICANE IAN IMPACTS") counts as **documented**. It's **documented + corroborated** when NOAA recorded that kind of storm in the county while the contract ran. A storm that merely overlapped is labeled **storm overlap only** and is never counted as the cause.
+
+**Results:**
+- **Overlap alone would mislead.** Raw numbers look like support: contracts with a tornado in their county were disrupted 44% of the time, vs 31% without. Most of that gap is contract length, because longer contracts see more storms *and* slip more. With the controls, no weather type significantly raises the odds of disruption (tornado odds ratio 1.12, 95% interval 0.98–1.27), and weather adds nothing to prediction (cross-validated AUC 0.704 with weather, 0.706 without).
+- **The original rule is wrong about 95% of the time.** Of 809 disrupted contracts with a tornado nearby, only **4.6%** say in their own documents that weather caused the delay. The rate for all disrupted contracts is 3.8%.
+- **91 disruptions are attributed to weather from the evidence.** 16 are documented + corroborated: 12 tropical, such as Hurricane Ian's landfall on 2022-09-28, and 4 flooding. 75 are documented as general weather delays.
+- **Revenue:** no company shows a consistent "storm, then bad quarter" pattern. For crew contractors, storms tend to come with **more** revenue (restoration work): Primoris, next quarter, Spearman 0.42, p = 0.01, one of 24 tests, so it may be chance. The public contractors hold almost none of these federal contracts (1), so a contract failure can't be traced to a company's revenue with public data.
+
+**What would make this definitive:** the utility's own crew contracts, with start and end dates, site, contractor, and outcome. With them, the same pipeline runs unchanged on real data. Load them in place of `data/field_contracts.csv` with the same columns.
+
+API: `GET /economics/contract-disruption` (summary), `GET /sites/{id}/contracts` (contracts in the site's county with their evidence). The site card shows them under **Economic impact**.
+
+**Restoration bounceback** (`python -m ml.bounceback`): is business above normal in the months after a storm? Three tests:
+- field contracts in the hit county
+- national crew contractors' revenue
+- the sites' utilities' revenue
+
+Not supported: no bounce in any of the 15 tests. An early "hail +31%" turned out to be the September fiscal-year-end spike in federal contract awards. The full process, data and results of both experiments are in [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md).
+
 ## AI safety report (on tap)
 
 `POST /sites/{id}/report` ([backend/reports.py](backend/reports.py)). Code gathers every fact and **decides go / caution / no-go**; Gemini only explains it. Each fact group has a source ID (`S1`–`S7`) that the report must cite, and the assumptions it relies on are listed. A **number audit** flags any number in Gemini's text that isn't in the facts (`verified: false`, with `unverified_numbers`). Gemini gets two retries per model, then the fallback model is tried, then a deterministic template report is used. Reports are cached for 30 minutes.
