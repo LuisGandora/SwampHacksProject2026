@@ -231,7 +231,7 @@ export default function App() {
             ))}
           </div>
           <button className={showPins ? "on" : ""} onClick={() => setShowPins((v) => !v)} aria-pressed={showPins}
-                  title="Past hazards: crew reports and OSHA injuries">📍<span className="hide-sm"> Pins</span></button>
+                  title="Past hazards: crew reports, and historical OSHA injury reports">📍<span className="hide-sm"> Pins</span></button>
           {health?.dev && (
             <button onClick={demo ? resetDemo : runDemo} title="Play the brief's story">{demo ? "■ Reset" : "▶ Demo"}</button>
           )}
@@ -264,7 +264,7 @@ export default function App() {
       {showPins && (
         <div className="pin-legend small" aria-label="Pin legend">
           <span><i className="dot" style={{ background: PIN_COLORS.crew }} /> Crew reports (faded = closed)</span>
-          <span><i className="dot" style={{ background: PIN_COLORS.osha }} /> OSHA severe injuries ≤50 mi of a site, 3 yrs</span>
+          <span><i className="dot dot--ring" style={{ borderColor: PIN_COLORS.osha }} /> Historical OSHA injury reports (not live)</span>
           <span className="muted">{pins.length.toLocaleString()} pins · tap one for details</span>
         </div>
       )}

@@ -1,0 +1,114 @@
+# Render Blueprint (render.com -> New -> Blueprint -> pick this repo). See docs/DEPLOY.md before applying it.
+# Public stack: API + exactly ONE worker + frontend. Demo stack: a separate API with PLANIT_DEV=1 + its own frontend,
+# so the public URL never exposes the demo endpoints. Values marked sync: false are typed in the Render dashboard.
+envVarGroups:
+  - name: planet-control-shared
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.1
+      - key: AUTH0_DOMAIN
+        sync: false
+      - key: AUTH0_AUDIENCE
+        sync: false
+      - key: WEBHOOK_KEY            # same key for the API and the worker, or saved webhooks can't be decrypted
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: NWS_USER_AGENT         # "Planet Control (team contact email)"
+        sync: false
+
+services:
+  - type: web
+    name: planet-control-api
+    runtime: python
+    plan: starter                   # a persistent disk needs a paid instance
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    disk:
+      name: crew-photos
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - fromGroup: planet-control-shared
+      - key: UPLOADS_DIR
+        value: /var/data/uploads
+      - key: DATABASE_URL           # the least-privilege planit_api URL from .env.api (python -m db.create_api_role)
+        sync: false
+      - key: CORS_ORIGINS           # https://planet-control.onrender.com (the frontend below)
+        sync: false
+
+  - type: worker
+    name: planet-control-worker     # run exactly one: two copies would double-send alerts and briefings
+    runtime: python
+    plan: starter
+    numInstances: 1
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: python -m backend.worker
+    envVars:
+      - fromGroup: planet-control-shared
+      - key: DATABASE_URL           # admin URL from .env (the worker writes forecasts, alerts, scores)
+        sync: false
+      - key: FIRMS_MAP_KEY
+        sync: false
+
+  - type: web
+    name: planet-control
+    runtime: static
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL           # https://planet-control-api.onrender.com
+        sync: false
+      - key: VITE_AUTH0_DOMAIN
+        sync: false
+      - key: VITE_AUTH0_CLIENT_ID
+        sync: false
+      - key: VITE_AUTH0_AUDIENCE
+        sync: false
+
+  # ---- demo stack: same database, demo endpoints on (supervisors only once Auth0 is on) ----
+  - type: web
+    name: planet-control-demo-api
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    disk:
+      name: demo-photos
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - fromGroup: planet-control-shared
+      - key: PLANIT_DEV
+        value: "1"
+      - key: UPLOADS_DIR
+        value: /var/data/uploads
+      - key: DATABASE_URL           # admin URL: /dev endpoints run worker jobs
+        sync: false
+      - key: CORS_ORIGINS           # https://planet-control-demo.onrender.com
+        sync: false
+
+  - type: web
+    name: planet-control-demo
+    runtime: static
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL           # https://planet-control-demo-api.onrender.com
+        sync: false
+      - key: VITE_AUTH0_DOMAIN
+        sync: false
+      - key: VITE_AUTH0_CLIENT_ID
+        sync: false
+      - key: VITE_AUTH0_AUDIENCE
+        sync: false

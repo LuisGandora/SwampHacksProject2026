@@ -3,7 +3,8 @@
 Raises alerts the moment a reading crosses a category's warn/stop threshold (heat index, wind chill, gusts,
 visibility), without waiting for an NWS advisory, plus the flood rule from the brief: heavy rain over the
 flooding category's look-back window (default 12 h overnight) raises a flood-risk alert, noting any river
-gauge nearby.
+gauge nearby. Sites inside a FEMA Special Flood Hazard Area (scraper/fema_flood_zones.py) are warned at 75% of the
+rain threshold, and the alert names their flood zone.
 """
 import datetime as dt
 
@@ -47,18 +48,40 @@ hourly AS (
 SELECT count(raise_site_alert(t.site_id, 'flooding',
                               CASE WHEN t.rain >= c.stop_value THEN 'stop_work' ELSE 'warning' END, now(), t.rain,
                               'Flood risk: ' || round(t.rain, 1) || ' in of rain in the last ' || c.window_minutes / 60
-                                  || ' h' || coalesce(' near ' || g.name, ''),
+                                  || ' h' || coalesce(' near ' || g.name, '')
+                                  || CASE WHEN s.fema_sfha THEN '; site is in FEMA flood zone ' || s.fema_flood_zone
+                                          || ' (1%-a-year floodplain)' ELSE '' END,
                               now() + interval '6 hours'))
   FROM total t CROSS JOIN c JOIN sites s USING (site_id)
   LEFT JOIN LATERAL (SELECT name FROM river_gauges r
                       WHERE ST_DWithin(r.geog, s.geog, c.warn_radius_mi * 1609.344)
                       ORDER BY r.geog <-> s.geog LIMIT 1) g ON true
+ WHERE t.rain >= c.warn_value * CASE WHEN s.fema_sfha THEN 0.75 ELSE 1 END  -- floodplain sites: warned sooner
+"""
+
+
+# Soil saturation: a week of soaking rain (soft ground, stuck vehicles, unstable trench walls). Same hourly rain as the
+# flood rule, over the soil_saturation window (7 days), thresholds from hazard_categories; open for 24 h, re-raised
+# while it stays wet.
+RAISE_FROM_WEEK_RAIN = """
+WITH c AS (SELECT * FROM hazard_categories WHERE category = 'soil_saturation'),
+hourly AS (
+    SELECT site_id, date_trunc('hour', observed_at) AS hour, max(precip_1h_in) AS rain
+      FROM weather_observations, c
+     WHERE observed_at > now() - make_interval(mins => c.window_minutes) AND precip_1h_in IS NOT NULL
+     GROUP BY 1, 2
+), total AS (SELECT site_id, sum(rain) AS rain FROM hourly GROUP BY site_id)
+SELECT count(raise_site_alert(t.site_id, 'soil_saturation',
+                              CASE WHEN t.rain >= c.stop_value THEN 'stop_work' ELSE 'warning' END, now(), t.rain,
+                              round(t.rain, 1) || ' in of rain in the last 7 days: soft ground, vehicles may get stuck, '
+                                  || 'check trench walls', now() + interval '24 hours'))
+  FROM total t CROSS JOIN c
  WHERE t.rain >= c.warn_value
 """
 
 
 def raise_alerts(conn):
-    return conn.execute(RAISE_FROM_READINGS).fetchone()["count"] + conn.execute(RAISE_FROM_RAIN).fetchone()["count"]
+    return sum(conn.execute(q).fetchone()["count"] for q in (RAISE_FROM_READINGS, RAISE_FROM_RAIN, RAISE_FROM_WEEK_RAIN))
 
 
 def sync(conn):

@@ -89,6 +89,9 @@ export default function RankingPanel({ sites, horizon, setHorizon, selectedId, o
                   {s.percentile >= 90 && (
                     <span className="badge badge--unusual" title={`Higher than ${Math.round(s.percentile)}% of this site's days in this month`}>UNUSUAL</span>
                   )}
+                  {s.fema_sfha && (
+                    <span className="badge badge--flood" title={`FEMA flood zone ${s.fema_flood_zone}: inside the 1%-a-year (100-year) floodplain`}>FLOODPLAIN</span>
+                  )}
                   {s.stop_work_alerts > 0 && <span className="badge badge--stop">STOP ×{s.stop_work_alerts}</span>}
                   {s.warning_alerts > 0 && <span className="badge badge--warn">WARN ×{s.warning_alerts}</span>}
                 </span>

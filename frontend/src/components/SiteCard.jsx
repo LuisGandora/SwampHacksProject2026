@@ -9,6 +9,15 @@ const COORD = {
   no_osm: ["Location: EIA only (no OSM match)", "muted"],
 };
 
+// FEMA National Flood Hazard Layer zone at the site, in plain words (scraper/fema_flood_zones.py).
+function floodZoneText(d) {
+  if (d.fema_flood_zone === "unmapped") return "FEMA flood map: none digitized here";
+  if (d.fema_sfha) return `🌊 FEMA flood zone ${d.fema_flood_zone}: inside the 1%-a-year (100-year) floodplain` +
+    (d.fema_bfe_ft ? ` · base flood ${Number(d.fema_bfe_ft)} ft` : "") + " · flood alerts trigger sooner";
+  if (/0\.2 PCT/i.test(d.fema_zone_subtype || "")) return `FEMA flood zone ${d.fema_flood_zone}: 0.2%-a-year (500-year) floodplain`;
+  return `FEMA flood zone ${d.fema_flood_zone}: minimal flood hazard`;
+}
+
 export default function SiteCard({ summary, horizon, categories, alerts, now, dev, onReport, onAiReport, onCompliance,
                                    onChanged,
                                    onScenario, onStrike, onClearScenario, refreshKey, onClose }) {
@@ -58,6 +67,7 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
             {now.toLocaleTimeString("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit", timeZoneName: "short" })}
           </p>
           <p className={`small ${coordCls}`}>{coordText}</p>
+          {detail?.fema_flood_zone && <p className={`small ${detail.fema_sfha ? "warn" : "muted"}`}>{floodZoneText(detail)}</p>}
         </div>
         <button className="icon-btn" onClick={onClose} aria-label="Close site">✕</button>
       </header>
@@ -171,7 +181,7 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
             <div><dt>Heat-warning days/yr</dt><dd>{p.heat_warn_days_per_year ?? "–"}</dd></div>
             <div><dt>Outdoor storm deaths</dt><dd>{p.storm_fatalities_crew_relevant ?? 0}</dd></div>
             <div><dt>OSHA PPE reports ≤50 mi</dt><dd>{p.ppe_osha_reports ?? 0}</dd></div>
-            <div><dt>County weather deaths</dt><dd>{p.cdc_county_suppressed && p.cdc_county_weather_deaths == null ? "<10" : p.cdc_county_weather_deaths ?? "–"}</dd></div>
+            <div><dt>County weather deaths</dt><dd>{(p.cdc_county_suppressed && p.cdc_county_weather_deaths == null) || (p.cdc_county_weather_deaths > 0 && p.cdc_county_weather_deaths < 10) ? "<10" : p.cdc_county_weather_deaths ?? "–"}</dd></div>
           </dl>
           <p className="small muted">NOAA Storm Events, OSHA, CDC WONDER, within each hazard's radius.</p>
         </details>

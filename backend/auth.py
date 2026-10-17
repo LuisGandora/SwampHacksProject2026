@@ -81,6 +81,14 @@ def current_user(creds: HTTPAuthorizationCredentials | None = Depends(bearer)):
 _hits = defaultdict(deque)
 
 
+def require_supervisor(user=Depends(current_user)):
+    """Signed-in supervisor (app_users.role). Without Auth0 (local PLANIT_DEV laptop) the dev user passes."""
+    if domain() and user["role"] != "supervisor":
+        raise HTTPException(403, "Supervisors only. An admin can run: UPDATE app_users SET role = 'supervisor' "
+                                 "WHERE email = '<your email>';")
+    return user
+
+
 def rate_limit(name, per_minute):
     """Dependency: the signed-in user, or 429 after `per_minute` calls to this group in the last minute."""
     def check(user=Depends(current_user)):

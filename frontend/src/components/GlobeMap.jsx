@@ -91,13 +91,14 @@ const GlobeMap = forwardRef(function GlobeMap(
         paint: { "circle-color": "#fff3a3", "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 2, 9, 5],
                  "circle-opacity": ["interpolate", ["linear"], ["get", "age_min"], 0, 1, 30, 0.15],
                  "circle-blur": 0.4 } });
-      // Past hazards (crew reports and OSHA injuries) under the sites, so site dots stay on top and clickable.
+      // Past hazards under the sites, so site dots stay on top and clickable. Crew reports are filled dots; historical
+      // OSHA injury reports are hollow rings, so nobody mistakes a 2023 injury report for a live crew report.
       m.addLayer({ id: "pins", type: "circle", source: "pins",
         paint: { "circle-color": ["match", ["get", "source"], "crew", PIN_COLORS.crew, PIN_COLORS.osha],
                  "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 2, 9, ["+", 3, ["get", "severity"]]],
-                 "circle-opacity": ["case", ["==", ["get", "status"], "open"], 0.95, ["==", ["get", "source"], "crew"], 0.2, 0.7],
+                 "circle-opacity": ["case", ["!=", ["get", "source"], "crew"], 0, ["==", ["get", "status"], "open"], 0.95, 0.2],
                  "circle-stroke-color": ["match", ["get", "source"], "crew", PIN_COLORS.crew, PIN_COLORS.osha],
-                 "circle-stroke-width": 1 } });
+                 "circle-stroke-width": ["match", ["get", "source"], "crew", 1, 1.6] } });
       m.addLayer({ id: "sites", type: "circle", source: "sites",
         paint: { "circle-color": BAND_COLOR_EXPRESSION,
                  "circle-radius": ["interpolate", ["linear"], ["zoom"], 2, 2.5, 5, 4.5, 9, 8, 13, 11],
@@ -125,9 +126,12 @@ const GlobeMap = forwardRef(function GlobeMap(
       const showPin = (f) => {
         const p = f.properties;
         pinPopup.setLngLat(f.geometry.coordinates).setHTML(
-          `<span style="color:${PIN_COLORS[p.source]}">●</span> <strong>${p.source === "crew" ? "Crew report" : "OSHA severe injury"}</strong>` +
+          (p.source === "crew"
+            ? `<span style="color:${PIN_COLORS.crew}">●</span> <strong>Crew report</strong>`
+            : `<span style="color:${PIN_COLORS.osha}">○</span> <strong>Historical OSHA injury report</strong>` +
+              `<br/><span class="muted">Public OSHA record, not a live crew report</span>`) +
           ` · ${esc(p.category.replace(/_/g, " "))}<br/>${esc(p.title)}<br/>` +
-          `<span class="muted">${new Date(p.at).toLocaleDateString()}${p.status ? ` · ${esc(p.status)}` : ""}` +
+          `<span class="muted">${p.source === "crew" ? "" : "Reported to OSHA "}${new Date(p.at).toLocaleDateString()}${p.status ? ` · ${esc(p.status)}` : ""}` +
           `${p.severity ? ` · severity ${esc(p.severity)}/5` : ""}</span>` +
           (p.photo_url && /^https?:\/\//.test(p.photo_url) ? `<br/><img src="${esc(p.photo_url)}" alt="" class="popup-photo"/>` : "")).addTo(m);
       };
