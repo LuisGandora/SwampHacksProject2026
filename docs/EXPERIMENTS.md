@@ -19,11 +19,16 @@ python scraper/contract_data.py      # USAspending, SEC, OpenFEMA (state and nat
 |---|---|---|
 | **USAspending.gov** | Federal field-construction contracts performed in FL/GA/AL since FY2016, with every change to them. Industry codes: power/utility lines 2371, highway and heavy civil 2373/2379, electrical 238210, site work 2389. Each change records the county where the work happened, its action type (terminate for default/cause/convenience, change order, option), the contract's end date after the change, and a free-text description. | 25,989 transactions → 7,647 contracts with their full history |
 | **SEC EDGAR XBRL** | Quarterly revenue for 8 public line-crew and field contractors (Quanta, MasTec, MYR, Dycom, Primoris, EMCOR, Granite, Sterling) and 4 utility parents (NextEra, Southern, Duke, Tampa Electric). Q4 = fiscal year minus Q1–Q3. | 34–49 quarters each |
-| **OpenFEMA** | Disaster declarations by county (FL/GA/AL); utility-repair projects from FEMA's Public Assistance program, damage category F; major-disaster declarations nationwide | 3,508 · 5,407 · 16,119 |
-| **NOAA Storm Events** (already in Tiger) | Storm events by county. Events recorded by forecast zone, such as hurricanes and heat, are spread to that zone's counties using the NWS zone-county file. | 2015–2026 |
+| **OpenFEMA** | Disaster declarations by county (FL/GA/AL; one row per disaster and county); utility-repair projects from FEMA's Public Assistance program, damage category F; major-disaster declarations nationwide | 3,430 · 5,407 · 16,119 |
+| **NOAA Storm Events** (the yearly `StormEvents_details` files in `data/raw`) | Storm events by county, read straight from the files. Events recorded by forecast zone, such as hurricanes, heat and winter storms, are spread to that zone's counties using the NWS zone-county file. Zones NWS has since renumbered are matched by the county in the zone's name ("Coastal Lee" → Lee County). | 42,190 relevant FL/GA/AL events, 2015 to June 2026 → 24,605 county-days |
 | **EIA-861M** (already in Tiger) | Monthly retail revenue for the sites' utilities | 2021–2026 |
 
 **Data fixes made along the way.** Each one changed results, so each is checked by a test:
+- **Storm data came from the database, not the data files.** The first runs read the `storm_events` table in Tiger. Its loader keeps only events it can put on a map, which drops 480 events these county-level tests need:
+  - 361 zone events whose zone numbers NWS has since retired (125 tropical storm, 12 hurricane, 26 storm surge and more)
+  - 119 county winter storms without coordinates
+
+  Both experiments now read the NOAA files in `data/raw` directly and were re-run. Tropical county-days went from 1,392 to 1,481, and winter from 1,894 to 1,973. Days are now each event's local date, not UTC. The verdicts didn't change, and the numbers below are from the re-run.
 - **FEMA's "Biological" declarations (COVID-19, 2020) covered every county.** They counted as storm exposure until they were filtered out. Fire declarations were removed too. The share of contracts "exposed" to a FEMA declaration fell from 58% to 36%.
 - **Reading weather in contract text: "the weather made the work"** is not "the weather held the work up". These matched at first:
   - "Hurricane protection project"
@@ -48,26 +53,26 @@ python -m ml.contract_disruption     # writes contract_weather_attribution and m
 
 ### Process
 1. **Checked the data first.** The database had no crew contracts at all (`crew_trips`: 0 rows), no record of which contracts failed, and revenue only for utilities. The weather data was complete. Public stand-ins were found and tested before building (table above).
-2. **Defined failure.** Disrupted means terminated (default, cause, convenience or cancelled) or finished 30+ days late, not counting planned option years. 2,396 of the 7,050 fully observed contracts qualify: 93 terminated and 2,332 late.
+2. **Defined failure.** Disrupted means terminated (default, cause, convenience or cancelled) or finished 30+ days late, not counting planned option years. 2,395 of the 7,049 fully observed contracts qualify: 93 terminated and 2,331 late.
 3. **Linked weather to each contract** by county, during its **originally planned** window. The stretched window would be circular: a late contract runs longer and collects more storms because of the delay.
 4. **Tested the rule against contracts without weather.** A logistic model of disruption used one exposed/not flag per weather type, controlling for planned length, contract value, type of work, agency, state, start year and start quarter. Odds ratios come with 95% intervals.
 5. **Used the contracts' own words as evidence.** A change that names weather as the delay is **documented**. It's **documented + corroborated** when the change names a kind of weather (hurricane, flooding...) and NOAA recorded that kind in the county while the contract ran. A storm that merely overlapped is **storm overlap only** and is never counted as the cause.
 6. **Revenue:** compared each company's quarterly revenue growth (vs the same quarter a year earlier) with storm days in its territory, same quarter and next quarter.
 
 ### Results
-- **Overlap alone looks convincing.** Contracts with a tornado in their county were disrupted **44%** of the time, against **31%** without.
+- **Overlap alone looks convincing.** Contracts with a tornado in their county were disrupted **43.6%** of the time, against **30.5%** without.
 - **Once contracts are compared fairly, the effect mostly disappears.** Longer contracts both see more storms and slip more. With the controls, no weather type significantly raises the odds of disruption:
-  - Tornado odds ratio 1.12, 95% interval 0.98–1.28.
-  - Tropical 0.88 (0.76–1.02).
+  - Tornado odds ratio 1.12, 95% interval 0.98–1.27.
+  - Tropical 1.05 (0.91–1.22).
   - Thunderstorm wind 1.00 (0.87–1.14).
-- **Weather adds nothing to predicting failure:** cross-validated AUC is 0.705 with the weather columns and 0.706 without them.
-- **The original rule would be wrong about 95% of the time.** Of 808 disrupted contracts with a tornado nearby, **4.6%** say in their own records that weather caused the delay. The rate for all disrupted contracts is 3.8%.
+- **Weather adds nothing to predicting failure:** cross-validated AUC is 0.704 with the weather columns and 0.706 without them.
+- **The original rule would be wrong about 95% of the time.** Of 809 disrupted contracts with a tornado nearby, **4.6%** say in their own records that weather caused the delay. The rate for all disrupted contracts is 3.8%.
 - **91 disruptions are attributable to weather from evidence.**
-  - **12 are documented + corroborated:** 8 tropical and 4 flooding. Examples:
+  - **16 are documented + corroborated:** 12 tropical and 4 flooding. Examples:
     - "HURRICANE IAN IMPACTS", where NOAA records a tropical event in the same county on 2022-09-28, Ian's landfall.
     - "REA 0002 – FLOODING DELAYS 2021".
-  - **79 are documented** as general weather delays ("WEATHER TIME EXTENSION").
-- **No "storm, then bad quarter" pattern for any company.** For crew contractors, storms tend to come with **more** revenue (restoration work). Primoris is the only significant result (next quarter, Spearman 0.43, p = 0.01), one of 24 tests, so it may be chance. The public contractors hold just 1 of these federal contracts, so a contract failure can't be traced to a company's revenue with public data.
+  - **75 are documented** as general weather delays ("WEATHER TIME EXTENSION").
+- **No "storm, then bad quarter" pattern for any company.** For crew contractors, storms tend to come with **more** revenue (restoration work). Primoris is the only significant result (next quarter, Spearman 0.42, p = 0.01), one of 24 tests, so it may be chance. The public contractors hold just 1 of these federal contracts, so a contract failure can't be traced to a company's revenue with public data.
 
 ### Limits and what would change the verdict
 - Federal contracts are the same kind of field work as a utility's crew contracts, but not the same owner. Weather may matter more for line crews on energized equipment.
@@ -98,7 +103,7 @@ Three independent tests. Each compares against "no storm", so seasons and region
    - **Bounce** = the average of months +1 to +6, minus the 3 months before.
    - The comparison removes each county's own calendar-month pattern and the same month across all counties. This is a difference-in-differences with seasonal controls.
    - 95% intervals come from bootstrapping the storm events (2,000 resamples).
-   - Storm kinds tested: tropical, tornado, flood, hail, winter, and FEMA weather declarations. That's 712–1,406 storm onsets per kind.
+   - Storm kinds tested: tropical, tornado, flood, hail, winter, and FEMA weather declarations. That's 761–1,410 storm onsets per kind.
 2. **B. National crew contractors' revenue.**
    - Quarterly growth in revenue for the 8 public contractors (330 company-quarters), against the number of counties under major weather-disaster declarations nationwide that quarter and in the two before. They work nationwide, so national storms are what drive their workload.
    - Company fixed effects, robust standard errors.
@@ -106,7 +111,7 @@ Three independent tests. Each compares against "no storm", so seasons and region
 3. **C. The sites' utilities.** Monthly revenue growth (vs the same month a year earlier) around 57 tropical-storm onsets in each utility's own site counties.
 
 ### What went wrong first (and why it matters)
-The first version of test A removed only each county's average level. It found one "supported" effect: **new contracts +31% in months 1–6 after a hail month**, with interval +0.025 to +0.097 contracts per county-month. A placebo test also passed: none of 200 runs with random storm months reached it.
+The first version of test A removed only each county's average level. It found one "supported" effect: **new contracts +31% in months 1–6 after a hail month**, with interval +0.025 to +0.099 contracts per county-month. A placebo test on the first data also passed: none of 200 runs with random storm months reached it.
 
 The effect turned out to be a calendar artifact:
 - Federal contract awards spike every September at the end of the fiscal year, and the spike is bigger in counties with many contracts.
@@ -118,21 +123,21 @@ The naive results are kept in `bounceback.json` (`regional_naive_two_way`) as th
 ### Results (final method)
 | Test | Weather | Bounce, months 1–6 (or next 2 quarters) | 95% interval | Supported |
 |---|---|---|---|---|
-| A. New field contracts in the county | tropical | +3.5% | −0.027 to +0.041 contracts/month | no |
-| | tornado | +1.5% | −0.030 to +0.035 | no |
-| | flood | +0.5% | −0.029 to +0.032 | no |
-| | hail | +3.5% | −0.019 to +0.034 | no |
-| | winter | −3.4% | −0.035 to +0.021 | no |
-| | FEMA weather declaration | −1.8% | −0.034 to +0.025 | no |
-| A. Dollars obligated in the county | tropical | +0.9% | −10% to +12% (log points) | no |
-| | tornado | −3.8% | −16% to +9% | no |
-| | flood | +1.8% | −9% to +13% | no |
-| | hail | +4.4% | −7% to +15% | no |
-| | winter | +2.5% | −10% to +14% | no |
-| | FEMA weather declaration | −2.0% | −13% to +9% | no |
+| A. New field contracts in the county | tropical | +2.5% | −0.026 to +0.037 contracts/month | no |
+| | tornado | +1.6% | −0.030 to +0.037 | no |
+| | flood | −0.2% | −0.030 to +0.029 | no |
+| | hail | +3.4% | −0.019 to +0.034 | no |
+| | winter | −2.8% | −0.032 to +0.019 | no |
+| | FEMA weather declaration | −1.8% | −0.032 to +0.024 | no |
+| A. Dollars obligated in the county | tropical | +1.2% | −10% to +13% (log points) | no |
+| | tornado | −3.6% | −16% to +8% | no |
+| | flood | +2.4% | −10% to +14% | no |
+| | hail | +4.2% | −7% to +15% | no |
+| | winter | +3.8% | −7% to +15% | no |
+| | FEMA weather declaration | −2.0% | −13% to +8% | no |
 | B. National contractors' revenue growth | major disasters | +0.6 points per standard deviation more declarations | −1.6 to +2.9 (p = 0.59) | no |
 | B. Utility parents' revenue growth (same test) | major disasters | −0.6 points | −2.8 to +1.6 (p = 0.60) | no |
-| C. Site utilities' revenue growth | tropical | −0.8 points | −6.8 to +6.0 | no |
+| C. Site utilities' revenue growth | tropical | −0.8 points | −7.2 to +5.6 | no |
 
 **Verdict: not supported.** No weather type is followed by a measurable rise in field-contract business in the hit county, in national crew contractors' revenue, or in the sites' utilities' revenue.
 
