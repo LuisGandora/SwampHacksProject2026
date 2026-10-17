@@ -14,6 +14,26 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 
 
+def load_env(path=None):
+    """Load KEY=VALUE lines from .env into os.environ without overwriting vars already set in the shell.
+
+    Keeps the project dependency-free (no python-dotenv). Call this at startup so GEMINI_API_KEY and other
+    settings in .env are visible to os.environ. Blank values (e.g. GEMINI_API_KEY=) are skipped, so an empty
+    slot cleanly falls back instead of setting the key to "".
+    """
+    path = path or (ROOT / ".env")
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8-sig").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, val = line.split("=", 1)
+        key, val = key.strip(), val.strip()
+        if val and not os.environ.get(key):
+            os.environ[key] = val
+
+
 def database_url():
     if os.environ.get("DATABASE_URL"):
         return os.environ["DATABASE_URL"]
