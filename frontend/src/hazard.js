@@ -37,3 +37,20 @@ export function countdown(isoUntil, now = Date.now()) {
 }
 
 export const usd = (v) => (v == null ? "–" : `$${Math.round(v).toLocaleString()}`);
+
+// NWS's own map colors for warnings (weather.gov), so the map reads like the NWS hazard map. Others: gray.
+export const NWS_COLORS = {
+  "Tornado Warning": "#ff0000", "Tornado Watch": "#ffff00",
+  "Severe Thunderstorm Warning": "#ffa500", "Severe Thunderstorm Watch": "#db7093",
+  "Flash Flood Warning": "#8b0000", "Flood Warning": "#00ff00", "Flood Advisory": "#00ff7f",
+  "Flood Watch": "#2e8b57", "Flash Flood Watch": "#2e8b57", "Coastal Flood Warning": "#228b22",
+  "Hurricane Warning": "#dc143c", "Hurricane Watch": "#ff00ff", "Tropical Storm Warning": "#b22222",
+  "Tropical Storm Watch": "#f08080", "Storm Surge Warning": "#b524f7",
+  "Extreme Heat Warning": "#c71585", "Excessive Heat Warning": "#c71585", "Heat Advisory": "#ff7f50",
+  "High Wind Warning": "#daa520", "Wind Advisory": "#d2b48c", "Lake Wind Advisory": "#d2b48c",
+  "Red Flag Warning": "#ff1493", "Freeze Warning": "#483d8b", "Frost Advisory": "#6495ed",
+  "Dense Fog Advisory": "#708090", "Rip Current Statement": "#40e0d0", "High Surf Advisory": "#ba55d3",
+  "Special Weather Statement": "#ffe4b5",
+};
+export const NWS_OTHER = "#9aa0a6";
+export const NWS_COLOR_EXPRESSION = ["match", ["get", "event"], ...Object.entries(NWS_COLORS).flat(), NWS_OTHER];

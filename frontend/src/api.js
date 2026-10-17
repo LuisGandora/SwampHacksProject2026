@@ -67,6 +67,7 @@ export const api = {
   },
   createCrewReport: (report) => request("/crew-reports", { method: "POST", json: report }),
   hazardPins: () => request("/hazard-pins?days=1095"),
+  nwsAlertMap: () => request("/nws-alerts/map"),
   me: () => request("/me"),
   channels: () => request("/me/channels"),
   addChannel: (c) => request("/me/channels", { method: "POST", json: c }),

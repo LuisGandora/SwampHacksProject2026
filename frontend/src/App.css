@@ -286,9 +286,6 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
                 background: rgba(8, 20, 28, .94); border: 1px solid var(--accent); border-radius: var(--radius); font-size: 15px; }
 .demo-caption .mono { color: var(--accent); }
 .demo-caption p { margin: 0; }
-.pin-legend { position: absolute; left: 50%; transform: translateX(-50%); bottom: 16px; z-index: 2; display: flex; gap: 14px; flex-wrap: wrap;
-              justify-content: center; padding: 6px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
-.pin-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .popup-photo { width: 100%; max-height: 140px; object-fit: cover; border-radius: 6px; margin-top: 6px; }
 .hud-controls button.on { border-color: var(--accent); color: var(--accent); }
 .user-btn { padding: 0; width: 32px; overflow: hidden; display: grid; place-items: center; }
@@ -312,7 +309,6 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
   .stopwork-clock strong { font-size: 32px; }
   .demo-caption { bottom: 8px; font-size: 13px; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 8px 10px; }
   .demo-caption p { grid-column: 1 / -1; grid-row: 2; }
-  .pin-legend { bottom: auto; top: calc(46vh - 40px); }
 }
 
 @media (max-width: 480px) {
@@ -371,3 +367,17 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
 .now-line { stroke: var(--text); stroke-width: 1; stroke-dasharray: 2 3; opacity: .7; }
 .data-table.daily tr.muted td { color: var(--muted); }
 .data-table.daily th, .data-table.daily td { white-space: nowrap; }
+
+/* ---------- map layers + legend ---------- */
+.map-layers { position: absolute; left: 412px; bottom: 16px; z-index: 4; width: 280px; max-height: calc(100% - 110px);
+              overflow-y: auto; padding: 12px; }
+.map-layers h4 { margin: 10px 0 4px; }
+.layer-toggles { display: grid; gap: 4px; }
+.layer-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+.layer-toggle input { width: auto; }
+.legend { list-style: none; padding: 0; margin: 0; display: grid; gap: 3px; font-size: 12px; }
+.legend li { display: flex; align-items: center; gap: 7px; }
+.radar-scale { display: flex; height: 10px; border-radius: 4px; overflow: hidden; }
+.radar-scale span { flex: 1; }
+.radar-labels { display: flex; justify-content: space-between; color: var(--text-2); }
+@media (max-width: 1000px) { .map-layers { left: 8px; right: 8px; width: auto; bottom: auto; top: 110px; max-height: 40vh; } }
