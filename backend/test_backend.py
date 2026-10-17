@@ -33,3 +33,21 @@ assert [len(m) for m in msgs] == [1000, 1011], [len(m) for m in msgs]   # never 
 peak = forecast_hour(15)
 assert (peak["heat_index_f"], peak["thunder_chance"], forecast_hour(4)["thunder_chance"]) == (112, 70, 10), peak
 print("notify + scenario ok")
+
+from backend.reports import audit, template
+
+facts_json = '{"score": 7.4, "gust": 35, "site": "Plant A"}'
+ok = {"headline": "Caution at Plant A: score 7.4", "summary": "Gusts to 35 mph [S3]", "uncertainty": "",
+      "actions": [], "hazards": [{"explanation": "see S1 and S2"}]}
+bad = {**ok, "summary": "Gusts to 35 mph, 60% chance of storms"}
+assert audit(ok, facts_json) == [] and audit(bad, facts_json) == ["60"], audit(bad, facts_json)  # invented number caught
+
+facts = {"site": {"name": "Plant A"}, "recommendation": {"value": "no_go", "rule": "r"}, "assumptions": ["a"],
+         "S2_active_alerts": [{"category": "lightning", "level": "stop_work", "message": "Lightning 3.0 mi away",
+                               "title": "STOP WORK: Lightning"}],
+         "S1_hazard_scores": {"next_day": {"score": 8.2, "category_scores": {
+             "severe_storm": {"score": 7.9, "drivers": [{"label": "rain that day"}]}, "_meta": {}}}}}
+r = template(facts)
+assert r["headline"] == "NO-GO: Plant A, hazard index 8.2/10 tomorrow" and len(r["hazards"]) == 2, r
+assert any("30 minutes" in a for a in r["actions"]), r["actions"]  # lightning policy action included
+print("reports ok")

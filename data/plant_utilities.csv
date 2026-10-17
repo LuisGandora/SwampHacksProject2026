@@ -1,0 +1,695 @@
+plant_id,utility_id,utility_name,balancing_authority
+10,195,Alabama Power Co,SOCO
+10004,9383,Mosaic Fertilizer LLC,TEC
+10008,1194,Baptist Memorial Hospital,JEA
+10020,4558,Cutrale Citrus Juices USA Inc,FPC
+10121,8596,High Shoals Hydro,SOCO
+10188,4558,Cutrale Citrus Juices USA Inc,TEC
+10202,9686,"WestRock, Fernandina Beach",JEA
+10204,3102,Mosaic Company,TEC
+10216,57356,Alabama River Cellulose LLC,SOCO
+10275,3662,Citrus World Inc,FPC
+10361,7127,Georgia-Pacific Consr Prods LP-Savannah,SOCO
+10416,56600,Ascend Performance Materials LLC,SOCO
+10426,23632,Inland Paperboard - Rome Mill,SOCO
+10431,623,Anheuser-Busch Inc,JEA
+10434,9383,Mosaic Fertilizer LLC,TEC
+10560,15726,Rayonier Advanced Materials,SOCO
+10562,15726,Rayonier Advanced Materials,JEA
+10605,50003,Brunswick Cellulose LLC,SOCO
+10611,50128,Georgia-Pacific Consr Ops LLC-Palatka,FPL
+10699,7136,Georgia-Pacific Consr Prods LP-Naheola,SOCO
+11,195,Alabama Power Co,SOCO
+12,195,Alabama Power Co,SOCO
+13,195,Alabama Power Co,SOCO
+136,21554,Seminole Electric Cooperative Inc,SEC
+14,195,Alabama Power Co,SOCO
+15,195,Alabama Power Co,SOCO
+16,195,Alabama Power Co,SOCO
+17,195,Alabama Power Co,SOCO
+18,195,Alabama Power Co,SOCO
+19,195,Alabama Power Co,SOCO
+2,195,Alabama Power Co,SOCO
+20,195,Alabama Power Co,SOCO
+21,195,Alabama Power Co,SOCO
+26,195,Alabama Power Co,SOCO
+3,195,Alabama Power Co,SOCO
+38,27813,USCE-Mobile District,SOCO
+4,195,Alabama Power Co,SOCO
+46,18642,Tennessee Valley Authority,TVA
+47,18642,Tennessee Valley Authority,TVA
+48,18642,Tennessee Valley Authority,TVA
+49,18642,Tennessee Valley Authority,TVA
+50071,17445,Solid Waste Authority of Palm Beach Co,FPL
+50146,27131,"US Sugar Savannah Refinery, LLC",SOCO
+50250,9401,International Paper Co-Pensacola,SOCO
+50310,14762,Pensacola Christian College,FPL
+50398,30002,International Paper Co,SOCO
+50465,61982,GFC - Flint River Mill,SOCO
+50474,20558,White Springs Agrici Chem Inc,FPC
+50482,19365,United States Sugar Corp,FPC
+50572,54842,WM Renewable Energy LLC,FPL
+50629,4482,Covanta Lake Inc,FPC
+50633,3102,Mosaic Company,TEC
+50666,14519,Pasco County - (FL),FPC
+50803,27718,WestRock Seminole,JEA
+50804,20505,GFC - Wentworth Mill,SOCO
+50858,8633,Hillsborough County - (FL),TEC
+50875,63619,City of Tampa (FL),TEC
+50884,55871,"Reworld Projects, LLC",FPC
+50887,67301,FCC Environmental,FPL
+50949,49893,Invenergy Services LLC,TEC
+50971,19216,Tropicana Products Inc,FPL
+52010,10875,Lee County Board-Commissioners,FPL
+52140,8009,International Paper Co,SOCO
+53,189,PowerSouth Energy Cooperative,SOCO
+533,189,PowerSouth Energy Cooperative,SOCO
+54004,17610,"WestRock Southeast, LLC",SOCO
+54096,9393,International Paper Co-Riverdl,SOCO
+54216,2053,Bowater Newport Coosa Pines Op,SOCO
+54239,10339,Kings Bay Naval Base,SOCO
+54290,61186,"DCII-250 Williams Street NW, LLC",SOCO
+54322,55810,Augusta Canal Authority,SOCO
+54347,18483,Tampa Wastewater Department,TEC
+54358,61880,Clearwater Paper Corporation - Augusta,SOCO
+54365,49901,Northern Star Generation Services Co LLC,FPC
+54426,6567,Florida Municipal Power Agency (FL),FPC
+54429,57356,Alabama River Cellulose LLC,SOCO
+54457,64432,"SWVP Alpharetta Owners, LLC",SOCO
+54462,55810,Augusta Canal Authority,SOCO
+54464,16024,Riverwood Intl USA Inc,SOCO
+54466,6567,Florida Municipal Power Agency (FL),FPC
+54538,13994,Oglethorpe Power Corporation,SOCO
+54550,57139,W&T Offshore Inc,SOCO
+54566,21116,YKK USA Inc,SOCO
+54623,12411,Miami Dade Water & Sewer Dept,FPL
+54624,12411,Miami Dade Water & Sewer Dept,FPL
+54627,13492,New Hope Power Company,FPL
+54752,56291,International Paper Co.,SOCO
+54763,59976,"WestRock Mill Company, LLC",SOCO
+54789,55932,Georgia-Pacific Brewton LLC,SOCO
+54802,12222,Mead Coated Board Inc,SOCO
+54813,17069,Shepherd Center,SOCO
+54816,56107,Highwoods Properties,SOCO
+54818,21260,"Banyan St./GAP 191 Peachtree Owner, LLC",SOCO
+54830,50109,DeKalb Regional Health System,SOCO
+54839,19726,City of Valdosta - (GA),SOCO
+54845,18166,Sun Trust Plaza Associates LLC,SOCO
+54848,11284,Lowndes County Hospital Authority,SOCO
+54877,876,Atlanta Gift Mart LP,SOCO
+54906,60564,GP Center Holdings LLC,SOCO
+54985,4468,Crestwood Corp,SOCO
+55,189,PowerSouth Energy Cooperative,SOCO
+55040,12564,"SEPG MGA, LLC",SOCO
+55044,56310,Boise White Paper LLC,SOCO
+55061,18535,Tenaska Georgia Partners LP,SOCO
+55128,13994,Oglethorpe Power Corporation,SOCO
+55138,60492,Walton Discover LLC,SOCO
+55141,13994,Oglethorpe Power Corporation,SOCO
+55152,3790,"600 Peachtree PropCo, LLC",SOCO
+55192,14610,Orlando Utilities Comm,FPC
+55241,12739,Mobile Energy LLC,SOCO
+55242,54692,Santa Rosa Energy Center LLC,FPL
+55244,13994,Oglethorpe Power Corporation,SOCO
+55267,17650,Southern Power Co,SOCO
+55271,195,Alabama Power Co,SOCO
+55274,18016,State Farm Mutual Auto Ins Co,SOCO
+55286,61905,Oleander Holdings LLC ,FPL
+55292,2929,Decatur Energy Center LLC,TVA
+55293,29122,Morgan Energy Center LLC,TVA
+55304,2671,Baconton Power LLC,SOCO
+55318,14610,Orlando Utilities Comm,FMPP
+55319,38021,Piedmont Athens Regional Medical Center,SOCO
+55332,66991,CAMS (Georgia) Washington County Power,SOCO
+55382,13994,Oglethorpe Power Corporation,SOCO
+55406,13994,Oglethorpe Power Corporation,SOCO
+55409,195,Alabama Power Co,SOCO
+55411,55987,CER Generation LLC,SOCO
+55412,6455,"Duke Energy Florida, LLC",TEC
+55414,40192,Shady Hills Power Co LLC,FPC
+55415,39125,Vandolah Power Co LLC,FPC
+55440,195,Alabama Power Co,SOCO
+55672,66992,CAMS (Georgia) AL Sandersville ,SOCO
+55821,61903,Stanton Clean Energy LLC,FPC
+55965,17650,Southern Power Co,SOCO
+56,189,PowerSouth Energy Cooperative,SOCO
+56015,60493,Walton Bainbridge LLC,SOCO
+56018,40614,Alabama Municipal Elec Authority - (AL),SOCO
+56076,5321,"ABC Coke - Drummond Co, Inc",SOCO
+56150,7140,Georgia Power Co,SOCO
+56231,50109,DeKalb Regional Health System,SOCO
+564,14610,Orlando Utilities Comm,FMPP
+56400,6616,Fort Pierce Utilities Authority,FMPP
+56407,6452,Florida Power & Light Co,FPL
+56518,6909,Gainesville Regional Utilities,GVL
+56522,54842,WM Renewable Energy LLC,SOCO
+56799,9617,JEA,JEA
+56870,55858,"Energy Developments, Inc d/b/a EDL",SOCO
+56929,6452,Florida Power & Light Co,FPL
+56930,6452,Florida Power & Light Co,FPL
+57026,54842,WM Renewable Energy LLC,SOCO
+57123,57249,"NextEra Renewable Fuels, LLC",JEA
+57128,56440,G2 Energy LLC,FPC
+57168,54842,WM Renewable Energy LLC,FPL
+57202,56582,Jacksonville Solar LLC,JEA
+57241,6909,Gainesville Regional Utilities,GVL
+57438,60281,"Altus Power America Management, LLC",GVL
+57502,6452,Florida Power & Light Co,FPL
+57565,65411,Deriva Energy,FPC
+57898,17445,Solid Waste Authority of Palm Beach Co,FPL
+57909,57282,Piedmont Green Power LLC,SOCO
+58011,57389,IKEA Property Inc,SOCO
+58012,57389,IKEA Property Inc,TEC
+58061,55858,"Energy Developments, Inc d/b/a EDL",TVA
+58064,57441,MARTA,SOCO
+58482,60453,Onward Energy,SOCO
+58484,61038,"Cube District Energy, LLC",SOCO
+58485,60898,Axium US Solar Holdings LLC,SOCO
+58572,49893,Invenergy Services LLC,SOCO
+58618,65305,"Clean Focus Yield, LLC",GVL
+58628,58580,"Simon Solar Farm, LLC",SOCO
+58892,60898,Axium US Solar Holdings LLC,SOCO
+58893,60898,Axium US Solar Holdings LLC,SOCO
+59221,55858,"Energy Developments, Inc d/b/a EDL",SOCO
+59240,59881,Port Charlotte Energy LLC,FPL
+59335,59135,Inst and Envir Div Marine Logistics Base,SOCO
+59449,17650,Southern Power Co,SOCO
+59450,17650,Southern Power Co,SOCO
+59459,59223,"BFI Waste Systems of GA, LLC",SEPA
+59535,59274,"SR Hazlehurst, LLC",SOCO
+59556,7140,Georgia Power Co,SOCO
+59611,59354,"LKL BLBD, LLC",FMPP
+59650,63199,Frontier Operation Services,SOCO
+59686,59458,Landfill Energy Systems Florida,FPL
+59689,61230,"Arevon Energy, Inc.",SOCO
+59690,61230,"Arevon Energy, Inc.",SOCO
+59691,61230,"Arevon Energy, Inc.",SOCO
+59710,55858,"Energy Developments, Inc d/b/a EDL",TVA
+59744,65922,"SunE W12DG-B, LLC",TEC
+59754,66044,Sun E N7 Holdings LLC,TEC
+59769,18454,Tampa Electric Co,TEC
+59843,59617,"Luminace Solar Georgia, LLC",SEPA
+59862,7140,Georgia Power Co,SOCO
+59863,7140,Georgia Power Co,SOCO
+59864,7140,Georgia Power Co,SOCO
+59865,7140,Georgia Power Co,SOCO
+59867,59648,Lockheed Martin Solar System,FPC
+59874,60453,Onward Energy,SEPA
+59876,7140,Georgia Power Co,SOCO
+59891,17650,Southern Power Co,SOCO
+59894,17650,Southern Power Co,SOCO
+59896,17650,Southern Power Co,SOCO
+59897,17650,Southern Power Co,SOCO
+59954,6455,"Duke Energy Florida, LLC",FPC
+59973,60054,Duke Energy Florida Solar Solutions,FPC
+59993,6452,Florida Power & Light Co,FPL
+60005,6452,Florida Power & Light Co,FPL
+60006,6452,Florida Power & Light Co,FPL
+6001,195,Alabama Power Co,SOCO
+60014,6452,Florida Power & Light Co,FPL
+6002,195,Alabama Power Co,SOCO
+60025,59765,Eight Flags Energy LLC,JEA
+60058,59790,"River Bend Solar, LLC",TVA
+60061,6452,Florida Power & Light Co,FPL
+60063,59802,"Live Oak Solar, LLC",SOCO
+60064,59803,"White Pine Solar, LLC",SOCO
+60071,6455,"Duke Energy Florida, LLC",FPC
+60082,59831,"White Oak Solar, LLC",SOCO
+60084,59833,PCA-Valdosta Mill,SOCO
+60124,64645,Goldfinch (Lakeland),FMPP
+60184,59946,"ADS Renewable Energy- Wolf Creek, LLC",SOCO
+60340,60130,"Albany Green Energy, LLC",SOCO
+60345,6452,Florida Power & Light Co,FPL
+60371,18454,Tampa Electric Co,TEC
+6042,6452,Florida Power & Light Co,FPL
+6043,6452,Florida Power & Light Co,FPL
+60448,63249,Terraform Arcadia,SOCO
+6045,6452,Florida Power & Light Co,FPL
+6046,6455,"Duke Energy Florida, LLC",FPC
+60469,61060,Cypress Creek Renewables,SOCO
+6051,7140,Georgia Power Co,SOCO
+60512,63249,Terraform Arcadia,SOCO
+60513,63249,Terraform Arcadia,SOCO
+60514,63249,Terraform Arcadia,SOCO
+60544,7140,Georgia Power Co,SOCO
+60550,60251,"GRP Franklin Renewable Energy Facility, LLC",SOCO
+60554,60330,"SR South Loving, LLC",SOCO
+60582,60453,Onward Energy,TAL
+60583,66100,Boralex US Operations LLC,SOCO
+60585,20065,Walton Electric Member Corp,SOCO
+60586,20065,Walton Electric Member Corp,SOCO
+60679,195,Alabama Power Co,SOCO
+60680,195,Alabama Power Co,SOCO
+60701,64784,LMS Energy USA LLC,FPC
+60702,61012,AES Distributed Energy,SOCO
+60741,58871,Citizens Enterprises Corporation,SOCO
+60788,6455,"Duke Energy Florida, LLC",FPC
+6087,7140,Georgia Power Co,SOCO
+609,6452,Florida Power & Light Co,FPL
+60930,61012,AES Distributed Energy,SOCO
+61000,55810,Augusta Canal Authority,SOCO
+61020,6452,Florida Power & Light Co,FPL
+61021,6452,Florida Power & Light Co,FPL
+61022,6452,Florida Power & Light Co,FPL
+61024,6452,Florida Power & Light Co,FPL
+61029,6452,Florida Power & Light Co,FPL
+61050,6452,Florida Power & Light Co,FPL
+61051,6452,Florida Power & Light Co,FPL
+61052,6452,Florida Power & Light Co,FPL
+61080,18445,City of Tallahassee - (FL),TAL
+61173,57389,IKEA Property Inc,FPL
+612,6452,Florida Power & Light Co,FPL
+61213,60846,"GRP Madison Renewable Energy Facility, LLC",SOCO
+6124,7140,Georgia Power Co,SOCO
+61246,60862,"ACE-Stanton, LLC",FMPP
+61247,60863,"ACE-Stanton A, LLC",FMPP
+613,6452,Florida Power & Light Co,FPL
+6130,27813,USCE-Mobile District,SOCO
+6131,27813,USCE-Mobile District,SOCO
+6132,19375,USCE-Savannah District,SEPA
+6133,27813,USCE-Mobile District,SOCO
+61385,61038,"Cube District Energy, LLC",SOCO
+61386,61038,"Cube District Energy, LLC",SOCO
+61387,61038,"Cube District Energy, LLC",SOCO
+61388,60571,"Onsite Partners, LLC",JEA
+61397,61032,"Luminace Solar Georgia 2, LLC",SOCO
+61441,62915,Madison Energy Holdings LLC,SOCO
+61459,61032,"Luminace Solar Georgia 2, LLC",SOCO
+61468,62915,Madison Energy Holdings LLC,SOCO
+6150,18642,Tennessee Valley Authority,TVA
+61554,7140,Georgia Power Co,SOCO
+61648,7140,Georgia Power Co,SOCO
+61653,18454,Tampa Electric Co,TEC
+61654,18454,Tampa Electric Co,TEC
+61655,18454,Tampa Electric Co,TEC
+61656,18454,Tampa Electric Co,TEC
+61657,18454,Tampa Electric Co,TEC
+61663,18454,Tampa Electric Co,TEC
+61664,18454,Tampa Electric Co,TEC
+61665,18454,Tampa Electric Co,TEC
+61666,18454,Tampa Electric Co,TEC
+61667,18454,Tampa Electric Co,TEC
+61694,61307,Lockheed Martin RMS,FPC
+61696,60453,Onward Energy,SOCO
+617,6452,Florida Power & Light Co,FPL
+61740,61361,Walton Solar,SOCO
+61763,6452,Florida Power & Light Co,FPL
+61766,6452,Florida Power & Light Co,FPL
+61767,6452,Florida Power & Light Co,FPL
+61768,6452,Florida Power & Light Co,FPL
+61777,57249,"NextEra Renewable Fuels, LLC",FPL
+61780,57249,"NextEra Renewable Fuels, LLC",FPL
+61785,49893,Invenergy Services LLC,SOCO
+61807,6455,"Duke Energy Florida, LLC",FPC
+61821,57389,IKEA Property Inc,JEA
+61879,62627,Cardinal Renewables,FPC
+6188,195,Alabama Power Co,SOCO
+6189,13994,Oglethorpe Power Corporation,SOCO
+619,6452,Florida Power & Light Co,FPL
+61901,61944,MN8 Energy LLC,TVA
+61924,61528,"Cumberland Land Holdings, LLC",TVA
+61982,6455,"Duke Energy Florida, LLC",FPC
+61988,61579,"FL Solar 5, LLC",FPC
+620,6452,Florida Power & Light Co,FPL
+62057,61635,"SR Hazlehurst III, LLC",SOCO
+62058,61634,"SR Terrell, LLC",SOCO
+621,6452,Florida Power & Light Co,FPL
+62165,61624,"SR Snipesville, LLC",SOCO
+62206,6452,Florida Power & Light Co,FPL
+62367,61899,"SR Arlington II MT, LLC",SOCO
+62375,61911,"Dougherty County Solar, LLC",SOCO
+62377,7140,Georgia Power Co,SOCO
+62392,7140,Georgia Power Co,SOCO
+62393,7140,Georgia Power Co,SOCO
+62394,6452,Florida Power & Light Co,FPL
+62409,7140,Georgia Power Co,SOCO
+62436,61900,"SR Arlington, LLC",SOCO
+62449,61964,Kimberly Clark - Mobile Alabama,SOCO
+62462,63647,"Muscle Shoals Solar, LLC",TVA
+62490,6452,Florida Power & Light Co,FPL
+62491,6452,Florida Power & Light Co,FPL
+62493,6452,Florida Power & Light Co,FPL
+62541,6455,"Duke Energy Florida, LLC",FPC
+62542,6455,"Duke Energy Florida, LLC",FPC
+62543,6455,"Duke Energy Florida, LLC",FPC
+6257,7140,Georgia Power Co,SOCO
+6258,7140,Georgia Power Co,SOCO
+62584,61910,"Quitman Solar, LLC",SOCO
+62631,6452,Florida Power & Light Co,FPL
+62632,6452,Florida Power & Light Co,FPL
+62633,6452,Florida Power & Light Co,FPL
+62634,6452,Florida Power & Light Co,FPL
+62645,6452,Florida Power & Light Co,FPL
+627,6455,"Duke Energy Florida, LLC",FPC
+62750,18454,Tampa Electric Co,TEC
+62778,62690,Hecate Energy Blair Road LLC,JEA
+628,6455,"Duke Energy Florida, LLC",FPC
+62878,62715,Westbound Solar LLC,SOCO
+62879,62715,Westbound Solar LLC,SOCO
+62881,62715,Westbound Solar LLC,SOCO
+62882,62715,Westbound Solar LLC,SOCO
+62883,62715,Westbound Solar LLC,SOCO
+62884,62715,Westbound Solar LLC,SOCO
+62885,62715,Westbound Solar LLC,SOCO
+62886,62715,Westbound Solar LLC,SOCO
+62887,62715,Westbound Solar LLC,SOCO
+62914,6452,Florida Power & Light Co,FPL
+62915,6452,Florida Power & Light Co,FPL
+62916,6452,Florida Power & Light Co,FPL
+62917,6452,Florida Power & Light Co,FPL
+62919,6452,Florida Power & Light Co,FPL
+62921,6452,Florida Power & Light Co,FPL
+62922,6452,Florida Power & Light Co,FPL
+62923,6452,Florida Power & Light Co,FPL
+62924,6452,Florida Power & Light Co,FPL
+62925,6452,Florida Power & Light Co,FPL
+62940,62764,C2 Starratt Solar LLC,JEA
+62960,65043,Madison Energy Investments LLC,SOCO
+63062,7140,Georgia Power Co,SOCO
+63109,6452,Florida Power & Light Co,FPL
+63110,6452,Florida Power & Light Co,FPL
+63186,62894,Imeson Solar Farm LLC,JEA
+63187,60453,Onward Energy,TAL
+63254,63055,Altamonte Mall,FPC
+63256,63056,Pembroke Lakes Mall,FPL
+63350,60453,Onward Energy,SOCO
+634,6455,"Duke Energy Florida, LLC",FPC
+63495,18454,Tampa Electric Co,TEC
+63517,6455,"Duke Energy Florida, LLC",FPC
+63518,6455,"Duke Energy Florida, LLC",FPC
+63522,67192,RWE Clean Energy,SOCO
+63535,63260,Cobb Electric Membership Corporation,SOCO
+63582,63292,Harmony Florida Solar LLC,FMPP
+63583,63290,Taylor Creek Solar LLC,FMPP
+63721,63414,"Cool Springs Solar, LLC",SOCO
+63754,6452,Florida Power & Light Co,FPL
+63765,62842,"Lightsource Renewable Energy Asset Management, LLC",SOCO
+63775,7140,Georgia Power Co,SOCO
+638,6455,"Duke Energy Florida, LLC",FPC
+63814,63473,"Odom Solar, LLC",SOCO
+63978,6455,"Duke Energy Florida, LLC",FPC
+63982,6455,"Duke Energy Florida, LLC",FPC
+63995,6455,"Duke Energy Florida, LLC",FPC
+63996,6455,"Duke Energy Florida, LLC",FPC
+63998,6455,"Duke Energy Florida, LLC",FPC
+63999,6455,"Duke Energy Florida, LLC",FPC
+64011,63665,"Bainbridge Solar, LLC",SOCO
+641,6452,Florida Power & Light Co,FPL
+64145,6455,"Duke Energy Florida, LLC",FPC
+64146,6455,"Duke Energy Florida, LLC",FPC
+64150,63769,"Lancaster Solar GA, LLC",SOCO
+64151,63770,"SR Perry, LLC",SOCO
+64191,63798,"SR Lumpkin, LLC",SOCO
+64211,63820,"SR Baxley, LLC",SOCO
+64226,60281,"Altus Power America Management, LLC",SOCO
+64275,63640,"Safari Energy, LLC",SOCO
+64276,63640,"Safari Energy, LLC",SOCO
+64277,63640,"Safari Energy, LLC",SOCO
+64278,63640,"Safari Energy, LLC",SOCO
+64279,63640,"Safari Energy, LLC",SOCO
+64280,63640,"Safari Energy, LLC",SOCO
+64281,63640,"Safari Energy, LLC",SOCO
+64282,63640,"Safari Energy, LLC",SOCO
+64283,63640,"Safari Energy, LLC",SOCO
+64284,63640,"Safari Energy, LLC",SOCO
+64285,63640,"Safari Energy, LLC",SOCO
+64286,63640,"Safari Energy, LLC",SOCO
+643,6452,Florida Power & Light Co,FPL
+64300,6452,Florida Power & Light Co,FPL
+64301,6452,Florida Power & Light Co,FPL
+64335,63957,"Quitman II Solar, LLC",SOCO
+6440,18642,Tennessee Valley Authority,TVA
+64469,58764,"Origis Energy USA, Inc",SOCO
+645,18454,Tampa Electric Co,TEC
+64533,6455,"Duke Energy Florida, LLC",FPC
+64546,6452,Florida Power & Light Co,FPL
+64565,62715,Westbound Solar LLC,SOCO
+64569,62715,Westbound Solar LLC,SOCO
+64570,62715,Westbound Solar LLC,SOCO
+64571,62715,Westbound Solar LLC,SOCO
+64582,62715,Westbound Solar LLC,SOCO
+64583,62715,Westbound Solar LLC,SOCO
+64584,62715,Westbound Solar LLC,SOCO
+64585,62715,Westbound Solar LLC,SOCO
+64586,62715,Westbound Solar LLC,SOCO
+64631,18454,Tampa Electric Co,TEC
+64641,18454,Tampa Electric Co,TEC
+64657,18454,Tampa Electric Co,TEC
+64752,6455,"Duke Energy Florida, LLC",FPC
+64757,6452,Florida Power & Light Co,FPL
+64838,64360,"SR Clay, LLC",SOCO
+64840,64361,"SR Cedar Springs, LLC",SOCO
+64841,64362,"SR DeSoto I, LLC",SOCO
+649,7140,Georgia Power Co,SOCO
+65018,7140,Georgia Power Co,SOCO
+65036,6452,Florida Power & Light Co,FPL
+65037,6452,Florida Power & Light Co,FPL
+65038,6452,Florida Power & Light Co,FPL
+65039,6452,Florida Power & Light Co,FPL
+65040,6452,Florida Power & Light Co,FPL
+65041,6452,Florida Power & Light Co,FPL
+65042,6452,Florida Power & Light Co,FPL
+65170,6455,"Duke Energy Florida, LLC",FPC
+65171,6455,"Duke Energy Florida, LLC",FPC
+65172,6455,"Duke Energy Florida, LLC",FPC
+65173,6455,"Duke Energy Florida, LLC",FPC
+65292,58764,"Origis Energy USA, Inc",FPL
+65376,64703,"SR Snipesville II, LLC",SOCO
+65420,6452,Florida Power & Light Co,FPL
+65421,6452,Florida Power & Light Co,FPL
+65422,6452,Florida Power & Light Co,FPL
+65423,6452,Florida Power & Light Co,FPL
+65424,6452,Florida Power & Light Co,FPL
+65427,6452,Florida Power & Light Co,FPL
+65428,6452,Florida Power & Light Co,FPL
+65429,6452,Florida Power & Light Co,FPL
+65430,6452,Florida Power & Light Co,FPL
+65431,6452,Florida Power & Light Co,FPL
+65432,6452,Florida Power & Light Co,FPL
+65433,6452,Florida Power & Light Co,FPL
+65438,6452,Florida Power & Light Co,FPL
+65481,63640,"Safari Energy, LLC",SOCO
+65501,6455,"Duke Energy Florida, LLC",FPC
+65519,64844,"Bell Ridge Solar, LLC",SEC
+65592,6452,Florida Power & Light Co,FPL
+65593,6452,Florida Power & Light Co,FPL
+65594,6452,Florida Power & Light Co,FPL
+65683,18454,Tampa Electric Co,TEC
+65684,18454,Tampa Electric Co,TEC
+65687,18454,Tampa Electric Co,TEC
+65727,62627,Cardinal Renewables,SOCO
+65728,62627,Cardinal Renewables,SOCO
+65729,62627,Cardinal Renewables,SOCO
+65730,62627,Cardinal Renewables,SOCO
+65759,65010,"SolAmerica Energy, LLC",SOCO
+65771,18454,Tampa Electric Co,TEC
+65772,18454,Tampa Electric Co,TEC
+6584,50079,Utility Board of Key West City (FL),FMPP
+65862,6452,Florida Power & Light Co,FPL
+65863,6452,Florida Power & Light Co,FPL
+65864,6452,Florida Power & Light Co,FPL
+65865,6452,Florida Power & Light Co,FPL
+65866,6452,Florida Power & Light Co,FPL
+65867,6452,Florida Power & Light Co,FPL
+65868,6452,Florida Power & Light Co,FPL
+65869,6452,Florida Power & Light Co,FPL
+65871,6452,Florida Power & Light Co,FPL
+65872,6452,Florida Power & Light Co,FPL
+65873,6452,Florida Power & Light Co,FPL
+65874,6452,Florida Power & Light Co,FPL
+65875,6452,Florida Power & Light Co,FPL
+65877,6452,Florida Power & Light Co,FPL
+65878,6452,Florida Power & Light Co,FPL
+65879,6452,Florida Power & Light Co,FPL
+65882,6452,Florida Power & Light Co,FPL
+65883,6452,Florida Power & Light Co,FPL
+65885,6452,Florida Power & Light Co,FPL
+65886,6452,Florida Power & Light Co,FPL
+65887,6452,Florida Power & Light Co,FPL
+65888,6452,Florida Power & Light Co,FPL
+65892,67192,RWE Clean Energy,SEPA
+65905,6452,Florida Power & Light Co,FPL
+65906,6452,Florida Power & Light Co,FPL
+65907,6452,Florida Power & Light Co,FPL
+65908,6452,Florida Power & Light Co,FPL
+65909,6452,Florida Power & Light Co,FPL
+65910,6452,Florida Power & Light Co,FPL
+65911,6452,Florida Power & Light Co,FPL
+65912,6452,Florida Power & Light Co,FPL
+65913,6452,Florida Power & Light Co,FPL
+65914,6452,Florida Power & Light Co,FPL
+65915,6452,Florida Power & Light Co,FPL
+65916,6452,Florida Power & Light Co,FPL
+65917,6452,Florida Power & Light Co,FPL
+65918,6452,Florida Power & Light Co,FPL
+65919,6452,Florida Power & Light Co,FPL
+65920,6452,Florida Power & Light Co,FPL
+65921,6452,Florida Power & Light Co,FPL
+65922,6452,Florida Power & Light Co,FPL
+65924,6452,Florida Power & Light Co,FPL
+65925,6452,Florida Power & Light Co,FPL
+65926,6452,Florida Power & Light Co,FPL
+65927,6452,Florida Power & Light Co,FPL
+65978,6452,Florida Power & Light Co,FPL
+65994,63640,"Safari Energy, LLC",SOCO
+65995,63640,"Safari Energy, LLC",SOCO
+66024,65210,"Bird Dog Solar, LLC",SOCO
+66025,65211,"Blackwater Solar, LLC",SOCO
+66026,65212,"Hobnail Solar, LLC",SOCO
+66027,65213,"Wolfskin Solar, LLC",SOCO
+66128,18454,Tampa Electric Co,TEC
+66129,18454,Tampa Electric Co,TEC
+66171,65307,"SR Snipesville III, LLC",SOCO
+66172,65306,"SR DeSoto II, LLC",SOCO
+66173,65304,"SR Ailey, LLC",SOCO
+66199,65327,"Southeastern Solar Farm Fund, LLC",SOCO
+66200,65327,"Southeastern Solar Farm Fund, LLC",SOCO
+66202,65327,"Southeastern Solar Farm Fund, LLC",JEA
+66205,65327,"Southeastern Solar Farm Fund, LLC",SOCO
+663,6909,Gainesville Regional Utilities,GVL
+66344,64994,SolRiver Capital LLC,SOCO
+66346,64994,SolRiver Capital LLC,SOCO
+66350,64994,SolRiver Capital LLC,SOCO
+66353,64994,SolRiver Capital LLC,SOCO
+66392,65356,Jax LNG,JEA
+664,6909,Gainesville Regional Utilities,GVL
+66418,61298,Pine Gate Renewables,SOCO
+665,8795,City of Homestead - (FL),HST
+66542,65589,Bulldog Solar LLC,SOCO
+66553,6455,"Duke Energy Florida, LLC",FPC
+666,9617,JEA,JEA
+66626,65645,"Wadley Solar, LLC",SOCO
+66639,6455,"Duke Energy Florida, LLC",FPC
+667,9617,JEA,JEA
+66825,65786,"SR DeSoto III, LLC",SOCO
+66920,18454,Tampa Electric Co,TEC
+66921,18454,Tampa Electric Co,TEC
+66936,62915,Madison Energy Holdings LLC,SOCO
+66980,62915,Madison Energy Holdings LLC,SOCO
+66990,65875,"Washington County Solar, LLC",SOCO
+66991,65849,ClearGen LLC,SOCO
+67021,65937,"CPV Stagecoach Solar, LLC",SOCO
+67047,65875,"Washington County Solar, LLC",SOCO
+67048,62915,Madison Energy Holdings LLC,SOCO
+67049,6455,"Duke Energy Florida, LLC",FPC
+67127,66024,"SR Toombs I, LLC",SEPA
+67182,66063,"FRP Tupelo Solar, LLC",FPL
+67203,18454,Tampa Electric Co,TEC
+67205,66088,"FRP Gadsden County Solar, LLC",FPC
+67206,66089,"FRP Columbia County Solar, LLC",FPC
+67207,66090,"FRP Gilchrist County Solar, LLC",FPC
+67208,66091,"Harmony Florida Solar II, LLC",FPC
+67209,66092,"Storey Bend Solar, LLC",FPC
+67240,65043,Madison Energy Investments LLC,SOCO
+67245,65043,Madison Energy Investments LLC,SOCO
+67246,65043,Madison Energy Investments LLC,SOCO
+673,10620,City of Lake Worth Beach - (FL),FMPP
+67488,66218,"TAI Huntsville Solar, LLC",TVA
+67491,62719,Green Street Power Partners,FPC
+67492,62719,Green Street Power Partners,FPC
+675,10623,City of Lakeland - (FL),FMPP
+676,10623,City of Lakeland - (FL),FMPP
+67672,6452,Florida Power & Light Co,FPL
+67673,6452,Florida Power & Light Co,FPL
+67692,6455,"Duke Energy Florida, LLC",FPC
+67864,7140,Georgia Power Co,SOCO
+67957,66513,"East Atmore Solar, LLC",SOCO
+68001,66543,"Old Hayneville Solar, LLC",SOCO
+68276,6452,Florida Power & Light Co,FPL
+683,14610,Orlando Utilities Comm,FMPP
+68372,66744,Bronson Solar LLC,FPC
+68472,18454,Tampa Electric Co,TEC
+68512,7140,Georgia Power Co,SOCO
+68549,66924,"Pineview Solar, LLC",SOCO
+68551,18454,Tampa Electric Co,TEC
+68595,58764,"Origis Energy USA, Inc",FPC
+68609,65330,"Westbound Solar 3, LLC",SOCO
+68610,65330,"Westbound Solar 3, LLC",TVA
+68618,65330,"Westbound Solar 3, LLC",SOCO
+68619,65330,"Westbound Solar 3, LLC",SOCO
+68621,65330,"Westbound Solar 3, LLC",SOCO
+68622,65330,"Westbound Solar 3, LLC",SOCO
+68626,65330,"Westbound Solar 3, LLC",SOCO
+68627,65330,"Westbound Solar 3, LLC",SOCO
+68669,58764,"Origis Energy USA, Inc",SOCO
+68670,58764,"Origis Energy USA, Inc",SOCO
+688,18445,City of Tallahassee - (FL),TAL
+68817,6452,Florida Power & Light Co,FPL
+68818,6452,Florida Power & Light Co,FPL
+68819,6452,Florida Power & Light Co,FPL
+68820,6452,Florida Power & Light Co,FPL
+68821,6452,Florida Power & Light Co,FPL
+68822,6452,Florida Power & Light Co,FPL
+68823,6452,Florida Power & Light Co,FPL
+689,18445,City of Tallahassee - (FL),TAL
+690,27813,USCE-Mobile District,FPL
+69000,65164,CleanCapital Holdings,GVL
+69001,65164,CleanCapital Holdings,GVL
+69165,18454,Tampa Electric Co,TEC
+69187,18454,Tampa Electric Co,TEC
+69250,6455,"Duke Energy Florida, LLC",FPC
+69354,6455,"Duke Energy Florida, LLC",FPC
+69355,6455,"Duke Energy Florida, LLC",FPC
+69436,65869,Prologis Logistics Services Incorporated,SOCO
+69627,6455,"Duke Energy Florida, LLC",FPC
+69688,63260,Cobb Electric Membership Corporation,SOCO
+69745,59135,Inst and Envir Div Marine Logistics Base,SOCO
+70179,60281,"Altus Power America Management, LLC",FMPP
+70180,60281,"Altus Power America Management, LLC",FPL
+702,7140,Georgia Power Co,SOCO
+703,7140,Georgia Power Co,SOCO
+704,7140,Georgia Power Co,SOCO
+706,7140,Georgia Power Co,SOCO
+7063,189,PowerSouth Energy Cooperative,SOCO
+707,7140,Georgia Power Co,SOCO
+710,7140,Georgia Power Co,SOCO
+712,7140,Georgia Power Co,SOCO
+715,7140,Georgia Power Co,SOCO
+717,7140,Georgia Power Co,SOCO
+718,7140,Georgia Power Co,SOCO
+719,7140,Georgia Power Co,SOCO
+7191,56477,Tallassee Shoals LLC,SOCO
+720,7140,Georgia Power Co,SOCO
+722,7140,Georgia Power Co,SOCO
+723,7140,Georgia Power Co,SOCO
+7238,10376,Kissimmee Utility Authority,FMPP
+724,7140,Georgia Power Co,SOCO
+7242,18454,Tampa Electric Co,TEC
+725,7140,Georgia Power Co,SOCO
+728,7140,Georgia Power Co,SOCO
+729,7140,Georgia Power Co,SOCO
+7302,6455,"Duke Energy Florida, LLC",FPC
+7345,6455,"Duke Energy Florida, LLC",FPC
+7348,7140,Georgia Power Co,SOCO
+736,17539,"Dominion Energy South Carolina, Inc",SCEG
+7380,21554,Seminole Electric Cooperative Inc,SEC
+752,4538,Crisp County Power Comm,SOCO
+753,4538,Crisp County Power Comm,SOCO
+754,19375,USCE-Savannah District,SEPA
+757,18642,Tennessee Valley Authority,TVA
+758,18642,Tennessee Valley Authority,TVA
+759,27813,USCE-Mobile District,SOCO
+760,27813,USCE-Mobile District,SOCO
+761,27813,USCE-Mobile District,SOCO
+7697,195,Alabama Power Co,SOCO
+7698,195,Alabama Power Co,SOCO
+7699,6455,"Duke Energy Florida, LLC",FPC
+7709,17650,Southern Power Co,SOCO
+7710,17650,Southern Power Co,SOCO
+7715,6452,Florida Power & Light Co,FPL
+7721,195,Alabama Power Co,SOCO
+7764,59960,"MPC Generating, LLC",SOCO
+7768,17690,SOWEGA Power LLC,SOCO
+7813,13994,Oglethorpe Power Corporation,SOCO
+7829,13994,Oglethorpe Power Corporation,SOCO
+7846,9617,JEA,JEA
+7873,18454,Tampa Electric Co,TEC
+7897,17650,Southern Power Co,SOCO
+7916,13994,Oglethorpe Power Corporation,SOCO
+7917,13994,Oglethorpe Power Corporation,SOCO
+7924,241,Albertville Municipal Utilities Board (AL),TVA
+7946,13100,Municipal Electric Authority - (GA),SOCO
+7954,56152,New Smyrna Beach Utilities Commission,FPL
+7997,10623,City of Lakeland - (FL),FMPP
+8048,6455,"Duke Energy Florida, LLC",FPC
+8049,6455,"Duke Energy Florida, LLC",FPC

@@ -59,10 +59,66 @@ Open the Command Palette (Ctrl+Shift+P), choose **Python: Select Interpreter**, 
 |---|---|---|
 | [frontend/](frontend/) | React (Vite) app: map, hazard index, crew reports, supervisor ranking | `cd frontend; npm install; npm run dev` |
 | [backend/](backend/) | Python FastAPI API and live-data worker (see [Backend](#backend-fastapi--live-data-worker)) | `python -m uvicorn backend.app:app --reload` and `python -m backend.worker` |
-| [hardzardModel.py](hardzardModel.py) | XGBoost Hazard Index model: trains on `data/plant_weather_summary.csv` and `data/plant_stations.csv`, writes `data/hazard_scores.csv` | `python hardzardModel.py` |
-| [scraper/](scraper/) | Data collection scripts (power plants, weather, OSHA, CDC) | see the sections below |
+| [ml/](ml/) | **Hazard Index model** (site-day XGBoost, scores today and tomorrow into the DB), **answer key**, **economic impact** | see [Hazard Index model](#hazard-index-model) |
+| [hardzardModel.py](hardzardModel.py) | First model (v0): one static score per plant, written to `data/hazard_scores.csv`. Replaced by `ml/hazard_model.py`; kept for reference. | `python hardzardModel.py` |
+| [scraper/](scraper/) | Data collection scripts (power plants, weather, OSHA, CDC, EIA sales and demand) | see the sections below |
 | [db/](db/) | Tiger Data (TimescaleDB) schema and loaders | `python db/setup_db.py`, `python db/load_history.py` |
-| [main.cpp](main.cpp) | Earlier C++ (Crow) server prototype; the backend has moved to Python | see `setup.txt` |
+| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Brief → feature checklist with status, demo steps and checks | (none) |
+
+## Hazard Index model
+
+[ml/hazard_model.py](ml/hazard_model.py). One row per site per day, 1.27M site-days from October 2021 to October 2026, with one XGBoost classifier per hazard category.
+
+| | |
+|---|---|
+| **Label** | Did a recorded hazard happen near the site that day? A NOAA storm event, or an OSHA heat/cold/lightning injury, within the category's radius (the `site_hazard_events` ties). |
+| **Features** | Only what a forecast can also give us: high and low temperature, heat index, rain that day, rain over the previous 6 days, wind gusts, season, location. The same model therefore scores tomorrow from the NWS forecast. |
+| **Score** | **Hazard Index = 10 × P(at least one hazard)**. So 7/10 means about a 70% chance, and the answer key checks the probabilities are calibrated. Each category also gets a score and its top weather drivers. |
+| **Economic link** | Each score carries the expected crew-hours lost and their cost: probability × hours lost per category × crew size × cost, using the labeled `economic_assumptions`. |
+| **Split** | Trained on 2021–2024, tested on 2025–2026. Never a random split, because one storm hits many sites on the same day. |
+
+```powershell
+python -m ml.hazard_model train    # about 6 min; writes ml/models/*.json and metrics.json
+python -m ml.hazard_model score    # writes today's and tomorrow's scores to hazard_scores (the worker does this hourly)
+python -m ml.answer_key            # known-answer checks; exit code 1 if any fail
+```
+
+**Answer key** ([ml/answer_key.py](ml/answer_key.py)). The brief has no sample data with known results, so this is ours. Run it after every change:
+- Four hurricane landfall days (Ian, Idalia, Helene, Milton) must rank in the top 2% of days for sites in the landfall counties. These are in the training years, so they're labeled *in-sample*.
+- Out-of-sample test AUC must be at least 0.75 for the common categories.
+- Predicted probabilities must match observed rates (calibration).
+- Calm winter days must score low.
+- Location must account for at most half of what the model uses.
+- No site in today's top 10 may have unresolved coordinates.
+
+## Economic impact
+
+[scraper/economics.py](scraper/economics.py) collects the data and [ml/economic_impact.py](ml/economic_impact.py) runs the analysis:
+
+```powershell
+python scraper/economics.py        # EIA: plant → company and grid operator, monthly sales, daily demand
+python -m ml.economic_impact       # load into Tiger, weekly impact + correlations
+```
+
+| Question | Data | Notes |
+|---|---|---|
+| Does weather move the company's sales? | **EIA-861M** monthly retail revenue and MWh per utility (FPL, Georgia Power, Alabama Power, Duke Energy Florida…) | Utilities don't publish weekly sales |
+| …week by week? | **EIA-930** daily demand per grid operator (Southern Co, FPL, Duke Florida, Tampa Electric: 614 of the 694 sites) | Demand served is the closest public weekly measure of sales volume |
+| How much crew time does weather cost? | Stop-work weather days per site × hours lost per category × crew size × hourly cost | **Every factor is a labeled assumption** in `economic_assumptions`. Replace them with company numbers. |
+| Crew trips by power maintainers | `crew_trips` table, loaded from `data/crew_trips.csv` (`trip_id, site_id, started_at, ended_at, crew_size, purpose, cost_usd`) | **No public source exists.** Until a utility's trip logs are loaded, lost crew time is the proxy. Once loaded, weekly trips are correlated with weather automatically. |
+
+Correlations are reported raw and **deseasonalized**, meaning each series minus its same-month average. Summer heat and summer demand rise together anyway, so the useful question is whether an unusually hot or stormy week also had unusual demand. Results (`GET /economics/correlations`):
+- **Unusually hot weeks raise demand at all four grid operators:** r = 0.33–0.38, p < 10⁻⁶, about 250 weeks each.
+- **Tampa Electric's unusually stormy weeks have lower demand:** r = −0.28, p = 7×10⁻⁶, consistent with outages.
+- **Monthly sales at FPL, Georgia Power and Alabama Power** rise in hotter-than-normal months (r ≈ 0.29–0.31).
+
+These are correlations with small samples for the monthly series (n = 58), not proof of cause.
+
+## AI safety report (on tap)
+
+`POST /sites/{id}/report` ([backend/reports.py](backend/reports.py)). Code gathers every fact and **decides go / caution / no-go**; Gemini only explains it. Each fact group has a source ID (`S1`–`S7`) that the report must cite, and the assumptions it relies on are listed. A **number audit** flags any number in Gemini's text that isn't in the facts (`verified: false`, with `unverified_numbers`). Gemini gets two retries per model, then the fallback model is tried, then a deterministic template report is used. Reports are cached for 30 minutes.
+
+Set `GEMINI_API_KEY`, and `GEMINI_MODEL` / `GEMINI_FALLBACK_MODEL`; check Google's current model names. Without a key, the template report is returned.
 
 ## Power plant scraper
 
@@ -410,6 +466,7 @@ python -m backend.test_backend         # parsing and threshold checks (no networ
 | `WILDLIFE_TAXA` | species to watch on iNaturalist, separated by `;` | alligator; cottonmouth; eastern diamondback |
 | `PLANIT_DEV` | `1` turns on the `/dev` demo endpoints. **Never on a public URL.** | off |
 | `CORS_ORIGINS` | the frontend origins allowed to call the API | `*` |
+| `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL` | the on-tap AI report | not set, so the template report is used |
 
 ### Worker schedule
 
@@ -425,6 +482,8 @@ python -m backend.test_backend         # parsing and threshold checks (no networ
 | `forecasts` | hourly (at :05) | NWS hourly forecast for the next 48 h → `weather_forecasts`: temperature, heat index, wind chill, gusts, rain, chance of rain and thunder, visibility |
 | `briefings` | every 15 min | Tomorrow's briefing for each site where it's 6:00–6:15 PM local time → `daily_briefings` |
 | `points` | daily | NWS grid and zones for any new site |
+| `scores` | hourly (at :20) | Hazard model scores for today and tomorrow → `hazard_scores` (needs a trained model: `python -m ml.hazard_model train`) |
+| `daily_weather` | daily (11:30 UTC) | Last 7 days of IEM station summaries → `weather_daily`, so the model's inputs stay current |
 
 Every threshold, radius and NWS alert name is stored as data in `hazard_categories`. That includes which NWS alerts mean a warning and which mean stop work (`nws_warn_events`, `nws_stop_events`).
 
@@ -445,6 +504,9 @@ Run any job once with `python -m backend.worker <job> [<job> ...]`.
 | `POST /uploads` | multipart `file` (JPEG, PNG, WebP or HEIC, up to 10 MB) → `{url}`. Photos are saved in `uploads/` on the API server. |
 | `POST /crew-reports` | `{category, lat, lon, description, photo_url, reported_by, severity, site_id?}`. The nearest site within 10 mi is filled in when `site_id` is omitted. **The site gets a warning alert immediately**, open for 12 h, with the photo. |
 | `GET /crew-reports?site_id=&category=&status=open` | crew hazard reports |
+| `POST /sites/{id}/report?refresh=false` | **On-tap AI safety report** (see [AI safety report](#ai-safety-report-on-tap)) |
+| `GET /sites/{id}/economics?weeks=26` | the site's company and grid operator, weekly weather impact and demand, correlations, assumptions |
+| `GET /economics/correlations?significant_only=true` | weather vs demand and sales correlations for every company |
 
 ### Demo
 
@@ -465,7 +527,7 @@ Start the API with `$env:PLANIT_DEV = "1"` to turn on:
 
 ### Notes
 
-- `hazard_scores` stays empty until the ML model writes to it. Until then, the dashboard ranks sites by active alerts, then capacity.
+- The dashboard ranks by `hazard_scores` (written hourly by the `scores` job). On calm days most scores are near 0, so active alerts decide the order.
 - GLM locates lightning to roughly 8 km (about 5 mi). That's coarse for a 10-mile rule, but it's the best free real-time source.
 - Two stations (`AMG`, `NFJ`) don't publish current NWS observations, so about 20 sites have forecasts and alerts but no live readings.
 - An NWS warning that's cancelled early keeps its site alert until the original expiry time.

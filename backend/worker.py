@@ -13,7 +13,8 @@ import time
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from backend import briefings, fires, lightning, notify, nws, observations, rivers, wildlife
+from backend import briefings, daily_weather, fires, lightning, notify, nws, observations, rivers, wildlife
+from ml import hazard_model
 from backend.db import connection, pool
 
 JOBS = {
@@ -27,6 +28,8 @@ JOBS = {
     "fires": fires.sync,
     "briefings": briefings.run_due,
     "notify": notify.sync,
+    "scores": hazard_model.score,
+    "daily_weather": daily_weather.sync,
 }
 
 
@@ -56,6 +59,8 @@ def main():
     s.add_job(run, "interval", minutes=15, args=["fires"], next_run_time=now)
     s.add_job(run, "interval", minutes=30, args=["wildlife"], next_run_time=now)
     s.add_job(run, "cron", minute=5, args=["forecasts"], next_run_time=now + dt.timedelta(minutes=1))
+    s.add_job(run, "cron", hour=11, minute=30, args=["daily_weather"])  # ~7:30 AM Eastern, yesterday is final
+    s.add_job(run, "cron", minute=20, args=["scores"], next_run_time=now + dt.timedelta(minutes=2))  # after forecasts
     s.add_job(run, "cron", minute="*/15", args=["briefings"])
     s.add_job(run, "interval", minutes=1, args=["notify"], next_run_time=now + dt.timedelta(seconds=30))
     print("Worker running. Ctrl+C to stop.", flush=True)

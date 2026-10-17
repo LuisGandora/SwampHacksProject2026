@@ -67,6 +67,11 @@ INSERT INTO hazard_categories VALUES
 ('slip_trip', 'Spills / trash in walkways', 'crew', NULL, NULL, NULL, NULL, NULL, NULL, 50, NULL, NULL, false, '{}', 'OSHA reports + crew reports.'),
 ('osha_inspection', 'OSHA violation / inspection', 'crew', NULL, NULL, NULL, NULL, NULL, NULL, 50, NULL, NULL, false, '{}', 'OSHA opened an inspection.')
 ON CONFLICT (category) DO NOTHING;  -- keep the team's edits on re-run
+-- high_wind watches sustained wind (the aerial-lift limit is a sustained-wind limit). Daily peak gusts of 28 mph
+-- happen on ~26% of station-days, so gusts made a quarter of all days look like stop-work days.
+UPDATE hazard_categories SET metric = 'wind_mph',
+       notes = 'Sustained wind. 28 mph is the ANSI A92 aerial-lift limit; cranes follow the manufacturer chart.'
+ WHERE category = 'high_wind' AND metric = 'wind_gust_mph' AND warn_value = 20 AND stop_value = 28;
 UPDATE hazard_categories SET lower_is_worse = true
  WHERE category IN ('extreme_cold', 'dense_fog') AND NOT lower_is_worse;
 
@@ -305,6 +310,7 @@ CREATE TABLE IF NOT EXISTS weather_forecasts (           -- next-day forecast fo
 SELECT create_hypertable('weather_forecasts', by_range('valid_at', INTERVAL '7 days'), if_not_exists => true);
 ALTER TABLE weather_forecasts ADD COLUMN IF NOT EXISTS wind_chill_f  numeric;
 ALTER TABLE weather_forecasts ADD COLUMN IF NOT EXISTS visibility_mi numeric;
+ALTER TABLE weather_forecasts ADD COLUMN IF NOT EXISTS wind_mph      numeric;  -- sustained
 SELECT add_retention_policy('weather_forecasts', INTERVAL '30 days', if_not_exists => true);
 
 CREATE TABLE IF NOT EXISTS nws_alerts (
@@ -479,6 +485,19 @@ CREATE TABLE IF NOT EXISTS daily_briefings (
 );
 ALTER TABLE daily_briefings ADD COLUMN IF NOT EXISTS notified_at timestamptz;
 
+CREATE TABLE IF NOT EXISTS site_reports (                -- on-tap AI report (backend/reports.py), cached 30 min
+    report_id           bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    site_id             bigint NOT NULL REFERENCES sites,
+    created_at          timestamptz NOT NULL DEFAULT now(),
+    generator           text NOT NULL,                   -- gemini:<model> or template
+    facts               jsonb NOT NULL,                  -- exactly what the model was given, with source ids
+    report              jsonb NOT NULL,
+    verified            boolean NOT NULL,                -- false when the model wrote numbers not in the facts
+    unverified_numbers  text[],
+    errors              text[]                           -- Gemini failures before falling back
+);
+CREATE INDEX IF NOT EXISTS site_reports_site_idx ON site_reports (site_id, created_at DESC);
+
 -- ===========================================================================================================
 -- Site <-> hazard ties: every historical event within its category's history_radius_mi of a site.
 -- Rebuilt by refresh_site_hazard_events(), so changing a radius and calling it re-ties every site.
@@ -539,6 +558,96 @@ ALTER TABLE site_hazard_events SET (timescaledb.enable_columnstore = true,
 CALL add_columnstore_policy('site_hazard_events', after => INTERVAL '30 days', if_not_exists => true);
 
 -- ===========================================================================================================
+-- Economic impact: which company runs each site, its sales and demand, crew trips, and lost crew time.
+-- Dollar figures depend on economic_assumptions, every one labeled as an assumption until replaced with
+-- company data. Correlations are computed in ml/economic_impact.py (never by an LLM).
+-- ===========================================================================================================
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS utility_id          bigint;  -- EIA utility (operator) ID
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS utility_name        text;
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS balancing_authority text;    -- grid operator, e.g. FPL, SOCO
+
+CREATE TABLE IF NOT EXISTS utility_monthly_sales (       -- EIA-861M retail sales, all sectors
+    utility_id              bigint NOT NULL,
+    utility_name            text,
+    state                   char(2) NOT NULL,
+    month                   date NOT NULL,
+    revenue_thousand_usd    numeric,
+    sales_mwh               numeric,
+    customers               bigint,
+    PRIMARY KEY (utility_id, state, month)
+);
+
+CREATE TABLE IF NOT EXISTS ba_daily_demand (             -- EIA-930 daily demand per grid operator
+    balancing_authority     text NOT NULL,
+    day                     date NOT NULL,
+    demand_mwh              numeric,
+    PRIMARY KEY (balancing_authority, day)
+);
+
+CREATE TABLE IF NOT EXISTS crew_trips (                  -- real trip logs from a utility (no public source exists)
+    trip_id         text PRIMARY KEY,
+    site_id         bigint REFERENCES sites,
+    started_at      timestamptz NOT NULL,
+    ended_at        timestamptz,
+    crew_size       int,
+    purpose         text,                                -- e.g. maintenance, storm restoration
+    cost_usd        numeric,
+    geog            geography(Point, 4326),
+    source          text NOT NULL DEFAULT 'company'
+);
+CREATE INDEX IF NOT EXISTS crew_trips_site_idx ON crew_trips (site_id, started_at);
+
+CREATE TABLE IF NOT EXISTS economic_assumptions (
+    key     text PRIMARY KEY,
+    value   numeric NOT NULL,
+    unit    text,
+    note    text
+);
+INSERT INTO economic_assumptions VALUES
+    ('crew_size', 4, 'people', 'ASSUMPTION: typical field crew; replace with company data'),
+    ('shift_hours', 10, 'hours', 'ASSUMPTION: one shift; caps lost hours per site-day'),
+    ('loaded_cost_per_hour', 85, 'USD per person-hour', 'ASSUMPTION: wage plus overhead; replace with company data'),
+    ('hours_lost_lightning', 2, 'hours per stop-work day', 'ASSUMPTION: 30-min all-clears that keep restarting'),
+    ('hours_lost_severe_storm', 3, 'hours per stop-work day', 'ASSUMPTION'),
+    ('hours_lost_tropical', 10, 'hours per stop-work day', 'ASSUMPTION: full shift'),
+    ('hours_lost_flooding', 6, 'hours per stop-work day', 'ASSUMPTION'),
+    ('hours_lost_extreme_heat', 3, 'hours per stop-work day', 'ASSUMPTION: afternoon work moved or stopped'),
+    ('hours_lost_extreme_cold', 2, 'hours per stop-work day', 'ASSUMPTION'),
+    ('hours_lost_high_wind', 2, 'hours per stop-work day', 'ASSUMPTION: aerial and crane work paused'),
+    ('hours_lost_soil_saturation', 4, 'hours per stop-work day', 'ASSUMPTION: equipment stuck, access delays'),
+    ('hours_lost_wildfire', 10, 'hours per stop-work day', 'ASSUMPTION'),
+    ('hours_lost_dense_fog', 2, 'hours per stop-work day', 'ASSUMPTION')
+ON CONFLICT (key) DO NOTHING;  -- keep the team's edits
+
+CREATE TABLE IF NOT EXISTS economic_weekly (             -- per grid operator per week (Monday start)
+    balancing_authority     text NOT NULL,
+    week                    date NOT NULL,
+    sites                   int,
+    demand_mwh              numeric,                     -- EIA-930, full weeks only
+    stop_work_site_days     int,                         -- weather days over a stop threshold, summed over sites
+    warning_site_days       int,
+    storm_events            int,                         -- NOAA events tied to the operator's sites
+    crew_hours_lost         numeric,                     -- stop-work site-days x hours_lost_<category> x crew_size
+    est_cost_usd            numeric,                     -- crew_hours_lost x loaded_cost_per_hour (assumption)
+    crew_trips              int,                         -- from crew_trips, when real trip logs are loaded
+    PRIMARY KEY (balancing_authority, week)
+);
+
+CREATE TABLE IF NOT EXISTS economic_correlations (
+    scope           text NOT NULL,                       -- weekly_ba / monthly_utility
+    entity          text NOT NULL,                       -- grid operator code or utility name
+    metric_x        text NOT NULL,                       -- weather / crew metric
+    metric_y        text NOT NULL,                       -- demand or sales metric
+    deseasonalized  boolean NOT NULL,                    -- true: both series minus their same-month average
+    r               numeric,                             -- Pearson correlation
+    p_value         numeric,
+    spearman        numeric,
+    n               int,
+    computed_at     timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (scope, entity, metric_x, metric_y, deseasonalized)
+);
+
+-- ===========================================================================================================
 -- Compression and retention (columnstore) for the high-volume live feeds
 -- ===========================================================================================================
 ALTER TABLE lightning_strikes SET (timescaledb.enable_columnstore = true, timescaledb.orderby = 'observed_at DESC');
@@ -571,7 +680,7 @@ WITH d AS (
     SELECT station_id, day, 'extreme_heat'::text AS category, max_heat_index_f AS value FROM d
     UNION ALL SELECT station_id, day, 'extreme_cold', min_temp_f FROM d
     UNION ALL SELECT station_id, day, 'flooding', precip_in FROM d
-    UNION ALL SELECT station_id, day, 'high_wind', round(max_gust_kt * 1.15078, 1) FROM d    -- knots -> mph
+    UNION ALL SELECT station_id, day, 'high_wind', round(max_wind_kt * 1.15078, 1) FROM d    -- sustained, knots -> mph
     UNION ALL SELECT station_id, day, 'soil_saturation', rain_7d_in FROM d
 )
 SELECT s.site_id, v.category, v.day, v.value, c.unit,

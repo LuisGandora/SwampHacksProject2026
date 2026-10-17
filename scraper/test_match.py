@@ -44,3 +44,14 @@ assert case(EventTitle="Fall on same level due to tripping over an object") == {
 assert case(Inspection="1018519", Loss_of_Eye="1.00") == {("osha_inspection", "inspection_opened"), ("ppe", "injury_type")}
 assert case(EventTitle="Exposure to environmental heat") == set()
 print("categorize ok")
+
+from scrape_power_plants import resolve_coordinates, same_name
+
+assert same_name("Kayak", "Kayak Solar") and not same_name("FL Solar 4, LLC", "Solar Farm")
+far = lambda **kw: {"coord_check": "review", "osm_distance_km": "40", "osm_id": "way/1", "osm_name": "",
+                    "name": "X", "lat": 1, "lon": 1, "_osm": (2, 2), "county_matches_eia": True, **kw}
+traced, wrong_county, unnamed = far(name="Kayak", osm_name="Kayak Solar"), far(county_matches_eia=False), far()
+moved = resolve_coordinates([traced, wrong_county, unnamed, far(osm_distance_km="3")])
+assert moved == [traced, wrong_county] and traced["lat"] == 2 and traced["coord_check"] == "corrected"
+assert unnamed["coord_check"] == "unresolved" and unnamed["lat"] == 1
+print("resolve ok")

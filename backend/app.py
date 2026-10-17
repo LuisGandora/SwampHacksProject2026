@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from backend import briefings, lightning, scenario
+from backend import briefings, lightning, reports, scenario
 from backend.db import connection
 
 app = FastAPI(title="PlanIT Control API")
@@ -123,6 +123,38 @@ def briefing(site_id: int, date: dt.date | None = None):
     """The 6 PM next-day briefing (latest one if no date)."""
     return one("SELECT * FROM daily_briefings WHERE site_id = %s AND (%s::date IS NULL OR briefing_date = %s) "
                "ORDER BY briefing_date DESC LIMIT 1", (site_id, date, date))
+
+
+@app.post("/sites/{site_id}/report")
+def site_report(site_id: int, refresh: bool = False):
+    """On-tap safety report for one site: facts computed in code, explained by Gemini (or a template fallback).
+    Cached for 30 minutes unless refresh=true. Check `verified`: false means the model wrote a number that isn't
+    in the facts (listed in unverified_numbers)."""
+    with connection() as conn:
+        r = reports.generate(conn, site_id, refresh)
+    if r is None:
+        raise HTTPException(404, "Not found")
+    return r
+
+
+@app.get("/sites/{site_id}/economics")
+def site_economics(site_id: int, weeks: int = Query(26, le=520)):
+    """The site's company and grid operator, weekly weather impact and demand, and significant correlations."""
+    s = one("SELECT site_id, name, utility_id, utility_name, balancing_authority FROM sites WHERE site_id = %s",
+            (site_id,))
+    return {**s,
+            "weekly": many("SELECT * FROM economic_weekly WHERE balancing_authority = %s ORDER BY week DESC LIMIT %s",
+                           (s["balancing_authority"], weeks)),
+            "correlations": many("SELECT * FROM economic_correlations WHERE entity IN (%s, %s) AND deseasonalized "
+                                 "ORDER BY p_value", (s["balancing_authority"], s["utility_name"])),
+            "assumptions": many("SELECT * FROM economic_assumptions ORDER BY key")}
+
+
+@app.get("/economics/correlations")
+def economic_correlations(significant_only: bool = True):
+    """Weather vs demand/sales correlations for every company (deseasonalized and raw)."""
+    return many("SELECT * FROM economic_correlations WHERE NOT %s OR p_value < 0.05 ORDER BY deseasonalized DESC, "
+                "abs(r) DESC", (significant_only,))
 
 
 @app.post("/uploads", status_code=201)

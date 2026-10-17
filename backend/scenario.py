@@ -19,6 +19,7 @@ def forecast_hour(local_hour):
     return {"temp_f": temp, "heat_index_f": temp + (18 if 11 <= local_hour <= 18 else 6),
             "thunder_chance": 70 if storms else 10, "precip_chance": 70 if storms else 10,
             "precip_in": 0.4 if 15 <= local_hour <= 17 else 0, "wind_gust_mph": 35 if local_hour == 16 else 12,
+            "wind_mph": 22 if local_hour == 16 else 8,
             "short_forecast": "demo: chance thunderstorms" if storms else "demo: mostly sunny"}
 
 
@@ -66,11 +67,12 @@ def start(conn, site_id):
         h = hour0 + dt.timedelta(hours=i)
         f = forecast_hour(h.astimezone(tz).hour)
         rows.append((site_id, now, h, f["temp_f"], f["heat_index_f"], f["precip_chance"], f["precip_in"],
-                     f["wind_gust_mph"], f["thunder_chance"], 10, f["short_forecast"]))
+                     f["wind_gust_mph"], f["thunder_chance"], 10, f["short_forecast"], f["wind_mph"]))
     conn.execute("DELETE FROM weather_forecasts WHERE site_id = %s AND valid_at >= %s", (site_id, hour0))
     conn.cursor().executemany(
         "INSERT INTO weather_forecasts (site_id, issued_at, valid_at, temp_f, heat_index_f, precip_chance, precip_in, "
-        "wind_gust_mph, thunder_chance, visibility_mi, short_forecast) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        "wind_gust_mph, thunder_chance, visibility_mi, short_forecast, wind_mph) "
+        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         rows)
 
     # 6. The 6 PM briefing for tomorrow, written now

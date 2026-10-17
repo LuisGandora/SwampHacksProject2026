@@ -24,7 +24,7 @@ SELECT s.site_id, (now() AT TIME ZONE s.timezone)::date + 1 AS day
 
 FORECAST = """
 SELECT max(heat_index_f) AS extreme_heat, min(coalesce(wind_chill_f, temp_f)) AS extreme_cold,
-       sum(precip_in) AS flooding, max(wind_gust_mph) AS high_wind, min(visibility_mi) AS dense_fog,
+       sum(precip_in) AS flooding, max(wind_mph) AS high_wind, max(wind_gust_mph) AS max_gust_mph, min(visibility_mi) AS dense_fog,
        max(thunder_chance) AS thunder_chance, max(precip_chance) AS precip_chance,
        max(temp_f) AS high_f, min(temp_f) AS low_f, count(*) AS hours,
        (array_agg(short_forecast ORDER BY valid_at) FILTER (WHERE extract(hour FROM valid_at AT TIME ZONE s.timezone) = 14))[1]

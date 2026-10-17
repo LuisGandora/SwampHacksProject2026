@@ -1,3 +1,0 @@
-Install VCPKG, install crow thru powershell (add commands), add command to file -> setting -> builds (add command)
-Add cmake files, rebuild
-run
