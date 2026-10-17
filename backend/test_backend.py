@@ -138,3 +138,13 @@ assert cdc_safe({"cdc_county_weather_deaths": 7})["cdc_county_weather_deaths"] i
 assert cdc_safe({"cdc_county_weather_deaths": 7})["cdc_county_suppressed"] is True
 assert cdc_safe({"cdc_county_weather_deaths": 12})["cdc_county_weather_deaths"] == 12 and cdc_safe(None) is None
 print("cdc suppression ok")
+
+# weather scanner: hours are grouped by the site's local day; rain adds up; measured and forecast both counted today
+from backend.app import daily as _daily
+_utc = lambda h: _dt.datetime(2026, 10, 18, h, tzinfo=_dt.timezone.utc)
+_row = lambda h, t, rain, gust: {"valid_at": _utc(h), "temp_f": t, "temp_min_f": t, "heat_index_f": None,
+                                 "precip_in": rain, "wind_gust_mph": gust}
+_d = _daily([_row(3, 70, 0.1, 10), _row(14, 88, 0.2, 25)], [{**_row(20, 84, 0.3, 30), "thunder_chance": 60}], "America/New_York")
+assert [x["day"].isoformat() for x in _d] == ["2026-10-17", "2026-10-18"], _d   # 03 UTC is still the 17th in Florida
+assert (_d[1]["high_f"], _d[1]["rain_in"], _d[1]["max_gust_mph"], _d[1]["source"]) == (88, 0.5, 30, "forecast + measured"), _d
+print("weather scanner daily ok")

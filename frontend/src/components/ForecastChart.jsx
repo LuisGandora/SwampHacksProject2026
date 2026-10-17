@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 // names it. A table view is one click away.
 const W = 340, ROW = 52, PAD_L = 36, PAD_R = 8, PAD_T = 14, BLUE = "#3987e5";
 
-export default function ForecastChart({ rows, timezone }) {
+export default function ForecastChart({ rows, timezone, title = "Next 48 hours (NWS)", nowIndex = null }) {
   const [hover, setHover] = useState(null);
   const [table, setTable] = useState(false);
   const svg = useRef(null);
@@ -26,13 +26,14 @@ export default function ForecastChart({ rows, timezone }) {
     setHover(Math.max(0, Math.min(n - 1, Math.round(((px - PAD_L) / (W - PAD_L - PAD_R)) * (n - 1)))));
   };
   const height = PAD_T + series.length * ROW + 16;
-  const dayTicks = rows.map((r, i) => [r, i]).filter(([r]) =>
-    new Date(r.valid_at).toLocaleString("en-US", { timeZone: timezone, hour: "numeric", hour12: false }) === "0");
+  const midnights = rows.map((r, i) => [r, i]).filter(([r]) =>
+    Number(new Date(r.valid_at).toLocaleString("en-US", { timeZone: timezone, hour: "numeric", hourCycle: "h23" })) === 0);
+  const dayTicks = midnights.filter((_, k) => midnights.length <= 8 || k % 2 === 0);  // two-week view: every other day
 
   return (
     <div className="forecast">
       <div className="forecast-head">
-        <h4>Next 48 hours (NWS)</h4>
+        <h4>{title}</h4>
         <button className="link" onClick={() => setTable((t) => !t)}>{table ? "Chart" : "Table"}</button>
       </div>
       {table ? (
@@ -79,6 +80,13 @@ export default function ForecastChart({ rows, timezone }) {
                 {new Date(r.valid_at).toLocaleString("en-US", { timeZone: timezone, weekday: "short" })}
               </text>
             ))}
+            {nowIndex != null && nowIndex > 0 && (
+              <g>
+                <line x1={x(nowIndex)} x2={x(nowIndex)} y1={PAD_T - 8} y2={height - 14} className="now-line" />
+                <text x={x(nowIndex) - 6} y={PAD_T - 6} className="tick" textAnchor="end">measured</text>
+                <text x={x(nowIndex) + 6} y={PAD_T - 6} className="tick">forecast</text>
+              </g>
+            )}
             {hover != null && <line x1={x(hover)} x2={x(hover)} y1={PAD_T - 8} y2={height - 14} className="crosshair" />}
           </svg>
           {hover != null && (

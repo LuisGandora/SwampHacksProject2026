@@ -10,6 +10,8 @@ import json
 
 from psycopg.types.json import Jsonb
 
+from backend import nws, observations
+
 BRIEFING_TIME = dt.time(18, 0)
 WINDOW = dt.timedelta(minutes=15)  # the worker runs every 15 min, so each site is caught once
 LIGHTNING_LIKELY_PCT = 50          # chance of thunder at which tomorrow gets a lightning flag
@@ -112,6 +114,10 @@ def run_due(conn):
     """Briefings for every site where it's between 6:00 and 6:15 PM local and tomorrow's isn't written yet."""
     end = (dt.datetime.combine(dt.date.today(), BRIEFING_TIME) + WINDOW).time()
     due = conn.execute(DUE, {"start": BRIEFING_TIME, "end": end}).fetchall()
+    if due:  # the weather scanner's 6 PM update: fresh forecast and readings for exactly these sites
+        ids = [d["site_id"] for d in due]
+        nws.sync_forecasts(conn, ids)
+        observations.sync(conn, ids)
     for d in due:
         save(conn, d["site_id"], d["day"], *build(conn, d["site_id"], d["day"]))
     return f"{len(due)} briefings written"
