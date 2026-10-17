@@ -71,7 +71,8 @@ def chunks(lines, limit=MAX_CHARS):
 
 
 def post(url, text):
-    body = {"content": text} if webhook_kind(url) == "discord" else {"text": text}
+    # Slack's markup uses *bold*, Discord's **bold**
+    body = {"content": text} if webhook_kind(url) == "discord" else {"text": text.replace("**", "*")}
     client.post(url, json=body).raise_for_status()
 
 
