@@ -1,0 +1,317 @@
+{
+  "model_version": "contract-disruption-v1",
+  "computed_at": "2026-10-17T22:10:27+00:00",
+  "contracts": 7049,
+  "disrupted": 2395,
+  "terminated": 93,
+  "slipped_30_days": 2331,
+  "attributed_to_weather": 91,
+  "attributed_by_weather": {
+    "unnamed": 75,
+    "tropical": 12,
+    "flood": 4
+  },
+  "evidence": {
+    "storm_overlap_only": 2208,
+    "none": 96,
+    "documented": 75,
+    "documented_and_corroborated": 16
+  },
+  "documented_weather_odds_ratios": {
+    "tornado": {
+      "odds_ratio": 0.669,
+      "ci_low": 0.3943,
+      "ci_high": 1.1351,
+      "p_value": 0.1362
+    },
+    "tropical": {
+      "odds_ratio": 1.281,
+      "ci_low": 0.7357,
+      "ci_high": 2.2305,
+      "p_value": 0.3814
+    },
+    "severe_wind": {
+      "odds_ratio": 0.3198,
+      "ci_low": 0.1798,
+      "ci_high": 0.5688,
+      "p_value": 0.0001
+    },
+    "hail": {
+      "odds_ratio": 1.5549,
+      "ci_low": 0.8872,
+      "ci_high": 2.7251,
+      "p_value": 0.1231
+    },
+    "flood": {
+      "odds_ratio": 0.4814,
+      "ci_low": 0.2807,
+      "ci_high": 0.8253,
+      "p_value": 0.0079
+    },
+    "lightning": {
+      "odds_ratio": 1.2646,
+      "ci_low": 0.6983,
+      "ci_high": 2.2905,
+      "p_value": 0.4385
+    },
+    "heat": {
+      "odds_ratio": 0.2465,
+      "ci_low": 0.055,
+      "ci_high": 1.1053,
+      "p_value": 0.0674
+    },
+    "winter": {
+      "odds_ratio": 0.5066,
+      "ci_low": 0.2431,
+      "ci_high": 1.0561,
+      "p_value": 0.0696
+    },
+    "fema_declaration": {
+      "odds_ratio": 0.8581,
+      "ci_low": 0.4856,
+      "ci_high": 1.5163,
+      "p_value": 0.5984
+    }
+  },
+  "documented_weather_cv_auc": 0.798,
+  "team_rule_check": {
+    "disrupted_with_tornado": 809,
+    "of_those_documented_weather": 0.046,
+    "documented_weather_rate_all_disrupted": 0.038
+  },
+  "exposed_share": {
+    "tornado": 0.263,
+    "tropical": 0.308,
+    "severe_wind": 0.578,
+    "hail": 0.294,
+    "flood": 0.418,
+    "lightning": 0.172,
+    "heat": 0.031,
+    "winter": 0.092,
+    "fema_declaration": 0.36
+  },
+  "cv_auc_with_weather": 0.704,
+  "cv_auc_controls_only": 0.706,
+  "disruptive_weather": [],
+  "weather_odds_ratios": {
+    "tornado": {
+      "odds_ratio": 1.115,
+      "ci_low": 0.9764,
+      "ci_high": 1.2733,
+      "p_value": 0.108
+    },
+    "tropical": {
+      "odds_ratio": 1.0505,
+      "ci_low": 0.908,
+      "ci_high": 1.2154,
+      "p_value": 0.5075
+    },
+    "severe_wind": {
+      "odds_ratio": 0.9987,
+      "ci_low": 0.8735,
+      "ci_high": 1.1418,
+      "p_value": 0.985
+    },
+    "hail": {
+      "odds_ratio": 1.0232,
+      "ci_low": 0.8905,
+      "ci_high": 1.1757,
+      "p_value": 0.7461
+    },
+    "flood": {
+      "odds_ratio": 0.9355,
+      "ci_low": 0.8241,
+      "ci_high": 1.0619,
+      "p_value": 0.3025
+    },
+    "lightning": {
+      "odds_ratio": 0.8649,
+      "ci_low": 0.7367,
+      "ci_high": 1.0155,
+      "p_value": 0.0763
+    },
+    "heat": {
+      "odds_ratio": 1.1798,
+      "ci_low": 0.8686,
+      "ci_high": 1.6026,
+      "p_value": 0.29
+    },
+    "winter": {
+      "odds_ratio": 0.869,
+      "ci_low": 0.7217,
+      "ci_high": 1.0463,
+      "p_value": 0.1383
+    },
+    "fema_declaration": {
+      "odds_ratio": 1.0125,
+      "ci_low": 0.8768,
+      "ci_high": 1.1692,
+      "p_value": 0.8657
+    }
+  },
+  "text_check": {
+    "disrupted_contracts_citing_weather": 91,
+    "attributed_rate_when_text_cites_weather": 1.0,
+    "attributed_rate_otherwise": 0.0,
+    "mean_prob_weather_caused_cited": 0.0,
+    "mean_prob_weather_caused_otherwise": 0.0,
+    "auc_prob_weather_caused_vs_text": 0.5
+  },
+  "revenue": [
+    {
+      "company": "MasTec",
+      "kind": "contractor",
+      "quarters": 46,
+      "spearman_same_quarter": 0.25,
+      "p_same_quarter": 0.0939,
+      "spearman_next_quarter": 0.278,
+      "p_next_quarter": 0.0646,
+      "bad_quarter_rate_after_stormy": 0.083,
+      "bad_quarter_rate_after_calm": 0.324,
+      "contracts_held": 0
+    },
+    {
+      "company": "Dycom Industries",
+      "kind": "contractor",
+      "quarters": 44,
+      "spearman_same_quarter": -0.098,
+      "p_same_quarter": 0.5263,
+      "spearman_next_quarter": -0.081,
+      "p_next_quarter": 0.6055,
+      "bad_quarter_rate_after_stormy": 0.273,
+      "bad_quarter_rate_after_calm": 0.242,
+      "contracts_held": 0
+    },
+    {
+      "company": "Southern Company",
+      "kind": "utility",
+      "quarters": 45,
+      "spearman_same_quarter": 0.224,
+      "p_same_quarter": 0.1386,
+      "spearman_next_quarter": 0.133,
+      "p_next_quarter": 0.391,
+      "bad_quarter_rate_after_stormy": 0.333,
+      "bad_quarter_rate_after_calm": 0.242,
+      "contracts_held": null
+    },
+    {
+      "company": "Tampa Electric",
+      "kind": "utility",
+      "quarters": 38,
+      "spearman_same_quarter": 0.006,
+      "p_same_quarter": 0.9705,
+      "spearman_next_quarter": -0.007,
+      "p_next_quarter": 0.9683,
+      "bad_quarter_rate_after_stormy": 0.444,
+      "bad_quarter_rate_after_calm": 0.207,
+      "contracts_held": null
+    },
+    {
+      "company": "EMCOR Group",
+      "kind": "contractor",
+      "quarters": 46,
+      "spearman_same_quarter": -0.25,
+      "p_same_quarter": 0.0943,
+      "spearman_next_quarter": -0.157,
+      "p_next_quarter": 0.302,
+      "bad_quarter_rate_after_stormy": 0.333,
+      "bad_quarter_rate_after_calm": 0.235,
+      "contracts_held": 0
+    },
+    {
+      "company": "MYR Group",
+      "kind": "contractor",
+      "quarters": 34,
+      "spearman_same_quarter": -0.134,
+      "p_same_quarter": 0.4514,
+      "spearman_next_quarter": 0.02,
+      "p_next_quarter": 0.9118,
+      "bad_quarter_rate_after_stormy": 0.3,
+      "bad_quarter_rate_after_calm": 0.25,
+      "contracts_held": 0
+    },
+    {
+      "company": "NextEra Energy",
+      "kind": "utility",
+      "quarters": 45,
+      "spearman_same_quarter": -0.131,
+      "p_same_quarter": 0.3905,
+      "spearman_next_quarter": 0.041,
+      "p_next_quarter": 0.7924,
+      "bad_quarter_rate_after_stormy": 0.231,
+      "bad_quarter_rate_after_calm": 0.281,
+      "contracts_held": null
+    },
+    {
+      "company": "Granite Construction",
+      "kind": "contractor",
+      "quarters": 46,
+      "spearman_same_quarter": -0.17,
+      "p_same_quarter": 0.2596,
+      "spearman_next_quarter": -0.219,
+      "p_next_quarter": 0.1475,
+      "bad_quarter_rate_after_stormy": 0.333,
+      "bad_quarter_rate_after_calm": 0.235,
+      "contracts_held": 0
+    },
+    {
+      "company": "Sterling Infrastructure",
+      "kind": "contractor",
+      "quarters": 46,
+      "spearman_same_quarter": 0.08,
+      "p_same_quarter": 0.5977,
+      "spearman_next_quarter": -0.036,
+      "p_next_quarter": 0.8142,
+      "bad_quarter_rate_after_stormy": 0.167,
+      "bad_quarter_rate_after_calm": 0.294,
+      "contracts_held": 1
+    },
+    {
+      "company": "Quanta Services",
+      "kind": "contractor",
+      "quarters": 34,
+      "spearman_same_quarter": -0.187,
+      "p_same_quarter": 0.2887,
+      "spearman_next_quarter": -0.114,
+      "p_next_quarter": 0.527,
+      "bad_quarter_rate_after_stormy": 0.3,
+      "bad_quarter_rate_after_calm": 0.25,
+      "contracts_held": 0
+    },
+    {
+      "company": "Duke Energy",
+      "kind": "utility",
+      "quarters": 45,
+      "spearman_same_quarter": -0.009,
+      "p_same_quarter": 0.955,
+      "spearman_next_quarter": 0.195,
+      "p_next_quarter": 0.2046,
+      "bad_quarter_rate_after_stormy": 0.083,
+      "bad_quarter_rate_after_calm": 0.333,
+      "contracts_held": null
+    },
+    {
+      "company": "Primoris Services",
+      "kind": "contractor",
+      "quarters": 34,
+      "spearman_same_quarter": 0.314,
+      "p_same_quarter": 0.0701,
+      "spearman_next_quarter": 0.423,
+      "p_next_quarter": 0.0143,
+      "bad_quarter_rate_after_stormy": 0.1,
+      "bad_quarter_rate_after_calm": 0.333,
+      "contracts_held": 0
+    }
+  ],
+  "sources": [
+    "USAspending.gov contract transactions (FL/GA/AL, NAICS 2371/2373/2379/238210/2389, FY2016-)",
+    "NOAA Storm Events",
+    "OpenFEMA disaster declarations",
+    "SEC EDGAR XBRL quarterly revenue"
+  ],
+  "caveats": [
+    "Federal contracts stand in for a utility's crew contracts: same kind of field work, not the same owner.",
+    "Attribution assumes the controls capture other differences between exposed and unexposed contracts: an estimate, not proof.",
+    "Correlation is not causation."
+  ]
+}

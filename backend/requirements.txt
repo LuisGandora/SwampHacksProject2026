@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+psycopg[binary]
+psycopg_pool
+httpx
+apscheduler
+h5py
+numpy
+python-multipart
+google-genai
+pandas
+scikit-learn
+xgboost
+scipy
+pyjwt[crypto]

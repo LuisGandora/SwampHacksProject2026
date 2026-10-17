@@ -36,10 +36,12 @@ const STYLE = {
 };
 
 const empty = { type: "FeatureCollection", features: [] };
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);  // popups take HTML
+export const PIN_COLORS = { crew: "#5fd3ff", osha: "#c08cff" };
 const point = (lon, lat, properties = {}) => ({ type: "Feature", geometry: { type: "Point", coordinates: [lon, lat] }, properties });
 
 const GlobeMap = forwardRef(function GlobeMap(
-  { sites, lightning, selectedId, onSelect, pinMode, pin, onPin, me, sensor }, ref) {
+  { sites, lightning, pins, selectedId, onSelect, pinMode, pin, onPin, me, sensor }, ref) {
   const container = useRef(null);
   const map = useRef(null);
   const ready = useRef(false);
@@ -81,6 +83,7 @@ const GlobeMap = forwardRef(function GlobeMap(
       m.addSource("sites", { type: "geojson", data: empty });
       m.addSource("lightning", { type: "geojson", data: empty });
       m.addSource("selected", { type: "geojson", data: empty });
+      m.addSource("pins", { type: "geojson", data: empty });
       m.addLayer({ id: "alert-pulse", type: "circle", source: "sites", filter: [">", ["get", "stop_work_alerts"], 0],
         paint: { "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#d03b3b", "circle-stroke-width": 2,
                  "circle-radius": 10, "circle-stroke-opacity": 0.9 } });
@@ -88,6 +91,14 @@ const GlobeMap = forwardRef(function GlobeMap(
         paint: { "circle-color": "#fff3a3", "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 2, 9, 5],
                  "circle-opacity": ["interpolate", ["linear"], ["get", "age_min"], 0, 1, 30, 0.15],
                  "circle-blur": 0.4 } });
+      // Past hazards under the sites, so site dots stay on top and clickable. Crew reports are filled dots; historical
+      // OSHA injury reports are hollow rings, so nobody mistakes a 2023 injury report for a live crew report.
+      m.addLayer({ id: "pins", type: "circle", source: "pins",
+        paint: { "circle-color": ["match", ["get", "source"], "crew", PIN_COLORS.crew, PIN_COLORS.osha],
+                 "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 2, 9, ["+", 3, ["get", "severity"]]],
+                 "circle-opacity": ["case", ["!=", ["get", "source"], "crew"], 0, ["==", ["get", "status"], "open"], 0.95, 0.2],
+                 "circle-stroke-color": ["match", ["get", "source"], "crew", PIN_COLORS.crew, PIN_COLORS.osha],
+                 "circle-stroke-width": ["match", ["get", "source"], "crew", 1, 1.6] } });
       m.addLayer({ id: "sites", type: "circle", source: "sites",
         paint: { "circle-color": BAND_COLOR_EXPRESSION,
                  "circle-radius": ["interpolate", ["linear"], ["zoom"], 2, 2.5, 5, 4.5, 9, 8, 13, 11],
@@ -102,7 +113,7 @@ const GlobeMap = forwardRef(function GlobeMap(
         const p = e.features[0].properties;
         const b = band(p.score === "" || p.score == null ? null : Number(p.score));
         popup.setLngLat(e.features[0].geometry.coordinates)
-          .setHTML(`<strong>${p.name}</strong><br/>${p.state} · Hazard ${fmtScore(p.score === "" ? null : Number(p.score))}/10 ` +
+          .setHTML(`<strong>${esc(p.name)}</strong><br/>${esc(p.state)} · Hazard ${fmtScore(p.score === "" ? null : Number(p.score))}/10 ` +
                    `<span style="color:${b.color}">● ${b.label}</span>` +
                    (Number(p.stop_work_alerts) ? `<br/><span class="stop">STOP WORK ×${p.stop_work_alerts}</span>` : ""))
           .addTo(m);
@@ -111,10 +122,27 @@ const GlobeMap = forwardRef(function GlobeMap(
         m.getCanvas().style.cursor = handlers.current.pinMode ? "crosshair" : "";
         popup.remove();
       });
+      const pinPopup = new maplibregl.Popup({ closeButton: true, offset: 8, className: "hud-popup", maxWidth: "280px" });
+      const showPin = (f) => {
+        const p = f.properties;
+        pinPopup.setLngLat(f.geometry.coordinates).setHTML(
+          (p.source === "crew"
+            ? `<span style="color:${PIN_COLORS.crew}">●</span> <strong>Crew report</strong>`
+            : `<span style="color:${PIN_COLORS.osha}">○</span> <strong>Historical OSHA injury report</strong>` +
+              `<br/><span class="muted">Public OSHA record, not a live crew report</span>`) +
+          ` · ${esc(p.category.replace(/_/g, " "))}<br/>${esc(p.title)}<br/>` +
+          `<span class="muted">${p.source === "crew" ? "" : "Reported to OSHA "}${new Date(p.at).toLocaleDateString()}${p.status ? ` · ${esc(p.status)}` : ""}` +
+          `${p.severity ? ` · severity ${esc(p.severity)}/5` : ""}</span>` +
+          (p.photo_url && /^https?:\/\//.test(p.photo_url) ? `<br/><img src="${esc(p.photo_url)}" alt="" class="popup-photo"/>` : "")).addTo(m);
+      };
+      m.on("mouseenter", "pins", () => { m.getCanvas().style.cursor = handlers.current.pinMode ? "crosshair" : "pointer"; });
+      m.on("mouseleave", "pins", () => { m.getCanvas().style.cursor = handlers.current.pinMode ? "crosshair" : ""; });
       m.on("click", (e) => {
         if (handlers.current.pinMode) return handlers.current.onPin({ lat: e.lngLat.lat, lon: e.lngLat.lng });
         const hit = m.queryRenderedFeatures(e.point, { layers: ["sites"] })[0];
-        if (hit) handlers.current.onSelect(Number(hit.properties.site_id));
+        if (hit) return handlers.current.onSelect(Number(hit.properties.site_id));
+        const pinHit = m.queryRenderedFeatures(e.point, { layers: ["pins"] })[0];
+        if (pinHit) showPin(pinHit);
       });
 
       // Pulse the stop-work rings at 20 fps, and only while a stop-work alert exists: every frame redraws the
@@ -146,11 +174,12 @@ const GlobeMap = forwardRef(function GlobeMap(
       const now = Date.now();
       m.getSource("lightning")?.setData({ type: "FeatureCollection", features: lightning.map((l) => point(l.lon, l.lat, {
         age_min: (now - new Date(l.observed_at).getTime()) / 60000 })) });
+      m.getSource("pins")?.setData({ type: "FeatureCollection", features: (pins || []).map((p) => point(p.lon, p.lat, p)) });
       const sel = sites.find((s) => s.site_id === selectedId);
       m.getSource("selected")?.setData(sel ? { type: "FeatureCollection", features: [point(sel.lon, sel.lat)] } : empty);
     };
     if (ready.current) apply(); else m.once("planit:ready", apply);
-  }, [sites, lightning, selectedId]);
+  }, [sites, lightning, pins, selectedId]);
 
   // Draft report pin and the viewer's own location, as DOM markers.
   useMarker(map, pin, "marker marker--pin", "Report location");
