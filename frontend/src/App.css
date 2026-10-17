@@ -199,6 +199,14 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
 .maplibregl-ctrl-top-right { top: 72px; }
 .marker { width: 16px; height: 16px; border-radius: 50%; }
 .marker--me { background: var(--series); border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(57, 135, 229, .3); }
+.marker--me::after{
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid #1a56db;
+  animation: pulse 3s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) { .marker--me::after { display: none; } }
 .marker--pin { width: 20px; height: 20px; background: var(--critical); border: 3px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); }
 
 /* Sensor modes, after the reference's "sensor reskins". They tint everything, data included: use STD to read colors. */
@@ -312,4 +320,46 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
   .hud-controls button { white-space: nowrap; }
   .stopwork { bottom: calc(58vh + 6px); }
   .stopwork-clock strong { font-size: 28px; }
+}
+
+.landing { max-width: 640px; margin: 0 auto; padding: 40px 20px 60px; }
+.landing h1 { margin: 0 0 8px; font-weight: 400; }
+.landing-intro { margin: 0 0 28px; font-size: 1.1rem; }
+.landing-status { margin: 8px 0 0; color: #fdfdfd; opacity: 50%;}
+
+.switch-row { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; font-size: 1.15rem; }
+.switch-row input { position: absolute; opacity: 0; }
+.switch { width: 48px; height: 26px; border-radius: 13px; background: #fcfbfb; position: relative; transition: background .15s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.switch-row input:checked + .switch { background: #1a56db; }
+.switch-row input:checked + .switch::after { transform: translateX(22px); }
+.switch-row input:focus-visible + .switch { outline: 3px solid #1a56db; outline-offset: 2px; }
+
+.pin-section { margin-top: 24px; }
+.pin-map { position: relative; max-width: 420px; background: #fff; cursor: crosshair; }
+.pin-map img { width: 100%; display: block; }
+.drop-pin { position: absolute; width: 18px; height: 18px; transform: translate(-50%, -50%); border-radius: 50%; background: #dc2626; border: 3px solid #fff; box-shadow: 0 0 0 2px #dc2626; pointer-events: none; }
+
+.radius-section { margin-top: 28px; display: flex; flex-direction: column; gap: 8px; }
+.radius-section input[type="range"] { width: 100%; }
+
+.landing-actions { margin-top: 32px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.landing-go { font: inherit; font-weight: 600; padding: 12px 24px; background: var(--ink); color: #fff; border: 0; cursor: pointer; }
+.landing-go:disabled { opacity: .4; cursor: not-allowed; }
+.landing-skip { font: inherit; background: none; border: 0; text-decoration: underline; cursor: pointer; }
+
+.landing-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+  background: rgba(207, 206, 206, 0.45);   /*lower last number for opacity*/
+  backdrop-filter: blur(3px);
+}
+
+/* Give the content its own readable panel */
+.landing-overlay .landing {
+  background: rgba(43, 37, 37, 0.78);
+  margin: 40px auto;
+  border-radius: 12px;
 }

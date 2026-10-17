@@ -57,6 +57,15 @@ const GlobeMap = forwardRef(function GlobeMap(
       sites.forEach((s) => b.extend([s.lon, s.lat]));
       map.current.fitBounds(b, { padding: 60, duration: reducedMotion() ? 0 : 2000 });
     },
+    flyRadius: (lon, lat, miles) => {
+      if (!map.current) return;
+      const dLat = miles / 69;
+      const dLon = miles / (69 * Math.cos((lat * Math.PI) / 180));
+      map.current.fitBounds(
+        [[lon - dLon, lat - dLat], [lon + dLon, lat + dLat]],
+        { padding: 60, maxZoom: 10, duration: reducedMotion() ? 0 : 2000 }
+      );
+    },
     flyTo: (lon, lat, zoom = 9) => map.current?.flyTo({ center: [lon, lat], zoom, duration: reducedMotion() ? 0 : 1800 }),
   }), [sites]);
 

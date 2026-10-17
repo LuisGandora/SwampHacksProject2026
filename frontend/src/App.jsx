@@ -14,6 +14,8 @@ import RankingPanel from "./components/RankingPanel.jsx";
 import ReportModal from "./components/ReportModal.jsx";
 import SiteCard from "./components/SiteCard.jsx";
 import { categoryLabel } from "./hazard.js";
+import Landing from "./components/landing.jsx";
+import { sitesWithin } from "./geo.js";
 
 const SENSORS = [["normal", "STD"], ["nvg", "NVG"], ["flir", "FLIR"], ["crt", "CRT"]];
 const POLL = { sites: 60000, alerts: 20000, alertsDuringStop: 8000, lightning: 60000 };
@@ -61,6 +63,7 @@ export default function App() {
   const demoRun = useRef(0);
   const seenAlerts = useRef(null);
   const globe = useRef(null);
+  const [focus, setFocus] = useState(null); // null = landing page still showing
 
   const toast = useCallback((text, kind = "info") => {
     const id = Math.random();
@@ -180,9 +183,22 @@ export default function App() {
   const counts = { stop: alerts.filter((a) => a.level === "stop_work").length, warn: alerts.filter((a) => a.level === "warning").length };
   const online = health && !apiError;
 
+  // The landing page lets the user focus on an area (GPS or a dropped pin + radius). Until they choose, focus is
+  // null and the Landing overlay is shown; after that the globe and ranking only show the in-range sites.
+  const visibleSites = sitesWithin(sites, focus);
+  const handleLandingDone = (f) => {
+    setFocus(f);
+    if (f.all) {
+      globe.current?.flyHome();
+    } else {
+      setMe({ lat: f.lat, lon: f.lon });
+      globe.current?.flyRadius(f.lon, f.lat, f.radius);
+    }
+  };
+
   return (
     <div className="app">
-      <GlobeMap ref={globe} sites={sites} lightning={lightning} selectedId={selectedId} onSelect={select}
+      <GlobeMap ref={globe} sites={visibleSites} lightning={lightning} selectedId={selectedId} onSelect={select}
                 pinMode={pinMode} pin={pin} onPin={(p) => { setPin(p); setPinMode(false); setTab("site"); }}
                 pins={showPins ? pins : null} me={me} sensor={sensor} />
       {sensor === "crt" && <div className="scanlines" aria-hidden="true" />}
@@ -197,7 +213,7 @@ export default function App() {
         </div>
         <div className="hud-stats mono small">
           <span className={online ? "ok" : "warn"}>● {online ? "LIVE" : "OFFLINE"}</span>
-          <span>{sites.length} SITES</span>
+          <span>{visibleSites.length} SITES</span>
           <span className="stop">{counts.stop} STOP</span>
           <span className="warn">{counts.warn} WARN</span>
           <span className="hide-sm">⚡ {lightning.length}/30m</span>
@@ -235,6 +251,7 @@ export default function App() {
           <button onClick={() => setModelOpen(true)} title="Model accuracy (backtest)" aria-label="Model accuracy">📈<span className="hide-sm"> Model</span></button>
           <button onClick={() => globe.current?.flyHome()} title="North America" aria-label="Show North America">🌎</button>
           <button onClick={() => globe.current?.flySites()} title="All sites" aria-label="Show all sites">◎<span className="hide-sm"> Sites</span></button>
+          <button onClick={() => { setFocus(null); globe.current?.flyHome(); }} title="Pick a different area">Change location</button>
         </div>
       </header>
 
@@ -267,7 +284,7 @@ export default function App() {
       </nav>
 
       <div className={`dock dock--left tab-${tab === "rank" ? "show" : "hide"}`}>
-        <RankingPanel sites={sites} horizon={horizon} setHorizon={setHorizon} selectedId={selectedId}
+        <RankingPanel sites={visibleSites} horizon={horizon} setHorizon={setHorizon} selectedId={selectedId}
                       onSelect={select} categories={categories} loading={loadingSites} />
       </div>
 
@@ -319,6 +336,12 @@ export default function App() {
       <div className="toasts" aria-live="polite">
         {toasts.map((t) => <div key={t.id} className={`toast toast--${t.kind}`}>{t.text}</div>)}
       </div>
+
+      {!focus && (
+        <div className="landing-overlay">
+          <Landing sites={sites} onDone={handleLandingDone} />
+        </div>
+      )}
     </div>
   );
 }
