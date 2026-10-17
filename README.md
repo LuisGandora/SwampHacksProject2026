@@ -377,7 +377,7 @@ The [backend/](backend/) folder has two processes that share the Tiger database:
 | Process | Command (from the project root) | What it does |
 |---|---|---|
 | API | `python -m uvicorn backend.app:app --reload` | Serves the endpoints below. Interactive docs are at http://127.0.0.1:8000/docs. |
-| Worker | `python -m backend.worker` | Pulls live NWS and lightning data on a schedule and writes the 6 PM briefings. Run **one** copy. |
+| Worker | `python -m backend.worker` | Pulls live data on a schedule, raises alerts, writes the 6 PM briefings and sends notifications. Run **one** copy. |
 
 ```powershell
 python -m pip install -r backend/requirements.txt
@@ -387,17 +387,37 @@ python -m backend.worker               # then leave this running
 python -m backend.test_backend         # parsing and threshold checks (no network needed)
 ```
 
+### Settings (environment variables)
+
+| Variable | Needed for | Default |
+|---|---|---|
+| `DATABASE_URL` | everything (or put it in `.env`) | (none) |
+| `NWS_USER_AGENT` | NWS API etiquette: include a contact email | `PlanIT-Control/0.1 (SwampHacks 2026)` |
+| `NOTIFY_WEBHOOK_URL` | sending alerts and briefings to a Discord or Slack channel | not set, so nothing is sent |
+| `NOTIFY_LEVELS` | which alert levels are sent | `stop_work` (use `stop_work,warning` for everything) |
+| `FIRMS_MAP_KEY` | wildfire detections. Get a free key at https://firms.modaps.eosdis.nasa.gov/api/area/ | not set, so the job is skipped |
+| `WILDLIFE_TAXA` | species to watch on iNaturalist, separated by `;` | alligator; cottonmouth; eastern diamondback |
+| `PLANIT_DEV` | `1` turns on the `/dev` demo endpoints. **Never on a public URL.** | off |
+| `CORS_ORIGINS` | the frontend origins allowed to call the API | `*` |
+
 ### Worker schedule
 
-| Job | How often | Source → table |
+| Job | How often | Source → table → alerts |
 |---|---|---|
-| `lightning` | every minute | GOES-19 GLM satellite flashes (AWS bucket `noaa-goes19`) → `lightning_strikes`. Flashes within a site's warn/stop radius call `raise_site_alert()`, which restarts the 30-minute all-clear on each new strike. |
-| `alerts` | every 2 min | NWS active alerts for the sites' states → `nws_alerts`. Alerts in effect now raise site alerts that last until the NWS warning expires. Storm-based warnings use their polygon; zone and county alerts use the site's NWS zone. |
-| `forecasts` | hourly (at :05) | NWS hourly gridpoint forecast for the next 48 h → `weather_forecasts`: temperature, heat index, wind chill, gusts, rain, chance of rain and thunder, visibility. One request per NWS grid cell. |
-| `briefings` | every 15 min | Writes tomorrow's briefing for each site where it's 6:00–6:15 PM local time → `daily_briefings` |
-| `points` | daily | Looks up the NWS grid and zones for any new site |
+| `lightning` | every minute | GOES-19 satellite lightning mapper (GLM, AWS bucket `noaa-goes19`) → `lightning_strikes`. Stop work within 10 mi and a warning within 20 mi. The 30-minute all-clear restarts with each strike. |
+| `notify` | every minute | New alerts (stop work by default) and new briefings → your Discord or Slack webhook, each sent once |
+| `alerts` | every 2 min | NWS active alerts → `nws_alerts`. Site alerts last until the NWS warning expires. Storm-based warnings use their polygon; others use the site's NWS zone or county. |
+| `observations` | every 10 min | Latest NWS reading at each site's station → `weather_observations`. Raises alerts the moment the heat index, wind chill, gusts or visibility cross a category's threshold. It also gives the **flood rule from the brief**: 2 in or more of rain in the last 12 h raises a flood-risk warning (4 in is stop work), naming any river gauge nearby. |
+| `rivers` | every 15 min | NOAA river gauges (NWPS, about 1,500 in the region, one request) → `river_gauges`, `river_gauge_readings`. A gauge at action stage or worse, or forecast to flood, within 5 mi raises a flood warning. Minor flooding or worse within 1 mi is stop work. |
+| `fires` | every 15 min | NASA FIRMS satellite fire detections (needs `FIRMS_MAP_KEY`) → `fire_detections`. A warning within 10 mi, stop work within 2 mi. |
+| `wildlife` | every 30 min | iNaturalist sightings from the last 7 days, with photos → `wildlife_sightings`. A warning within 1 mi, with the photo on the alert. |
+| `forecasts` | hourly (at :05) | NWS hourly forecast for the next 48 h → `weather_forecasts`: temperature, heat index, wind chill, gusts, rain, chance of rain and thunder, visibility |
+| `briefings` | every 15 min | Tomorrow's briefing for each site where it's 6:00–6:15 PM local time → `daily_briefings` |
+| `points` | daily | NWS grid and zones for any new site |
 
-Which NWS alert names map to which hazard category, and whether they mean `warning` or `stop_work`, is stored as data in `hazard_categories.nws_warn_events` and `nws_stop_events`.
+Every threshold, radius and NWS alert name is stored as data in `hazard_categories`. That includes which NWS alerts mean a warning and which mean stop work (`nws_warn_events`, `nws_stop_events`).
+
+Run any job once with `python -m backend.worker <job> [<job> ...]`.
 
 ### Endpoints
 
@@ -409,21 +429,33 @@ Which NWS alert names map to which hazard category, and whether they mean `warni
 | `GET /sites/{id}` | site details, historical `risk_profile`, `active_alerts`, `latest_score` |
 | `GET /sites/{id}/forecast?hours=48` | hourly forecast |
 | `GET /sites/{id}/hazard-events?category=lightning` | historical events tied to the site |
-| `GET /alerts/active?state=FL` | **Instant alerts** with `all_clear_seconds` for the countdown. Poll every 15–30 s. |
+| `GET /alerts/active?state=FL` | **Instant alerts**: `title`, `message`, `image_url`, location, `all_clear_seconds` for the countdown. Poll every 15–30 s. |
 | `GET /briefings/{id}?date=2026-10-18` | the 6 PM next-day briefing: `summary` text plus structured `content` (flags, forecast, NWS alerts, score) for the AI API to rewrite |
-| `POST /crew-reports` | `{category, lat, lon, description, photo_url, reported_by, severity, site_id?}`. Upload the photo to storage first and send its URL. The nearest site within 10 mi is filled in when `site_id` is omitted. |
+| `POST /uploads` | multipart `file` (JPEG, PNG, WebP or HEIC, up to 10 MB) → `{url}`. Photos are saved in `uploads/` on the API server. |
+| `POST /crew-reports` | `{category, lat, lon, description, photo_url, reported_by, severity, site_id?}`. The nearest site within 10 mi is filled in when `site_id` is omitted. **The site gets a warning alert immediately**, open for 12 h, with the photo. |
 | `GET /crew-reports?site_id=&category=&status=open` | crew hazard reports |
 
-**Demo endpoints** (start the API with `$env:PLANIT_DEV = "1"`):
+### Demo
+
+Start the API with `$env:PLANIT_DEV = "1"` to turn on:
 
 | Method and path | What it does |
 |---|---|
-| `POST /dev/lightning/{site_id}?miles_away=3` | fakes a strike to show the stop-work countdown |
-| `POST /dev/briefings/{site_id}` | writes tomorrow's briefing now, without waiting for 6 PM |
+| `POST /dev/scenario/{site_id}` | **The brief's opening story on one site**: heat index 108°F now, lightning 4 mi away (stop work with the 30-min countdown), a week of rain (soft ground), a crew-reported gator, and a stormy 112°F tomorrow with its 6 PM briefing. It uses the same tables and alert logic as live data. Try 7345 (University of Florida). |
+| `DELETE /dev/scenario/{site_id}` | removes everything the scenario added |
+| `POST /dev/lightning/{site_id}?miles_away=3` | one fake strike, to show the countdown restarting |
+| `POST /dev/briefings/{site_id}` | writes tomorrow's briefing now |
 | `POST /dev/jobs/{name}` | runs one worker job |
+
+### Sharing the API with your team
+
+- **Quick (your laptop):** `cloudflared tunnel --url http://localhost:8000` prints a public `https://….trycloudflare.com` URL that forwards to your running API. It only works while your laptop and the tunnel are running. **Turn `PLANIT_DEV` off first**, because anyone with the URL can call the endpoints.
+- **Always on (for judging):** deploy the API and the worker to a host such as Railway, Render or Fly.io, with the environment variables above. Run the API as a web service and the worker as a background worker, one copy each. Uploaded photos live on the API server's disk, so use a persistent volume, or move them to S3/R2.
 
 ### Notes
 
 - `hazard_scores` stays empty until the ML model writes to it. Until then, the dashboard ranks sites by active alerts, then capacity.
 - GLM locates lightning to roughly 8 km (about 5 mi). That's coarse for a 10-mile rule, but it's the best free real-time source.
-- Forecasts keep 30 days, NWS alerts keep 180 days, and lightning keeps 90 days (compressed after 2), to stay within the free tier.
+- Two stations (`AMG`, `NFJ`) don't publish current NWS observations, so about 20 sites have forecasts and alerts but no live readings.
+- An NWS warning that's cancelled early keeps its site alert until the original expiry time.
+- Forecasts and observations keep 30 days, NWS alerts 180 days, and lightning 90 days (compressed after 2), to stay within the free tier.

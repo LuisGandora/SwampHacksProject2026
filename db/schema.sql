@@ -287,6 +287,7 @@ CREATE TABLE IF NOT EXISTS weather_observations (       -- live conditions per s
     PRIMARY KEY (site_id, observed_at)
 );
 SELECT create_hypertable('weather_observations', by_range('observed_at', INTERVAL '7 days'), if_not_exists => true);
+SELECT add_retention_policy('weather_observations', INTERVAL '30 days', if_not_exists => true);
 
 CREATE TABLE IF NOT EXISTS weather_forecasts (           -- next-day forecast for the 6 PM briefing
     site_id         bigint NOT NULL REFERENCES sites,
@@ -325,7 +326,7 @@ CREATE INDEX IF NOT EXISTS nws_alerts_geog_idx ON nws_alerts USING gist (geog);
 SELECT add_retention_policy('nws_alerts', INTERVAL '180 days', if_not_exists => true);
 
 CREATE TABLE IF NOT EXISTS river_gauges (
-    gauge_id            text PRIMARY KEY,                -- USGS site number
+    gauge_id            text PRIMARY KEY,                -- NWS gauge id (NOAA NWPS "lid"), e.g. AANG1
     name                text,
     geog                geography(Point, 4326) NOT NULL,
     action_stage_ft     numeric,
@@ -343,6 +344,10 @@ CREATE TABLE IF NOT EXISTS river_gauge_readings (
     PRIMARY KEY (gauge_id, observed_at)
 );
 SELECT create_hypertable('river_gauge_readings', by_range('observed_at', INTERVAL '7 days'), if_not_exists => true);
+-- NWS flood categories: no_flooding / action / minor / moderate / major (computed by NOAA from each gauge's stages)
+ALTER TABLE river_gauge_readings ADD COLUMN IF NOT EXISTS flood_category          text;
+ALTER TABLE river_gauge_readings ADD COLUMN IF NOT EXISTS forecast_flood_category text;
+ALTER TABLE river_gauge_readings ADD COLUMN IF NOT EXISTS forecast_stage_ft       numeric;
 
 CREATE TABLE IF NOT EXISTS fire_detections (             -- NASA FIRMS
     detected_at     timestamptz NOT NULL,
@@ -399,14 +404,17 @@ CREATE TABLE IF NOT EXISTS site_alerts (
     message         text
 );
 CREATE INDEX IF NOT EXISTS site_alerts_open_idx ON site_alerts (site_id, category) WHERE cleared_at IS NULL;
+ALTER TABLE site_alerts ADD COLUMN IF NOT EXISTS notified_at timestamptz;  -- set when the notifier delivered it
+ALTER TABLE site_alerts ADD COLUMN IF NOT EXISTS image_url   text;         -- e.g. wildlife photo
 
 -- Raise or extend an alert. A new trigger on an open alert of the same site/category/level restarts its
 -- countdown (when the category says so) instead of opening a second alert. p_until keeps an alert open at
 -- least until then (an NWS warning's expiry time).
 DROP FUNCTION IF EXISTS raise_site_alert(bigint, text, text, timestamptz, numeric, text);
+DROP FUNCTION IF EXISTS raise_site_alert(bigint, text, text, timestamptz, numeric, text, timestamptz);
 CREATE OR REPLACE FUNCTION raise_site_alert(p_site bigint, p_category text, p_level text,
                                             p_at timestamptz, p_value numeric DEFAULT NULL, p_message text DEFAULT NULL,
-                                            p_until timestamptz DEFAULT NULL)
+                                            p_until timestamptz DEFAULT NULL, p_image text DEFAULT NULL)
 RETURNS site_alerts LANGUAGE plpgsql AS $$
 DECLARE
     rule       hazard_categories;
@@ -426,21 +434,25 @@ BEGIN
                all_clear_at = CASE WHEN rule.all_clear_restarts OR p_until IS NOT NULL
                                    THEN greatest(all_clear_at, new_clear) ELSE all_clear_at END,
                trigger_value = coalesce(p_value, trigger_value),
-               message = coalesce(p_message, message)
+               message = coalesce(p_message, message),
+               image_url = coalesce(p_image, image_url)
          WHERE alert_id = a.alert_id
      RETURNING * INTO a;
     ELSE
-        INSERT INTO site_alerts (site_id, category, level, started_at, last_trigger_at, all_clear_at, trigger_value, message)
-        VALUES (p_site, p_category, p_level, p_at, p_at, new_clear, p_value, p_message)
+        INSERT INTO site_alerts (site_id, category, level, started_at, last_trigger_at, all_clear_at, trigger_value,
+                                 message, image_url)
+        VALUES (p_site, p_category, p_level, p_at, p_at, new_clear, p_value, p_message, p_image)
         RETURNING * INTO a;
     END IF;
     RETURN a;
 END $$;
 
-CREATE OR REPLACE VIEW active_site_alerts AS
+DROP VIEW IF EXISTS active_site_alerts;
+CREATE VIEW active_site_alerts AS
 SELECT a.*, s.name AS site_name, s.timezone,
+       CASE a.level WHEN 'stop_work' THEN 'STOP WORK: ' ELSE 'Warning: ' END || c.label AS title,
        greatest(a.all_clear_at - now(), interval '0') AS all_clear_remaining
-  FROM site_alerts a JOIN sites s USING (site_id)
+  FROM site_alerts a JOIN sites s USING (site_id) JOIN hazard_categories c USING (category)
  WHERE a.cleared_at IS NULL AND (a.all_clear_at IS NULL OR a.all_clear_at > now());
 
 CREATE TABLE IF NOT EXISTS hazard_scores (               -- ML hazard index output
@@ -465,6 +477,7 @@ CREATE TABLE IF NOT EXISTS daily_briefings (
     content         jsonb,
     PRIMARY KEY (site_id, briefing_date)
 );
+ALTER TABLE daily_briefings ADD COLUMN IF NOT EXISTS notified_at timestamptz;
 
 -- ===========================================================================================================
 -- Site <-> hazard ties: every historical event within its category's history_radius_mi of a site.

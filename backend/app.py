@@ -2,22 +2,34 @@
 
     uvicorn backend.app:app --reload        # from the project root; docs at http://127.0.0.1:8000/docs
 
-Set PLANIT_DEV=1 to enable the /dev endpoints (fake lightning strike, run a job, write a briefing now).
+Set PLANIT_DEV=1 to enable the /dev endpoints (demo scenario, fake lightning strike, run a job, briefing now).
+Never set it on a public URL: they write to the shared database.
 """
 import datetime as dt
 import os
+import uuid
+from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from backend import briefings, lightning
+from backend import briefings, lightning, scenario
 from backend.db import connection
 
 app = FastAPI(title="PlanIT Control API")
 app.add_middleware(CORSMiddleware, allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
                    allow_methods=["*"], allow_headers=["*"])
+
+# Crew photos are stored on this server's disk and served from /uploads.
+# ponytail: local disk only, switch to S3/R2 when the API runs on more than one machine.
+UPLOADS = Path(__file__).resolve().parent.parent / "uploads"
+UPLOADS.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOADS), name="uploads")
+MAX_PHOTO_BYTES = 10 * 1024 * 1024
+PHOTO_TYPES = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/heic": ".heic"}
 
 LATLON = "ST_Y({0}::geometry) AS lat, ST_X({0}::geometry) AS lon"
 
@@ -113,12 +125,26 @@ def briefing(site_id: int, date: dt.date | None = None):
                "ORDER BY briefing_date DESC LIMIT 1", (site_id, date, date))
 
 
+@app.post("/uploads", status_code=201)
+async def upload_photo(file: UploadFile, request: Request):
+    """Upload a crew photo (JPEG, PNG, WebP or HEIC, up to 10 MB). Send the returned url as photo_url."""
+    ext = PHOTO_TYPES.get(file.content_type or "")
+    if not ext:
+        raise HTTPException(415, f"Unsupported type {file.content_type!r}; send one of {sorted(PHOTO_TYPES)}")
+    data = await file.read(MAX_PHOTO_BYTES + 1)
+    if len(data) > MAX_PHOTO_BYTES:
+        raise HTTPException(413, "Photo is larger than 10 MB")
+    name = f"{uuid.uuid4().hex}{ext}"
+    (UPLOADS / name).write_bytes(data)
+    return {"url": str(request.url_for("uploads", path=name))}
+
+
 class CrewReport(BaseModel):
     category: str = Field(examples=["wildlife"])
     lat: float = Field(ge=-90, le=90)
     lon: float = Field(ge=-180, le=180)
     description: str | None = None
-    photo_url: str | None = None          # upload the photo to storage first, send its URL here
+    photo_url: str | None = None          # from POST /uploads
     reported_by: str | None = None
     severity: int | None = Field(None, ge=1, le=5)
     site_id: int | None = None            # defaults to the nearest site within 10 miles
@@ -126,10 +152,11 @@ class CrewReport(BaseModel):
 
 @app.post("/crew-reports", status_code=201)
 def create_crew_report(r: CrewReport):
+    """Save a crew hazard report and alert the site right away (warning, open for 12 hours)."""
     with connection() as conn:
         if not conn.execute("SELECT 1 FROM hazard_categories WHERE category = %s", (r.category,)).fetchone():
             raise HTTPException(422, f"Unknown category {r.category!r}; see GET /hazard-categories")
-        return conn.execute(
+        report = conn.execute(
             f"""INSERT INTO crew_reports (site_id, category, description, photo_url, geog, reported_by, severity)
                 VALUES (coalesce(%(site_id)s, (SELECT site_id FROM sites
                                                WHERE ST_DWithin(geog, ST_MakePoint(%(lon)s, %(lat)s)::geography, 16093)
@@ -138,6 +165,12 @@ def create_crew_report(r: CrewReport):
                         %(reported_by)s, %(severity)s)
                 RETURNING report_id, reported_at, site_id, category, status, {LATLON.format('geog')}""",
             r.model_dump()).fetchone()
+        if report["site_id"]:
+            conn.execute("SELECT raise_site_alert(%s, %s, 'warning', %s, NULL, %s, %s, %s)",
+                         (report["site_id"], r.category, report["reported_at"],
+                          "Crew report: " + (r.description or r.category.replace("_", " ")),
+                          report["reported_at"] + dt.timedelta(hours=12), r.photo_url))
+        return report
 
 
 @app.get("/crew-reports")
@@ -180,6 +213,23 @@ if os.environ.get("PLANIT_DEV") == "1":
         return briefing(site_id, day)
 
     @app.post("/dev/jobs/{name}")
-    def run_job(name: Literal["points", "alerts", "forecasts", "lightning", "briefings"]):
+    def run_job(name: str):
+        if name not in JOBS:
+            raise HTTPException(404, f"Unknown job; one of {sorted(JOBS)}")
         with connection() as conn:
             return {"job": name, "result": JOBS[name](conn)}
+
+    @app.post("/dev/scenario/{site_id}")
+    def start_scenario(site_id: int):
+        """Put the site into the brief's story: heat index 108°F, lightning 4 mi away, a week of rain, a gator
+        report, and a stormy 112°F tomorrow with its briefing. Remove with DELETE."""
+        with connection() as conn:
+            result = scenario.start(conn, site_id)
+        if result is None:
+            raise HTTPException(404, "Not found")
+        return {**result, "active_alerts": active_alerts(site_id=site_id)}
+
+    @app.delete("/dev/scenario/{site_id}")
+    def stop_scenario(site_id: int):
+        with connection() as conn:
+            return scenario.stop(conn, site_id)

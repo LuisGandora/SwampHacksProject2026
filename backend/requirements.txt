@@ -6,3 +6,4 @@ httpx
 apscheduler
 h5py
 numpy
+python-multipart

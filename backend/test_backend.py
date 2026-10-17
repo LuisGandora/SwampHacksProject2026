@@ -24,3 +24,12 @@ assert describe([{"coverage": "slight_chance", "weather": "thunderstorms"}, {"we
 assert file_start("GLM-L2-LCFA/2026/290/05/OR_GLM-L2-LCFA_G19_s20262900540200_e2026290054040.nc") == \
     dt.datetime(2026, 10, 17, 5, 40, 20, tzinfo=dt.timezone.utc)
 print("backend ok")
+
+from backend.notify import chunks
+from backend.scenario import forecast_hour
+
+msgs = chunks(["a" * 1000, "b" * 1000, "c" * 10], limit=1500)
+assert [len(m) for m in msgs] == [1000, 1011], [len(m) for m in msgs]   # never over the limit, nothing lost
+peak = forecast_hour(15)
+assert (peak["heat_index_f"], peak["thunder_chance"], forecast_hour(4)["thunder_chance"]) == (112, 70, 10), peak
+print("notify + scenario ok")

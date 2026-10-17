@@ -27,6 +27,22 @@ def get(path, **params):
         return r.json()
 
 
+def c_to_f(c):
+    return None if c is None else round(c * 9 / 5 + 32, 1)
+
+
+def kmh_to_mph(v):
+    return None if v is None else round(v / 1.609344, 1)
+
+
+def mm_to_in(v):
+    return None if v is None else round(v / 25.4, 3)
+
+
+def m_to_mi(v):
+    return None if v is None else round(v / 1609.344, 2)
+
+
 def hours_in(duration):
     """ISO-8601 duration like PT1H, PT6H, P1DT19H -> hours."""
     m = re.fullmatch(r"P(?:(\d+)D)?(?:T(?:(\d+)H)?)?", duration)
@@ -84,11 +100,9 @@ def sync_forecasts(conn):
         gust, pop = hourly(p.get("windGust")), hourly(p.get("probabilityOfPrecipitation"))
         rain, thunder = hourly(p.get("quantitativePrecipitation"), split=True), hourly(p.get("probabilityOfThunder"))
         vis, wx = hourly(p.get("visibility")), hourly(p.get("weather"))
-        f = lambda c: None if c is None else round(c * 9 / 5 + 32, 1)
-        rows = [(site, dt.datetime.fromisoformat(p["updateTime"]), h, f(temp.get(h)), f(heat.get(h)), f(chill.get(h)),
-                 pop.get(h), None if rain.get(h) is None else round(rain[h] / 25.4, 3),
-                 None if gust.get(h) is None else round(gust[h] / 1.609344, 1), thunder.get(h),
-                 None if vis.get(h) is None else round(vis[h] / 1609.344, 2), describe(wx.get(h)))
+        rows = [(site, dt.datetime.fromisoformat(p["updateTime"]), h, c_to_f(temp.get(h)), c_to_f(heat.get(h)),
+                 c_to_f(chill.get(h)), pop.get(h), mm_to_in(rain.get(h)), kmh_to_mph(gust.get(h)), thunder.get(h),
+                 m_to_mi(vis.get(h)), describe(wx.get(h)))
                 for site in grid["sites"] for h in hours if h in temp]
         conn.execute("DELETE FROM weather_forecasts WHERE site_id = ANY(%s) AND valid_at >= %s", (grid["sites"], now))
         conn.cursor().executemany(
