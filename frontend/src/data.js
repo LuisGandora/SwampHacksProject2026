@@ -27,3 +27,10 @@ export const CITIES = [
   hazard: (i * 7) % 11, // placeholder 0-10
   info: ["General Info 1", "General Info 2", "General Info 3"],
 }));
+
+// Convert GPS to a pixel position on map (ref Huntsville + Miami)
+export function latLonToPixel(lat, lon) {
+  const x = 196 + (lon + 86.59) * 93.75;
+  const y = 67 + (34.73 - lat) * 105.2;
+  return { x, y };
+}
