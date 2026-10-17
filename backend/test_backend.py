@@ -51,3 +51,67 @@ r = template(facts)
 assert r["headline"] == "NO-GO: Plant A, hazard index 8.2/10 tomorrow" and len(r["hazards"]) == 2, r
 assert any("30 minutes" in a for a in r["actions"]), r["actions"]  # lightning policy action included
 print("reports ok")
+
+import datetime as _dt
+import numpy as _np
+import pandas as _pd
+from ml.hazard_model import combine, nws_event_group, nws_history_days
+
+assert [nws_event_group(e) for e in ("Heat Advisory", "Extreme Heat Warning", "Wind Chill Advisory", "Wind Advisory",
+        "Flood Watch", "Tropical Storm Warning", "Red Flag Warning", "Tornado Watch", "Rip Current Statement",
+        "Special Weather Statement")] == ["heat", "heat", "cold", "wind", "flood", "tropical", "fire", "convective",
+                                          None, None]
+# severity weighting: a severe chance moves the index more than the same ordinary chance; zero stays zero
+assert combine(_np.array([0.0]), _np.array([0.0]))[0] == 0
+assert combine(_np.array([0.2]), _np.array([0.05]))[0] > combine(_np.array([0.25]), _np.array([0.0]))[0]
+
+# an alert counts for day D only if issued before 6 PM local on D-1
+import tempfile, os, ml.hazard_model as hm
+tmp = tempfile.TemporaryDirectory()
+_pd.DataFrame([{"group": "heat", "phenomena": "HT", "significance": "Y", "ugc": "FLZ045",
+                "issued_utc": "2024-07-10 20:00", "expires_utc": "2024-07-12 23:00"},   # 4 PM EDT Jul 10
+               {"group": "wind", "phenomena": "WI", "significance": "Y", "ugc": "FLZ045",
+                "issued_utc": "2024-07-11 00:00", "expires_utc": "2024-07-11 23:00"}]  # 8 PM EDT Jul 10: too late
+              ).to_csv(os.path.join(tmp.name, "nws_warning_history.csv"), index=False)
+old, hm.DATA = hm.DATA, __import__("pathlib").Path(tmp.name)
+days = nws_history_days(_pd.DataFrame([{"site_id": 1, "forecast_zone": "FLZ045", "county_ugc": None,
+                                        "timezone": "America/New_York"}]))
+hm.DATA = old
+assert days == {(1, _dt.date(2024, 7, 11)): {"heat"}, (1, _dt.date(2024, 7, 12)): {"heat"}}, days
+print("model logic ok")
+
+# sign-in: only tokens signed by the tenant's key, for our audience, unexpired, are accepted
+import time as _time
+import jwt as _jwt
+from cryptography.hazmat.primitives.asymmetric import rsa as _rsa
+from fastapi import HTTPException as _HTTPException
+import backend.auth as auth
+
+os.environ.update(AUTH0_DOMAIN="test.auth0.com", AUTH0_AUDIENCE="https://api.test")
+_key, _other = (_rsa.generate_private_key(public_exponent=65537, key_size=2048) for _ in range(2))
+auth._jwks["test.auth0.com"] = type("FakeJwks", (), {"get_signing_key_from_jwt": lambda self, t:
+                                                     type("K", (), {"key": _key.public_key()})()})()
+def _token(key=_key, **over):
+    claims = {"sub": "auth0|1", "iss": "https://test.auth0.com/", "aud": "https://api.test",
+              "iat": int(_time.time()), "exp": int(_time.time()) + 600, **over}
+    return _jwt.encode(claims, key, algorithm="RS256")
+assert auth.verify(_token())["sub"] == "auth0|1"
+for bad in (_token(key=_other), _token(aud="https://other"), _token(exp=int(_time.time()) - 120),
+            _token(iss="https://evil.auth0.com/"), _jwt.encode({"sub": "x"}, "s" * 32, algorithm="HS256")):
+    try:
+        auth.verify(bad)
+        raise AssertionError("accepted a bad token")
+    except _HTTPException as e:
+        assert e.status_code == 401
+print("auth ok")
+
+from backend.notify import webhook_kind, wants
+assert webhook_kind("https://discord.com/api/webhooks/1/abc") == "discord"
+assert webhook_kind("https://hooks.slack.com/services/T/B/x") == "slack"
+assert not any(webhook_kind(u) for u in ("http://discord.com/api/webhooks/1/abc", "https://discord.com.evil.io/api/webhooks/",
+                                         "https://169.254.169.254/latest", "https://hooks.slack.com/services/a b", None))
+ch = {"site_ids": [7], "levels": ["stop_work"], "briefings": False, "crew_reports": True}
+assert [wants(ch, i) for i in [("a", 7, "alert", "stop_work", ""), ("a", 7, "alert", "warning", ""),
+                               ("a", 8, "alert", "stop_work", ""), ("r", 7, "report", None, ""),
+                               ("b", 7, "briefing", None, "")]] == [True, False, False, True, False]
+print("notify channels ok")

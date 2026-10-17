@@ -1,0 +1,237 @@
+{
+  "folds": [
+    {
+      "fold": "2023",
+      "variants": {
+        "A0 v2, measured weather (optimistic)": {
+          "auc_any_hazard": 0.901,
+          "auc_severe_outcome": 0.817,
+          "auc_death": 0.946,
+          "calibration_any": 0.76,
+          "severe_days_in_top_10pct": 0.426,
+          "spearman_damage_on_event_days": 0.184,
+          "test_site_days": 244185,
+          "severe_site_days": 1308,
+          "death_site_days": 267
+        },
+        "A  v2, day-ahead forecast": {
+          "auc_any_hazard": 0.851,
+          "auc_severe_outcome": 0.809,
+          "auc_death": 0.959,
+          "calibration_any": 0.39,
+          "severe_days_in_top_10pct": 0.424,
+          "spearman_damage_on_event_days": 0.057,
+          "test_site_days": 244185,
+          "severe_site_days": 1308,
+          "death_site_days": 267
+        },
+        "B  v3 forecast-trained": {
+          "auc_any_hazard": 0.868,
+          "auc_severe_outcome": 0.794,
+          "auc_death": 0.976,
+          "calibration_any": 0.96,
+          "severe_days_in_top_10pct": 0.453,
+          "spearman_damage_on_event_days": 0.092,
+          "test_site_days": 244185,
+          "severe_site_days": 1308,
+          "death_site_days": 267
+        },
+        "C  v3 + NWS alerts, P(any) only": {
+          "auc_any_hazard": 0.876,
+          "auc_severe_outcome": 0.809,
+          "auc_death": 0.979,
+          "calibration_any": 0.72,
+          "severe_days_in_top_10pct": 0.467,
+          "spearman_damage_on_event_days": 0.035,
+          "test_site_days": 244185,
+          "severe_site_days": 1308,
+          "death_site_days": 267
+        },
+        "C  v3 + NWS alerts + severity (production)": {
+          "auc_any_hazard": 0.869,
+          "auc_severe_outcome": 0.818,
+          "auc_death": 0.977,
+          "calibration_any": 0.72,
+          "severe_days_in_top_10pct": 0.488,
+          "spearman_damage_on_event_days": 0.029,
+          "test_site_days": 244185,
+          "severe_site_days": 1308,
+          "death_site_days": 267
+        }
+      }
+    },
+    {
+      "fold": "2024",
+      "variants": {
+        "A0 v2, measured weather (optimistic)": {
+          "auc_any_hazard": 0.907,
+          "auc_severe_outcome": 0.868,
+          "auc_death": 0.952,
+          "calibration_any": 1.18,
+          "severe_days_in_top_10pct": 0.589,
+          "spearman_damage_on_event_days": 0.292,
+          "test_site_days": 243695,
+          "severe_site_days": 2062,
+          "death_site_days": 628
+        },
+        "A  v2, day-ahead forecast": {
+          "auc_any_hazard": 0.88,
+          "auc_severe_outcome": 0.878,
+          "auc_death": 0.973,
+          "calibration_any": 0.67,
+          "severe_days_in_top_10pct": 0.603,
+          "spearman_damage_on_event_days": 0.227,
+          "test_site_days": 243695,
+          "severe_site_days": 2062,
+          "death_site_days": 628
+        },
+        "B  v3 forecast-trained": {
+          "auc_any_hazard": 0.901,
+          "auc_severe_outcome": 0.874,
+          "auc_death": 0.973,
+          "calibration_any": 1.18,
+          "severe_days_in_top_10pct": 0.591,
+          "spearman_damage_on_event_days": 0.269,
+          "test_site_days": 243695,
+          "severe_site_days": 2062,
+          "death_site_days": 628
+        },
+        "C  v3 + NWS alerts, P(any) only": {
+          "auc_any_hazard": 0.895,
+          "auc_severe_outcome": 0.863,
+          "auc_death": 0.955,
+          "calibration_any": 1.06,
+          "severe_days_in_top_10pct": 0.535,
+          "spearman_damage_on_event_days": 0.266,
+          "test_site_days": 243695,
+          "severe_site_days": 2062,
+          "death_site_days": 628
+        },
+        "C  v3 + NWS alerts + severity (production)": {
+          "auc_any_hazard": 0.889,
+          "auc_severe_outcome": 0.873,
+          "auc_death": 0.963,
+          "calibration_any": 1.06,
+          "severe_days_in_top_10pct": 0.566,
+          "spearman_damage_on_event_days": 0.252,
+          "test_site_days": 243695,
+          "severe_site_days": 2062,
+          "death_site_days": 628
+        }
+      }
+    },
+    {
+      "fold": "2025-26",
+      "variants": {
+        "A0 v2, measured weather (optimistic)": {
+          "auc_any_hazard": 0.903,
+          "auc_severe_outcome": 0.837,
+          "auc_death": 0.909,
+          "calibration_any": 1.08,
+          "severe_days_in_top_10pct": 0.399,
+          "spearman_damage_on_event_days": 0.269,
+          "test_site_days": 327810,
+          "severe_site_days": 1160,
+          "death_site_days": 79
+        },
+        "A  v2, day-ahead forecast": {
+          "auc_any_hazard": 0.862,
+          "auc_severe_outcome": 0.839,
+          "auc_death": 0.831,
+          "calibration_any": 0.57,
+          "severe_days_in_top_10pct": 0.426,
+          "spearman_damage_on_event_days": 0.088,
+          "test_site_days": 327810,
+          "severe_site_days": 1160,
+          "death_site_days": 79
+        },
+        "B  v3 forecast-trained": {
+          "auc_any_hazard": 0.883,
+          "auc_severe_outcome": 0.824,
+          "auc_death": 0.86,
+          "calibration_any": 1.05,
+          "severe_days_in_top_10pct": 0.278,
+          "spearman_damage_on_event_days": 0.098,
+          "test_site_days": 327810,
+          "severe_site_days": 1160,
+          "death_site_days": 79
+        },
+        "C  v3 + NWS alerts, P(any) only": {
+          "auc_any_hazard": 0.866,
+          "auc_severe_outcome": 0.81,
+          "auc_death": 0.828,
+          "calibration_any": 0.98,
+          "severe_days_in_top_10pct": 0.211,
+          "spearman_damage_on_event_days": 0.118,
+          "test_site_days": 327810,
+          "severe_site_days": 1160,
+          "death_site_days": 79
+        },
+        "C  v3 + NWS alerts + severity (production)": {
+          "auc_any_hazard": 0.852,
+          "auc_severe_outcome": 0.83,
+          "auc_death": 0.816,
+          "calibration_any": 0.98,
+          "severe_days_in_top_10pct": 0.328,
+          "spearman_damage_on_event_days": 0.085,
+          "test_site_days": 327810,
+          "severe_site_days": 1160,
+          "death_site_days": 79
+        }
+      }
+    }
+  ],
+  "mean_over_folds": {
+    "A0 v2, measured weather (optimistic)": {
+      "auc_any_hazard": 0.904,
+      "auc_severe_outcome": 0.841,
+      "auc_death": 0.936,
+      "calibration_any": 1.007,
+      "severe_days_in_top_10pct": 0.471,
+      "spearman_damage_on_event_days": 0.248
+    },
+    "A  v2, day-ahead forecast": {
+      "auc_any_hazard": 0.864,
+      "auc_severe_outcome": 0.842,
+      "auc_death": 0.921,
+      "calibration_any": 0.543,
+      "severe_days_in_top_10pct": 0.484,
+      "spearman_damage_on_event_days": 0.124
+    },
+    "B  v3 forecast-trained": {
+      "auc_any_hazard": 0.884,
+      "auc_severe_outcome": 0.831,
+      "auc_death": 0.936,
+      "calibration_any": 1.063,
+      "severe_days_in_top_10pct": 0.441,
+      "spearman_damage_on_event_days": 0.153
+    },
+    "C  v3 + NWS alerts, P(any) only": {
+      "auc_any_hazard": 0.879,
+      "auc_severe_outcome": 0.827,
+      "auc_death": 0.921,
+      "calibration_any": 0.92,
+      "severe_days_in_top_10pct": 0.404,
+      "spearman_damage_on_event_days": 0.14
+    },
+    "C  v3 + NWS alerts + severity (production)": {
+      "auc_any_hazard": 0.87,
+      "auc_severe_outcome": 0.84,
+      "auc_death": 0.919,
+      "calibration_any": 0.92,
+      "severe_days_in_top_10pct": 0.461,
+      "spearman_damage_on_event_days": 0.122
+    }
+  },
+  "nws_groups": [
+    "heat",
+    "flood",
+    "wind",
+    "tropical",
+    "cold",
+    "fire",
+    "fog",
+    "convective"
+  ],
+  "note": "Walk-forward: each fold trains only on earlier years. A0 uses measured weather and is optimistic."
+}

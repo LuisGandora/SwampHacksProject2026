@@ -14,12 +14,20 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 
 
+def load_env():
+    """Copy KEY=value lines from .env into os.environ (real environment variables win)."""
+    env = ROOT / ".env"
+    if env.exists():
+        for line in env.read_text(encoding="utf-8-sig").splitlines():
+            key, sep, value = line.partition("=")
+            if sep and key.strip() and not key.lstrip().startswith("#"):
+                os.environ.setdefault(key.strip(), value.strip())
+
+
 def database_url():
+    load_env()
     if os.environ.get("DATABASE_URL"):
         return os.environ["DATABASE_URL"]
-    for line in (ROOT / ".env").read_text(encoding="utf-8-sig").splitlines():
-        if line.startswith("DATABASE_URL="):
-            return line.split("=", 1)[1].strip()
     raise SystemExit("DATABASE_URL not found in the environment or .env")
 
 
