@@ -79,6 +79,12 @@ def load_sites(conn):
                    nws_office = EXCLUDED.nws_office, fl_climate_region = EXCLUDED.fl_climate_region,
                    weather_station_id = EXCLUDED.weather_station_id, weather_station_mi = EXCLUDED.weather_station_mi""",
             rows)
+        zones = DATA / "site_flood_zones.csv"   # scraper/fema_flood_zones.py
+        if zones.exists():
+            cur.executemany("UPDATE sites SET fema_flood_zone = %s, fema_zone_subtype = %s, fema_sfha = %s, "
+                            "fema_bfe_ft = %s WHERE site_id = %s",
+                            [(z["fld_zone"], none(z["zone_subtype"]), z["sfha"] == "True", none(z["bfe_ft"]),
+                              int(z["site_id"])) for z in csv.DictReader(open(zones, encoding="utf-8"))])
     return len(used), len(rows)
 
 

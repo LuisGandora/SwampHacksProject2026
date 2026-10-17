@@ -3,6 +3,17 @@
     {
       "fold": "2023",
       "variants": {
+        "Z  baseline: site x month historical rate": {
+          "auc_any_hazard": 0.653,
+          "auc_severe_outcome": 0.63,
+          "auc_death": 0.658,
+          "calibration_any": 0.8,
+          "severe_days_in_top_10pct": 0.227,
+          "spearman_damage_on_event_days": -0.005,
+          "test_site_days": 244185,
+          "severe_site_days": 1308,
+          "death_site_days": 267
+        },
         "A0 v2, measured weather (optimistic)": {
           "auc_any_hazard": 0.901,
           "auc_severe_outcome": 0.817,
@@ -63,6 +74,17 @@
     {
       "fold": "2024",
       "variants": {
+        "Z  baseline: site x month historical rate": {
+          "auc_any_hazard": 0.664,
+          "auc_severe_outcome": 0.674,
+          "auc_death": 0.66,
+          "calibration_any": 1.21,
+          "severe_days_in_top_10pct": 0.306,
+          "spearman_damage_on_event_days": -0.118,
+          "test_site_days": 243695,
+          "severe_site_days": 2062,
+          "death_site_days": 628
+        },
         "A0 v2, measured weather (optimistic)": {
           "auc_any_hazard": 0.907,
           "auc_severe_outcome": 0.868,
@@ -123,6 +145,17 @@
     {
       "fold": "2025-26",
       "variants": {
+        "Z  baseline: site x month historical rate": {
+          "auc_any_hazard": 0.66,
+          "auc_severe_outcome": 0.774,
+          "auc_death": 0.621,
+          "calibration_any": 1.28,
+          "severe_days_in_top_10pct": 0.483,
+          "spearman_damage_on_event_days": -0.085,
+          "test_site_days": 327810,
+          "severe_site_days": 1160,
+          "death_site_days": 79
+        },
         "A0 v2, measured weather (optimistic)": {
           "auc_any_hazard": 0.903,
           "auc_severe_outcome": 0.837,
@@ -182,6 +215,14 @@
     }
   ],
   "mean_over_folds": {
+    "Z  baseline: site x month historical rate": {
+      "auc_any_hazard": 0.659,
+      "auc_severe_outcome": 0.693,
+      "auc_death": 0.646,
+      "calibration_any": 1.097,
+      "severe_days_in_top_10pct": 0.339,
+      "spearman_damage_on_event_days": -0.069
+    },
     "A0 v2, measured weather (optimistic)": {
       "auc_any_hazard": 0.904,
       "auc_severe_outcome": 0.841,

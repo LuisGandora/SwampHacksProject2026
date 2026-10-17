@@ -4,6 +4,7 @@ against what actually happened (NOAA events, deaths, injuries, damage, OSHA weat
     python -m ml.backtest          # ~10-15 min; writes ml/models/backtest.json (served at GET /model/backtest)
 
 Variants, all scored on the same test site-days:
+  Z   baseline, no weather: the site's historical hazard rate for that calendar month (training years only).
   A0  v2 design (trained on measured weather), scored on measured weather: what earlier checks reported. Optimistic:
       at 6 PM nobody knows tomorrow's measured weather.
   A   v2 design scored on the day-ahead forecast: what users of v2 would really have seen.
@@ -60,6 +61,19 @@ def run(df):
             continue
         print(f"fold {name}: train {len(tr):,} site-days (< {start}), test {len(te):,}", flush=True)
         fold = {"fold": name, "variants": {}}
+
+        # Baseline with no weather at all: how often this site had a hazard (and a severe outcome) in this calendar
+        # month during the training years; month-wide then overall rate where a site-month has no history.
+        tr_m, te_m = pd.to_datetime(tr["day"]).dt.month, pd.to_datetime(te["day"]).dt.month
+
+        def rate(col):
+            site_month = tr.groupby([tr["site_id"], tr_m])[col].mean()
+            r = pd.Series(site_month.reindex(pd.MultiIndex.from_arrays([te["site_id"], te_m])).to_numpy(), index=te.index)
+            month_only = pd.Series(tr.groupby(tr_m)[col].mean().reindex(te_m).to_numpy(), index=te.index)
+            return r.fillna(month_only).fillna(tr[col].mean()).to_numpy()
+
+        r_any, r_sev = rate("y_any"), rate("y_severe")
+        fold["variants"]["Z  baseline: site x month historical rate"] = metrics(te, combine(r_any, r_sev), r_any)
 
         obs = tr.dropna(subset=["max_temp_f"])
         a = new_model(TREES).fit(obs[OBSERVED], obs["y_any"])

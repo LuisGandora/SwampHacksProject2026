@@ -131,3 +131,10 @@ _idx = _pd.MultiIndex.from_product([["A", "B"], _months], names=["county_fips", 
 _y = _pd.Series([(5.0 if c == "A" else 1.0) * (m.month == 9) for c, m in _idx], index=_idx)  # A spikes 5x harder
 assert seasonal_residual(_y).abs().max() < 1e-9
 print("bounceback seasonal adjustment ok")
+
+# CDC WONDER terms: county death counts of 1-9 are never shown
+from backend.reports import cdc_safe
+assert cdc_safe({"cdc_county_weather_deaths": 7})["cdc_county_weather_deaths"] is None
+assert cdc_safe({"cdc_county_weather_deaths": 7})["cdc_county_suppressed"] is True
+assert cdc_safe({"cdc_county_weather_deaths": 12})["cdc_county_weather_deaths"] == 12 and cdc_safe(None) is None
+print("cdc suppression ok")

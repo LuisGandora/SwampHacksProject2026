@@ -65,6 +65,8 @@ Open the Command Palette (Ctrl+Shift+P), choose **Python: Select Interpreter**, 
 | [db/](db/) | Tiger Data (TimescaleDB) schema and loaders | `python db/setup_db.py`, `python db/load_history.py` |
 | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Brief → feature checklist with status, demo steps and checks | (none) |
 
+> **Judging and deployment:** [docs/JUDGING.md](docs/JUDGING.md) (baseline slide, demo script, Q&A, hygiene checklist) · [docs/DEPLOY.md](docs/DEPLOY.md) (Render blueprint, one worker, separate demo instance).
+
 ## Hazard Index model
 
 [ml/hazard_model.py](ml/hazard_model.py). One row per site per day, 1.27M site-days from October 2021 to October 2026, with one XGBoost classifier per hazard category.

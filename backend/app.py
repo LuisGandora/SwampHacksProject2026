@@ -3,8 +3,9 @@
     uvicorn backend.app:app --reload        # from the project root; docs at http://127.0.0.1:8000/docs
 
 Reads are public; every write needs an Auth0 sign-in (backend/auth.py) and is rate limited per user.
-Set PLANIT_DEV=1 to enable the /dev endpoints (demo scenario, fake lightning strike, run a job, briefing now).
-Never set it on a public URL: they write to the shared database.
+Set PLANIT_DEV=1 to enable the /dev endpoints (demo scenario, fake lightning strike, run a job, briefing now). They
+write to the shared database, so keep PLANIT_DEV off on the public URL and run demos from a separate instance
+(docs/DEPLOY.md); with Auth0 on, only supervisors (app_users.role) can call them.
 """
 import datetime as dt
 import json
@@ -22,7 +23,7 @@ from db.setup_db import load_env
 load_env()  # read .env (GEMINI_API_KEY, GEMINI_MODEL, ...) into os.environ before reports/briefings read them
 
 from backend import briefings, compliance, lightning, notify, reports, scenario
-from backend.auth import current_user, rate_limit
+from backend.auth import current_user, rate_limit, require_supervisor
 from backend.db import connection
 
 app = FastAPI(title="PlanIT Control API")
@@ -33,8 +34,9 @@ app.add_middleware(CORSMiddleware, allow_origins=os.environ.get(
 
 # Crew photos are stored on this server's disk and served from /uploads.
 # ponytail: local disk only, switch to S3/R2 when the API runs on more than one machine.
-UPLOADS = Path(__file__).resolve().parent.parent / "uploads"
-UPLOADS.mkdir(exist_ok=True)
+# UPLOADS_DIR: a persistent disk when deployed (e.g. /var/data/uploads); the repo's uploads/ folder locally.
+UPLOADS = Path(os.environ.get("UPLOADS_DIR") or Path(__file__).resolve().parent.parent / "uploads")
+UPLOADS.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOADS), name="uploads")
 MAX_PHOTO_BYTES = 10 * 1024 * 1024
 PHOTO_TYPES = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/heic": ".heic"}
@@ -98,7 +100,7 @@ def sites(state: str | None = None, horizon: Literal["now", "next_day"] = "next_
               FROM active_site_alerts GROUP BY site_id
         )
         SELECT s.site_id, s.name, s.operator, s.state, s.county, s.timezone, s.capacity_mw, s.primary_technology,
-               s.coord_check, {LATLON.format('s.geog')},
+               s.coord_check, s.fema_flood_zone, s.fema_sfha, {LATLON.format('s.geog')},
                CASE WHEN %(horizon)s = 'now' THEN greatest(h.score, f.floor) ELSE h.score END AS score,
                h.score AS model_score, %(horizon)s AS horizon, h.scored_for, h.category_scores,
                greatest(n.score, f.floor) AS score_now, t.score AS score_next_day,
@@ -135,6 +137,7 @@ def site(site_id: int):
     profile = many("SELECT * FROM site_risk_profile WHERE site_id = %s", (site_id,))
     if profile:
         profile[0].pop("geog")
+        profile[0] = reports.cdc_safe(profile[0])
     return {**s, "risk_profile": profile[0] if profile else None,
             "active_alerts": many("SELECT * FROM active_site_alerts WHERE site_id = %s ORDER BY level DESC, started_at",
                                   (site_id,)),
@@ -453,7 +456,7 @@ if os.environ.get("PLANIT_DEV") == "1":
     from backend.worker import JOBS
 
     @app.post("/dev/lightning/{site_id}")
-    def fake_strike(site_id: int, miles_away: float = Query(3.0, ge=0, le=10), user=Depends(current_user)):
+    def fake_strike(site_id: int, miles_away: float = Query(3.0, ge=0, le=10), user=Depends(require_supervisor)):
         """Insert a strike `miles_away` north of the site and raise alerts, exactly like a real GLM strike."""
         with connection() as conn:
             since = conn.execute("SELECT now() - interval '1 second' AS t").fetchone()["t"]
@@ -464,7 +467,7 @@ if os.environ.get("PLANIT_DEV") == "1":
         return active_alerts(site_id=site_id)
 
     @app.post("/dev/briefings/{site_id}")
-    def briefing_now(site_id: int, user=Depends(current_user)):
+    def briefing_now(site_id: int, user=Depends(require_supervisor)):
         """Write tomorrow's briefing for one site right now (normally 6 PM local)."""
         with connection() as conn:
             day = conn.execute("SELECT (now() AT TIME ZONE timezone)::date + 1 AS d FROM sites WHERE site_id = %s",
@@ -473,14 +476,14 @@ if os.environ.get("PLANIT_DEV") == "1":
         return briefing(site_id, day)
 
     @app.post("/dev/jobs/{name}")
-    def run_job(name: str, user=Depends(current_user)):
+    def run_job(name: str, user=Depends(require_supervisor)):
         if name not in JOBS:
             raise HTTPException(404, f"Unknown job; one of {sorted(JOBS)}")
         with connection() as conn:
             return {"job": name, "result": JOBS[name](conn)}
 
     @app.post("/dev/scenario/{site_id}")
-    def start_scenario(site_id: int, user=Depends(current_user)):
+    def start_scenario(site_id: int, user=Depends(require_supervisor)):
         """Put the site into the brief's story: heat index 108°F, lightning 4 mi away, a week of rain, a gator
         report, and a stormy 112°F tomorrow with its briefing. Remove with DELETE."""
         with connection() as conn:
@@ -490,6 +493,6 @@ if os.environ.get("PLANIT_DEV") == "1":
         return {**result, "active_alerts": active_alerts(site_id=site_id)}
 
     @app.delete("/dev/scenario/{site_id}")
-    def stop_scenario(site_id: int, user=Depends(current_user)):
+    def stop_scenario(site_id: int, user=Depends(require_supervisor)):
         with connection() as conn:
             return scenario.stop(conn, site_id)

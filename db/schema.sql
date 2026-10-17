@@ -134,6 +134,11 @@ ALTER TABLE sites ADD COLUMN IF NOT EXISTS nws_grid_x    int;
 ALTER TABLE sites ADD COLUMN IF NOT EXISTS nws_grid_y    int;
 ALTER TABLE sites ADD COLUMN IF NOT EXISTS forecast_zone text;    -- e.g. FLZ045, matches NWS alert UGC codes
 ALTER TABLE sites ADD COLUMN IF NOT EXISTS county_ugc    text;    -- e.g. FLC095
+-- FEMA National Flood Hazard Layer at the site (scraper/fema_flood_zones.py)
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS fema_flood_zone   text;     -- AE, VE, A, X, ... or 'unmapped'
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS fema_zone_subtype text;     -- e.g. 0.2 PCT ANNUAL CHANCE FLOOD HAZARD
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS fema_sfha         boolean;  -- inside the 1%-a-year (100-year) floodplain
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS fema_bfe_ft       numeric;  -- base flood elevation, where FEMA set one
 
 -- ===========================================================================================================
 -- History: NOAA Storm Events (details, locations, fatalities), CDC weather deaths, OSHA injuries, daily weather
