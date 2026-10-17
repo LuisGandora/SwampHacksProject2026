@@ -25,9 +25,13 @@ CREATE TABLE IF NOT EXISTS hazard_categories (
     all_clear_restarts  boolean NOT NULL DEFAULT false,  -- each new trigger restarts the countdown
     noaa_event_types    text[] NOT NULL DEFAULT '{}',    -- NOAA Storm Events EVENT_TYPE values in this category
     notes               text,
-    lower_is_worse      boolean NOT NULL DEFAULT false   -- cold and fog: values at or below the thresholds trigger
+    lower_is_worse      boolean NOT NULL DEFAULT false,  -- cold and fog: values at or below the thresholds trigger
+    nws_warn_events     text[] NOT NULL DEFAULT '{}',    -- NWS alert names that raise a warning
+    nws_stop_events     text[] NOT NULL DEFAULT '{}'     -- NWS alert names that raise stop work
 );
 ALTER TABLE hazard_categories ADD COLUMN IF NOT EXISTS lower_is_worse boolean NOT NULL DEFAULT false;
+ALTER TABLE hazard_categories ADD COLUMN IF NOT EXISTS nws_warn_events text[] NOT NULL DEFAULT '{}';
+ALTER TABLE hazard_categories ADD COLUMN IF NOT EXISTS nws_stop_events text[] NOT NULL DEFAULT '{}';
 
 INSERT INTO hazard_categories VALUES
 ('lightning', 'Lightning', 'environmental', 'strikes', 'count', 1, 1, 20, 10, 10, 30, 30, true,
@@ -66,6 +70,26 @@ ON CONFLICT (category) DO NOTHING;  -- keep the team's edits on re-run
 UPDATE hazard_categories SET lower_is_worse = true
  WHERE category IN ('extreme_cold', 'dense_fog') AND NOT lower_is_worse;
 
+-- Default NWS alert -> category mapping; only fills categories whose lists are still empty.
+UPDATE hazard_categories h SET nws_warn_events = d.warn, nws_stop_events = d.stop
+  FROM (VALUES
+    ('severe_storm', '{"Severe Thunderstorm Watch","Tornado Watch"}'::text[],
+                     '{"Severe Thunderstorm Warning","Tornado Warning"}'::text[]),
+    ('tropical',     '{"Tropical Storm Watch","Hurricane Watch","Storm Surge Watch"}',
+                     '{"Tropical Storm Warning","Hurricane Warning","Storm Surge Warning","Extreme Wind Warning"}'),
+    ('flooding',     '{"Flood Watch","Flash Flood Watch","Flood Advisory","Flood Warning","Coastal Flood Watch","Coastal Flood Advisory","Coastal Flood Warning"}',
+                     '{"Flash Flood Warning","Flash Flood Emergency"}'),
+    ('extreme_heat', '{"Heat Advisory","Excessive Heat Watch","Extreme Heat Watch"}',
+                     '{"Excessive Heat Warning","Extreme Heat Warning"}'),
+    ('extreme_cold', '{"Frost Advisory","Freeze Watch","Freeze Warning","Hard Freeze Watch","Hard Freeze Warning","Cold Weather Advisory","Wind Chill Advisory","Winter Weather Advisory","Winter Storm Watch"}',
+                     '{"Extreme Cold Warning","Wind Chill Warning","Winter Storm Warning","Ice Storm Warning","Blizzard Warning"}'),
+    ('high_wind',    '{"Wind Advisory","High Wind Watch","Lake Wind Advisory"}', '{"High Wind Warning"}'),
+    ('wildfire',     '{"Red Flag Warning","Fire Weather Watch"}', '{"Fire Warning"}'),
+    ('dense_fog',    '{"Dense Fog Advisory","Dense Smoke Advisory"}', '{}'),
+    ('coastal',      '{"Rip Current Statement","High Surf Advisory","Beach Hazards Statement"}', '{"High Surf Warning"}')
+  ) AS d(category, warn, stop)
+ WHERE h.category = d.category AND h.nws_warn_events = '{}' AND h.nws_stop_events = '{}';
+
 -- ===========================================================================================================
 -- Job sites (power plants) and weather stations
 -- ===========================================================================================================
@@ -99,6 +123,12 @@ CREATE TABLE IF NOT EXISTS sites (
     weather_station_mi    numeric
 );
 CREATE INDEX IF NOT EXISTS sites_geog_idx ON sites USING gist (geog);
+-- NWS lookups (filled once per site by the worker's "points" job)
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS nws_grid_id   text;    -- forecast office grid, e.g. MLB
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS nws_grid_x    int;
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS nws_grid_y    int;
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS forecast_zone text;    -- e.g. FLZ045, matches NWS alert UGC codes
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS county_ugc    text;    -- e.g. FLC095
 
 -- ===========================================================================================================
 -- History: NOAA Storm Events (details, locations, fatalities), CDC weather deaths, OSHA injuries, daily weather
@@ -272,6 +302,9 @@ CREATE TABLE IF NOT EXISTS weather_forecasts (           -- next-day forecast fo
     PRIMARY KEY (site_id, valid_at, issued_at)
 );
 SELECT create_hypertable('weather_forecasts', by_range('valid_at', INTERVAL '7 days'), if_not_exists => true);
+ALTER TABLE weather_forecasts ADD COLUMN IF NOT EXISTS wind_chill_f  numeric;
+ALTER TABLE weather_forecasts ADD COLUMN IF NOT EXISTS visibility_mi numeric;
+SELECT add_retention_policy('weather_forecasts', INTERVAL '30 days', if_not_exists => true);
 
 CREATE TABLE IF NOT EXISTS nws_alerts (
     alert_id        text NOT NULL,
@@ -289,6 +322,7 @@ CREATE TABLE IF NOT EXISTS nws_alerts (
 );
 SELECT create_hypertable('nws_alerts', by_range('sent_at', INTERVAL '1 month'), if_not_exists => true);
 CREATE INDEX IF NOT EXISTS nws_alerts_geog_idx ON nws_alerts USING gist (geog);
+SELECT add_retention_policy('nws_alerts', INTERVAL '180 days', if_not_exists => true);
 
 CREATE TABLE IF NOT EXISTS river_gauges (
     gauge_id            text PRIMARY KEY,                -- USGS site number
@@ -367,15 +401,20 @@ CREATE TABLE IF NOT EXISTS site_alerts (
 CREATE INDEX IF NOT EXISTS site_alerts_open_idx ON site_alerts (site_id, category) WHERE cleared_at IS NULL;
 
 -- Raise or extend an alert. A new trigger on an open alert of the same site/category/level restarts its
--- countdown (when the category says so) instead of opening a second alert.
+-- countdown (when the category says so) instead of opening a second alert. p_until keeps an alert open at
+-- least until then (an NWS warning's expiry time).
+DROP FUNCTION IF EXISTS raise_site_alert(bigint, text, text, timestamptz, numeric, text);
 CREATE OR REPLACE FUNCTION raise_site_alert(p_site bigint, p_category text, p_level text,
-                                            p_at timestamptz, p_value numeric DEFAULT NULL, p_message text DEFAULT NULL)
+                                            p_at timestamptz, p_value numeric DEFAULT NULL, p_message text DEFAULT NULL,
+                                            p_until timestamptz DEFAULT NULL)
 RETURNS site_alerts LANGUAGE plpgsql AS $$
 DECLARE
-    rule  hazard_categories;
-    a     site_alerts;
+    rule       hazard_categories;
+    a          site_alerts;
+    new_clear  timestamptz;
 BEGIN
     SELECT * INTO STRICT rule FROM hazard_categories WHERE category = p_category;
+    new_clear := greatest(p_at + make_interval(mins => rule.all_clear_minutes), p_until);  -- greatest skips NULLs
     UPDATE site_alerts SET cleared_at = all_clear_at              -- close countdowns that already ran out
      WHERE site_id = p_site AND category = p_category AND cleared_at IS NULL AND all_clear_at <= p_at;
     SELECT * INTO a FROM site_alerts
@@ -384,17 +423,15 @@ BEGIN
     IF FOUND THEN
         UPDATE site_alerts
            SET last_trigger_at = greatest(last_trigger_at, p_at),
-               all_clear_at = CASE WHEN rule.all_clear_restarts AND rule.all_clear_minutes IS NOT NULL
-                                   THEN greatest(all_clear_at, p_at + make_interval(mins => rule.all_clear_minutes))
-                                   ELSE all_clear_at END,
+               all_clear_at = CASE WHEN rule.all_clear_restarts OR p_until IS NOT NULL
+                                   THEN greatest(all_clear_at, new_clear) ELSE all_clear_at END,
                trigger_value = coalesce(p_value, trigger_value),
                message = coalesce(p_message, message)
          WHERE alert_id = a.alert_id
      RETURNING * INTO a;
     ELSE
         INSERT INTO site_alerts (site_id, category, level, started_at, last_trigger_at, all_clear_at, trigger_value, message)
-        VALUES (p_site, p_category, p_level, p_at, p_at,
-                p_at + make_interval(mins => rule.all_clear_minutes), p_value, p_message)
+        VALUES (p_site, p_category, p_level, p_at, p_at, new_clear, p_value, p_message)
         RETURNING * INTO a;
     END IF;
     RETURN a;

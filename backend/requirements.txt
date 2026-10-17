@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+psycopg[binary]
+psycopg_pool
+httpx
+apscheduler
+h5py
+numpy
