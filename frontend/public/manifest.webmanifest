@@ -1,6 +1,6 @@
 {
-  "name": "PlanIT Control",
-  "short_name": "PlanIT",
+  "name": "Planet Control",
+  "short_name": "Planet Control",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#05070a",
