@@ -1,0 +1,103 @@
+:root {
+  --bg: #d9d9d9;
+  --ink: #111;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); }
+
+.page { min-height: 100vh; padding: 16px 40px 40px; }
+
+.header { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; }
+.title { margin: 0; font-size: 2rem; font-weight: 400; }
+.index { margin: 0; font-size: 2.25rem; font-weight: 400; }
+
+.clock { margin: 0; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+
+.layout { display: grid; grid-template-columns: minmax(280px, 850px) 1fr; gap: 80px; margin-top: 40px; align-items: start; }
+
+.map-wrap { max-width: 850px; }
+.map { position: relative; background: #fff; width: 100%; }
+.map img { width: 100%; height: 100%; display: block; }
+
+.pin {
+  position: absolute; width: 16px; height: 16px; padding: 0;
+  transform: translate(-50%, -50%); border-radius: 50%;
+  border: 2px solid #fff; box-shadow: 0 0 0 1px #0006; cursor: pointer;
+}
+.pin:hover { transform: translate(-50%, -50%) scale(2); }
+.pin:focus-visible { outline: 3px solid #1a56db; outline-offset: 2px; }
+.pin--active { box-shadow: 0 0 0 3px var(--ink); }
+
+.panel { display: flex; flex-direction: column; justify-content: space-between; min-height: 70vh; padding-left: 8px; }
+.city-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin: 0 0 24px; }
+.city { font-size: 1.5rem; margin: 0; }
+.city-time { font-size: 1.25rem; color: #333; font-variant-numeric: tabular-nums; }.info-line { font-size: 2.25rem; font-weight: 700; margin: 0 0 56px; }
+.hint { font-size: 1rem; color: #555; margin: -24px 0 0; }
+
+.rank-btn {
+  font: inherit; font-size: 2.25rem; font-weight: 700; text-align: left; line-height: 1.15;
+  background: none; border: 0; padding: 0; color: inherit; cursor: pointer;
+}
+.rank-btn:hover:not(:disabled) { text-decoration: underline; }
+.rank-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.rank-picker { margin-top: 16px; }
+.rank-picker p { margin: 0 0 8px; }
+.rank-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.rank-options button {
+  width: 40px; height: 40px; font: inherit; font-weight: 600;
+  border: 1px solid var(--ink); background: #fff; cursor: pointer;
+}
+.rank-options button.on { background: var(--ink); color: #fff; }
+
+.location { margin: 0; font-size: 1rem; color: #333; }
+
+.me-marker {
+  position: absolute; width: 18px; height: 18px;
+  transform: translate(-50%, -50%); border-radius: 50%;
+  background: #1a56db; border: 3px solid #fff;
+  box-shadow: 0 0 0 2px #1a56db; pointer-events: none;
+
+}
+
+.me-marker::after {
+  content:"";
+  position: absolute; 
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid #1a56db;
+  animation: pulse 3s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8;}
+  60% { transform: scale(3); opacity: 0.1;}
+  100% { transform: scale(3); opacity: 0.0;}  
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .me-marker::after { animation: none; display: none; }
+}
+
+.crew-btn { margin-top: 24px; }
+
+.reports { margin-top: 8px; max-width: 480px; }
+.reports-title { margin: 0 0 12px; font-size: 1.25rem; }
+.report { background: #fff; padding: 10px 14px; margin-bottom: 10px; border-left: 4px solid var(--ink); }
+.report-meta { margin: 0 0 4px; font-size: 0.85rem; color: #555; }
+.report-text { margin: 0; }
+
+.report-form { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; max-width: 420px; }
+.report-form p { margin: 0; }
+.report-form select, .report-form textarea { font: inherit; padding: 8px; border: 1px solid var(--ink); background: #fff; }
+.report-form textarea { resize: vertical; }
+.report-form button { align-self: flex-start; font: inherit; font-weight: 600; padding: 8px 16px; background: var(--ink); color: #fff; border: 0; cursor: pointer; }
+
+@media (max-width: 900px) {
+  .page { padding: 16px 20px 40px; }
+  .layout { grid-template-columns: 1fr; gap: 32px; }
+  .index { font-size: 1.5rem; }
+  .info-line, .rank-btn { font-size: 1.5rem; margin-bottom: 20px; }
+  .panel { min-height: 0; gap: 32px; }
+}
