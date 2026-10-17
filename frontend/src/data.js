@@ -3,6 +3,12 @@ export const MAP_SIZE = { width: 850, height: 1100 };
 
 // x/y are pixel positions on public/map.png.
 // hazard + info are PLACEHOLDERS: replace with real data / API calls.
+// Cities in the central time zone, pretty much everything else should be eastern
+const CENTRAL = new Set([
+  "Huntsville", "Birmingham", "Tuscaloosa", "Montgomery", "Mobile",
+  "Pensacola", "Panama City Beach",
+]);
+
 export const CITIES = [
   { name: "Huntsville", x: 196, y: 67 },
   { name: "Birmingham", x: 174, y: 196 },
@@ -24,6 +30,7 @@ export const CITIES = [
   { name: "Miami", x: 796, y: 1011 },
 ].map((c, i) => ({
   ...c,
+  tz: CENTRAL.has(c.name) ? "America/Chicago" : "America/New_York",
   hazard: (i * 7) % 11, // placeholder 0-10
   info: ["General Info 1", "General Info 2", "General Info 3"],
 }));

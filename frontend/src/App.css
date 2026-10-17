@@ -30,8 +30,9 @@ body { margin: 0; background: var(--bg); color: var(--ink); }
 .pin--active { box-shadow: 0 0 0 3px var(--ink); }
 
 .panel { display: flex; flex-direction: column; justify-content: space-between; min-height: 70vh; padding-left: 8px; }
-.city { font-size: 1.5rem; margin: 0 0 24px; }
-.info-line { font-size: 2.25rem; font-weight: 700; margin: 0 0 56px; }
+.city-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin: 0 0 24px; }
+.city { font-size: 1.5rem; margin: 0; }
+.city-time { font-size: 1.25rem; color: #333; font-variant-numeric: tabular-nums; }.info-line { font-size: 2.25rem; font-weight: 700; margin: 0 0 56px; }
 .hint { font-size: 1rem; color: #555; margin: -24px 0 0; }
 
 .rank-btn {
