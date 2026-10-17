@@ -1,0 +1,655 @@
+-- PlanIT Control schema for Tiger Data (TimescaleDB + PostGIS).
+-- Safe to re-run: tables use IF NOT EXISTS, default rules never overwrite edits, derived views are rebuilt.
+-- Distances are miles; geography columns are WGS84 lon/lat (SRID 4326).
+
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS timescaledb;
+
+-- ===========================================================================================================
+-- Hazard rules: one row per category. Every radius, threshold and countdown lives here as data, so the
+-- team can retune a range (e.g. lightning stop-work radius) with an UPDATE instead of a code change.
+-- ===========================================================================================================
+CREATE TABLE IF NOT EXISTS hazard_categories (
+    category            text PRIMARY KEY,
+    label               text NOT NULL,
+    kind                text NOT NULL CHECK (kind IN ('environmental', 'crew')),
+    metric              text,             -- live value the alert watches, e.g. strikes, heat_index_f
+    unit                text,
+    warn_value          numeric,          -- metric >= warn_value -> warning (<= for cold)
+    stop_value          numeric,          -- metric >= stop_value -> stop work
+    warn_radius_mi      numeric,          -- live event this close -> warning (NULL = measured at the site)
+    stop_radius_mi      numeric,          -- live event this close -> stop work
+    history_radius_mi   numeric NOT NULL, -- historical events this close count toward the site's risk profile
+    window_minutes      int,              -- look-back for the metric, e.g. 720 = overnight rain
+    all_clear_minutes   int,              -- stop-work lasts this long after the last trigger
+    all_clear_restarts  boolean NOT NULL DEFAULT false,  -- each new trigger restarts the countdown
+    noaa_event_types    text[] NOT NULL DEFAULT '{}',    -- NOAA Storm Events EVENT_TYPE values in this category
+    notes               text,
+    lower_is_worse      boolean NOT NULL DEFAULT false   -- cold and fog: values at or below the thresholds trigger
+);
+ALTER TABLE hazard_categories ADD COLUMN IF NOT EXISTS lower_is_worse boolean NOT NULL DEFAULT false;
+
+INSERT INTO hazard_categories VALUES
+('lightning', 'Lightning', 'environmental', 'strikes', 'count', 1, 1, 20, 10, 10, 30, 30, true,
+ '{Lightning}', 'Any strike within 10 mi: stop work, 30-min all-clear that restarts with each new strike. Warn at 20 mi.'),
+('extreme_heat', 'Extreme heat', 'environmental', 'heat_index_f', 'F', 103, 115, NULL, NULL, 25, 60, NULL, false,
+ '{Heat,"Excessive Heat"}', 'OSHA heat index risk bands: 103-115 high, above 115 very high/extreme.'),
+('extreme_cold', 'Extreme cold', 'environmental', 'wind_chill_f', 'F', 32, 15, NULL, NULL, 25, 60, NULL, false,
+ '{Cold/Wind Chill,"Extreme Cold/Wind Chill",Frost/Freeze,"Winter Storm","Winter Weather","Ice Storm","Heavy Snow",Sleet,"Freezing Fog"}',
+ 'Lower is worse: warn at or below 32 F, stop at or below 15 F.'),
+('flooding', 'Flooding', 'environmental', 'rain_in', 'in', 2, 4, 5, 1, 10, 720, NULL, false,
+ '{Flood,"Flash Flood","Heavy Rain","Coastal Flood","Lakeshore Flood","Storm Surge/Tide"}',
+ 'Overnight (12 h) rain at the site, or a river gauge above flood stage within the radius, or an NWS flood warning covering the site.'),
+('high_wind', 'High wind', 'environmental', 'wind_gust_mph', 'mph', 20, 28, NULL, NULL, 25, 10, 30, true,
+ '{"High Wind","Strong Wind"}', '28 mph is the ANSI A92 aerial-lift limit; cranes follow the manufacturer chart.'),
+('severe_storm', 'Severe thunderstorm / tornado', 'environmental', 'nws_warning', 'active', 1, 1, 25, 10, 25, NULL, 30, true,
+ '{"Thunderstorm Wind",Tornado,Hail,"Funnel Cloud",Waterspout,"Dust Devil"}',
+ 'NWS severe thunderstorm or tornado warning polygon within the radius.'),
+('tropical', 'Tropical storm / hurricane', 'environmental', 'nws_warning', 'active', 1, 1, 100, 50, 50, NULL, NULL, false,
+ '{Hurricane,"Hurricane (Typhoon)","Tropical Storm","Tropical Depression"}',
+ 'Tropical storm or hurricane watch/warning for the site''s zone.'),
+('wildfire', 'Wildfire', 'environmental', 'fire_detections', 'count', 1, 1, 10, 2, 10, 1440, NULL, false,
+ '{Wildfire}', 'Satellite fire detection (NASA FIRMS) in the last 24 h.'),
+('soil_saturation', 'Soil saturation / mud', 'environmental', 'rain_7d_in', 'in', 4, 8, NULL, NULL, 0, 10080, NULL, false,
+ '{}', 'A week of soaking rain: soft ground, stuck vehicles, unstable trench walls.'),
+('dense_fog', 'Dense fog / smoke', 'environmental', 'visibility_mi', 'mi', 1, 0.25, NULL, NULL, 10, 60, NULL, false,
+ '{"Dense Fog","Dense Smoke"}', 'Lower is worse: equipment moves and site access.'),
+('coastal', 'Rip current / high surf', 'environmental', NULL, NULL, NULL, NULL, NULL, NULL, 5, NULL, NULL, false,
+ '{"Rip Current","High Surf",Sneakerwave}', 'History only; matters for waterfront sites.'),
+('wildlife', 'Wildlife sighting', 'environmental', 'sightings', 'count', 1, 1, 1, 0.1, 2, 10080, NULL, false,
+ '{}', 'Alligators, snakes, bees, etc. from crew reports and iNaturalist in the last 7 days.'),
+('ppe', 'PPE not worn', 'crew', NULL, NULL, NULL, NULL, NULL, NULL, 50, NULL, NULL, false, '{}', 'OSHA reports + crew reports.'),
+('heavy_machinery', 'Heavy machinery misuse', 'crew', NULL, NULL, NULL, NULL, NULL, NULL, 50, NULL, NULL, false, '{}', 'OSHA reports + crew reports.'),
+('slip_trip', 'Spills / trash in walkways', 'crew', NULL, NULL, NULL, NULL, NULL, NULL, 50, NULL, NULL, false, '{}', 'OSHA reports + crew reports.'),
+('osha_inspection', 'OSHA violation / inspection', 'crew', NULL, NULL, NULL, NULL, NULL, NULL, 50, NULL, NULL, false, '{}', 'OSHA opened an inspection.')
+ON CONFLICT (category) DO NOTHING;  -- keep the team's edits on re-run
+UPDATE hazard_categories SET lower_is_worse = true
+ WHERE category IN ('extreme_cold', 'dense_fog') AND NOT lower_is_worse;
+
+-- ===========================================================================================================
+-- Job sites (power plants) and weather stations
+-- ===========================================================================================================
+CREATE TABLE IF NOT EXISTS weather_stations (
+    station_id   text PRIMARY KEY,         -- ASOS id, e.g. MCO
+    name         text,
+    network      text,                     -- e.g. FL_ASOS
+    nws_office   text,
+    geog         geography(Point, 4326) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sites (
+    site_id               bigint PRIMARY KEY,   -- EIA plant ID
+    name                  text NOT NULL,
+    operator              text,
+    state                 char(2) NOT NULL,
+    county                text,
+    county_fips           char(5),
+    timezone              text NOT NULL,        -- IANA, drives the 6 PM local briefing
+    capacity_mw           numeric,
+    primary_technology    text,
+    fuels                 text,
+    generators            int,
+    geog                  geography(Point, 4326) NOT NULL,
+    coord_source          text,                 -- eia860m or osm
+    osm_id                text,
+    coord_check           text,                 -- ok / review / no_osm
+    nws_office            text,
+    fl_climate_region     text,
+    weather_station_id    text REFERENCES weather_stations,
+    weather_station_mi    numeric
+);
+CREATE INDEX IF NOT EXISTS sites_geog_idx ON sites USING gist (geog);
+
+-- ===========================================================================================================
+-- History: NOAA Storm Events (details, locations, fatalities), CDC weather deaths, OSHA injuries, daily weather
+-- ===========================================================================================================
+CREATE TABLE IF NOT EXISTS storm_events (                -- StormEvents_details
+    event_id            bigint NOT NULL,
+    episode_id          bigint,
+    begin_time          timestamptz NOT NULL,
+    end_time            timestamptz,
+    state               text,
+    state_fips          char(2),
+    event_type          text NOT NULL,
+    category            text REFERENCES hazard_categories,  -- from hazard_categories.noaa_event_types
+    cz_type             char(1),                             -- C county, Z forecast zone, M marine
+    cz_fips             text,
+    cz_name             text,
+    wfo                 text,
+    injuries_direct     int NOT NULL DEFAULT 0,
+    injuries_indirect   int NOT NULL DEFAULT 0,
+    deaths_direct       int NOT NULL DEFAULT 0,
+    deaths_indirect     int NOT NULL DEFAULT 0,
+    damage_property_usd numeric,
+    damage_crops_usd    numeric,
+    source              text,
+    magnitude           numeric,                             -- wind kt or hail inches
+    magnitude_type      text,
+    flood_cause         text,
+    tropical_category   int,
+    tor_f_scale         text,
+    tor_length_mi       numeric,
+    tor_width_yd        numeric,
+    begin_location      text,
+    end_location        text,
+    geog                geography(Geometry, 4326),           -- point, tornado path line, or zone centroid
+    location_precision  text CHECK (location_precision IN ('point', 'path', 'zone', 'none')),
+    episode_narrative   text,
+    event_narrative     text,
+    PRIMARY KEY (event_id, begin_time)
+);
+SELECT create_hypertable('storm_events', by_range('begin_time', INTERVAL '6 months'), if_not_exists => true);
+CREATE INDEX IF NOT EXISTS storm_events_geog_idx ON storm_events USING gist (geog);
+CREATE INDEX IF NOT EXISTS storm_events_category_idx ON storm_events (category, begin_time DESC);
+
+CREATE TABLE IF NOT EXISTS storm_event_locations (       -- StormEvents_locations: extra points along an event
+    event_id        bigint NOT NULL,
+    episode_id      bigint,
+    location_index  int NOT NULL,
+    year_month      int NOT NULL,                        -- YYYYMM
+    range_mi        numeric,
+    azimuth         text,
+    location        text,
+    geog            geography(Point, 4326) NOT NULL,
+    PRIMARY KEY (event_id, location_index)
+);
+CREATE INDEX IF NOT EXISTS storm_event_locations_geog_idx ON storm_event_locations USING gist (geog);
+
+CREATE TABLE IF NOT EXISTS storm_fatalities (            -- StormEvents_fatalities: one row per person
+    fatality_id     bigint NOT NULL,
+    event_id        bigint NOT NULL,
+    fatality_time   timestamptz NOT NULL,
+    is_direct       boolean NOT NULL,                    -- FATALITY_TYPE D (direct) / I (indirect)
+    age             int,
+    sex             char(1),
+    location        text,                                -- e.g. Outside/Open Areas, Heavy Equipment/Construction
+    crew_relevant   boolean GENERATED ALWAYS AS (location IN
+                        ('Heavy Equipment/Construction', 'Outside/Open Areas', 'Under Tree', 'Vehicle/Towed Trailer')) STORED,
+    PRIMARY KEY (fatality_id, fatality_time)
+);
+SELECT create_hypertable('storm_fatalities', by_range('fatality_time', INTERVAL '1 year'), if_not_exists => true);
+CREATE INDEX IF NOT EXISTS storm_fatalities_event_idx ON storm_fatalities (event_id);
+
+CREATE TABLE IF NOT EXISTS weather_fatalities (          -- CDC WONDER: deaths by county, ICD-10 X30-X39
+    county_fips     char(5) NOT NULL,
+    county_name     text,
+    period_start    date NOT NULL,
+    period_end      date NOT NULL,
+    icd10_codes     text NOT NULL,
+    deaths          int,                                 -- NULL when suppressed (under 10): never display a value
+    suppressed      boolean NOT NULL DEFAULT false,
+    population      bigint,
+    crude_rate      numeric,
+    PRIMARY KEY (county_fips, period_start, period_end, icd10_codes)
+);
+
+CREATE TABLE IF NOT EXISTS osha_injuries (               -- OSHA Severe Injury Reports
+    report_id           bigint NOT NULL,
+    event_time          timestamptz NOT NULL,
+    employer            text,
+    address             text,
+    city                text,
+    state               text,
+    zip                 text,
+    naics               text,
+    hospitalized        int,
+    amputation          int,
+    loss_of_eye         int,
+    inspection_id       text,
+    nature              text,
+    part_of_body        text,
+    event_code          text,
+    event_title         text,
+    source_code         text,
+    source_title        text,
+    narrative           text,
+    crew_categories     text[] NOT NULL DEFAULT '{}',    -- ppe / heavy_machinery / slip_trip / osha_inspection
+    weather_category    text REFERENCES hazard_categories,  -- extreme_heat / extreme_cold / lightning, if weather-caused
+    geog                geography(Point, 4326),
+    PRIMARY KEY (report_id, event_time)
+);
+SELECT create_hypertable('osha_injuries', by_range('event_time', INTERVAL '1 year'), if_not_exists => true);
+CREATE INDEX IF NOT EXISTS osha_injuries_geog_idx ON osha_injuries USING gist (geog);
+
+CREATE TABLE IF NOT EXISTS weather_daily (               -- IEM ASOS daily summaries
+    station_id          text NOT NULL REFERENCES weather_stations,
+    day                 date NOT NULL,
+    max_temp_f          numeric,
+    min_temp_f          numeric,
+    max_heat_index_f    numeric,
+    max_dewpoint_f      numeric,
+    min_rh              numeric,
+    avg_rh              numeric,
+    precip_in           numeric,
+    max_gust_kt         numeric,
+    max_wind_kt         numeric,
+    PRIMARY KEY (station_id, day)
+);
+SELECT create_hypertable('weather_daily', by_range('day', INTERVAL '1 year'), if_not_exists => true);
+
+-- ===========================================================================================================
+-- Live feeds (high volume -> columnstore compression and retention where it makes sense)
+-- ===========================================================================================================
+CREATE TABLE IF NOT EXISTS lightning_strikes (
+    observed_at     timestamptz NOT NULL,
+    geog            geography(Point, 4326) NOT NULL,
+    source          text NOT NULL DEFAULT 'goes_glm',
+    energy_fj       numeric,                             -- GLM flash energy (femtojoules)
+    quality_flag    int
+);
+SELECT create_hypertable('lightning_strikes', by_range('observed_at', INTERVAL '1 day'), if_not_exists => true);
+CREATE INDEX IF NOT EXISTS lightning_strikes_geog_idx ON lightning_strikes USING gist (geog);
+
+CREATE TABLE IF NOT EXISTS weather_observations (       -- live conditions per site (NWS API / station)
+    site_id         bigint NOT NULL REFERENCES sites,
+    observed_at     timestamptz NOT NULL,
+    temp_f          numeric,
+    heat_index_f    numeric,
+    wind_chill_f    numeric,
+    dewpoint_f      numeric,
+    rh              numeric,
+    wind_mph        numeric,
+    wind_gust_mph   numeric,
+    precip_1h_in    numeric,
+    visibility_mi   numeric,
+    soil_moisture   numeric,                             -- m3/m3, 0-7 cm
+    source          text,
+    PRIMARY KEY (site_id, observed_at)
+);
+SELECT create_hypertable('weather_observations', by_range('observed_at', INTERVAL '7 days'), if_not_exists => true);
+
+CREATE TABLE IF NOT EXISTS weather_forecasts (           -- next-day forecast for the 6 PM briefing
+    site_id         bigint NOT NULL REFERENCES sites,
+    issued_at       timestamptz NOT NULL,
+    valid_at        timestamptz NOT NULL,
+    temp_f          numeric,
+    heat_index_f    numeric,
+    precip_chance   numeric,
+    precip_in       numeric,
+    wind_gust_mph   numeric,
+    thunder_chance  numeric,
+    short_forecast  text,
+    PRIMARY KEY (site_id, valid_at, issued_at)
+);
+SELECT create_hypertable('weather_forecasts', by_range('valid_at', INTERVAL '7 days'), if_not_exists => true);
+
+CREATE TABLE IF NOT EXISTS nws_alerts (
+    alert_id        text NOT NULL,
+    sent_at         timestamptz NOT NULL,
+    event           text NOT NULL,                       -- e.g. Flood Warning, Tornado Warning
+    category        text REFERENCES hazard_categories,
+    severity        text,
+    urgency         text,
+    onset_at        timestamptz,
+    expires_at      timestamptz,
+    headline        text,
+    ugc_codes       text[],
+    geog            geography(Geometry, 4326),           -- warning polygon when given
+    PRIMARY KEY (alert_id, sent_at)
+);
+SELECT create_hypertable('nws_alerts', by_range('sent_at', INTERVAL '1 month'), if_not_exists => true);
+CREATE INDEX IF NOT EXISTS nws_alerts_geog_idx ON nws_alerts USING gist (geog);
+
+CREATE TABLE IF NOT EXISTS river_gauges (
+    gauge_id            text PRIMARY KEY,                -- USGS site number
+    name                text,
+    geog                geography(Point, 4326) NOT NULL,
+    action_stage_ft     numeric,
+    flood_stage_ft      numeric,
+    moderate_stage_ft   numeric,
+    major_stage_ft      numeric
+);
+CREATE INDEX IF NOT EXISTS river_gauges_geog_idx ON river_gauges USING gist (geog);
+
+CREATE TABLE IF NOT EXISTS river_gauge_readings (
+    gauge_id        text NOT NULL REFERENCES river_gauges,
+    observed_at     timestamptz NOT NULL,
+    stage_ft        numeric,
+    flow_cfs        numeric,
+    PRIMARY KEY (gauge_id, observed_at)
+);
+SELECT create_hypertable('river_gauge_readings', by_range('observed_at', INTERVAL '7 days'), if_not_exists => true);
+
+CREATE TABLE IF NOT EXISTS fire_detections (             -- NASA FIRMS
+    detected_at     timestamptz NOT NULL,
+    geog            geography(Point, 4326) NOT NULL,
+    satellite       text,
+    confidence      text,
+    frp_mw          numeric                              -- fire radiative power
+);
+SELECT create_hypertable('fire_detections', by_range('detected_at', INTERVAL '7 days'), if_not_exists => true);
+CREATE INDEX IF NOT EXISTS fire_detections_geog_idx ON fire_detections USING gist (geog);
+
+CREATE TABLE IF NOT EXISTS wildlife_sightings (
+    observed_at     timestamptz NOT NULL,
+    geog            geography(Point, 4326) NOT NULL,
+    species         text,                                -- scientific name, e.g. Alligator mississippiensis
+    common_name     text,
+    source          text NOT NULL,                       -- inaturalist / crew
+    source_ref      text,
+    photo_url       text,
+    PRIMARY KEY (source, source_ref, observed_at)
+);
+SELECT create_hypertable('wildlife_sightings', by_range('observed_at', INTERVAL '1 month'), if_not_exists => true);
+CREATE INDEX IF NOT EXISTS wildlife_sightings_geog_idx ON wildlife_sightings USING gist (geog);
+
+-- ===========================================================================================================
+-- App tables: crew reports, alerts with countdowns, ML scores, 6 PM briefings
+-- ===========================================================================================================
+CREATE TABLE IF NOT EXISTS crew_reports (
+    report_id       uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    reported_at     timestamptz NOT NULL DEFAULT now(),
+    site_id         bigint REFERENCES sites,
+    category        text NOT NULL REFERENCES hazard_categories,
+    description     text,
+    photo_url       text,
+    geog            geography(Point, 4326) NOT NULL,
+    reported_by     text,
+    severity        int CHECK (severity BETWEEN 1 AND 5),
+    status          text NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'resolved', 'dismissed')),
+    resolved_at     timestamptz
+);
+CREATE INDEX IF NOT EXISTS crew_reports_geog_idx ON crew_reports USING gist (geog);
+CREATE INDEX IF NOT EXISTS crew_reports_site_idx ON crew_reports (site_id, reported_at DESC);
+
+CREATE TABLE IF NOT EXISTS site_alerts (
+    alert_id        bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    site_id         bigint NOT NULL REFERENCES sites,
+    category        text NOT NULL REFERENCES hazard_categories,
+    level           text NOT NULL CHECK (level IN ('warning', 'stop_work')),
+    started_at      timestamptz NOT NULL,
+    last_trigger_at timestamptz NOT NULL,
+    all_clear_at    timestamptz,                         -- countdown end; moves forward on each new trigger
+    cleared_at      timestamptz,                         -- set when the countdown passes or a supervisor clears it
+    trigger_value   numeric,                             -- e.g. distance of the strike, heat index
+    message         text
+);
+CREATE INDEX IF NOT EXISTS site_alerts_open_idx ON site_alerts (site_id, category) WHERE cleared_at IS NULL;
+
+-- Raise or extend an alert. A new trigger on an open alert of the same site/category/level restarts its
+-- countdown (when the category says so) instead of opening a second alert.
+CREATE OR REPLACE FUNCTION raise_site_alert(p_site bigint, p_category text, p_level text,
+                                            p_at timestamptz, p_value numeric DEFAULT NULL, p_message text DEFAULT NULL)
+RETURNS site_alerts LANGUAGE plpgsql AS $$
+DECLARE
+    rule  hazard_categories;
+    a     site_alerts;
+BEGIN
+    SELECT * INTO STRICT rule FROM hazard_categories WHERE category = p_category;
+    UPDATE site_alerts SET cleared_at = all_clear_at              -- close countdowns that already ran out
+     WHERE site_id = p_site AND category = p_category AND cleared_at IS NULL AND all_clear_at <= p_at;
+    SELECT * INTO a FROM site_alerts
+     WHERE site_id = p_site AND category = p_category AND level = p_level AND cleared_at IS NULL
+     ORDER BY started_at DESC LIMIT 1 FOR UPDATE;
+    IF FOUND THEN
+        UPDATE site_alerts
+           SET last_trigger_at = greatest(last_trigger_at, p_at),
+               all_clear_at = CASE WHEN rule.all_clear_restarts AND rule.all_clear_minutes IS NOT NULL
+                                   THEN greatest(all_clear_at, p_at + make_interval(mins => rule.all_clear_minutes))
+                                   ELSE all_clear_at END,
+               trigger_value = coalesce(p_value, trigger_value),
+               message = coalesce(p_message, message)
+         WHERE alert_id = a.alert_id
+     RETURNING * INTO a;
+    ELSE
+        INSERT INTO site_alerts (site_id, category, level, started_at, last_trigger_at, all_clear_at, trigger_value, message)
+        VALUES (p_site, p_category, p_level, p_at, p_at,
+                p_at + make_interval(mins => rule.all_clear_minutes), p_value, p_message)
+        RETURNING * INTO a;
+    END IF;
+    RETURN a;
+END $$;
+
+CREATE OR REPLACE VIEW active_site_alerts AS
+SELECT a.*, s.name AS site_name, s.timezone,
+       greatest(a.all_clear_at - now(), interval '0') AS all_clear_remaining
+  FROM site_alerts a JOIN sites s USING (site_id)
+ WHERE a.cleared_at IS NULL AND (a.all_clear_at IS NULL OR a.all_clear_at > now());
+
+CREATE TABLE IF NOT EXISTS hazard_scores (               -- ML hazard index output
+    site_id         bigint NOT NULL REFERENCES sites,
+    scored_for      timestamptz NOT NULL,                -- the hour/day the score applies to
+    horizon         text NOT NULL CHECK (horizon IN ('now', 'next_day')),
+    score           numeric(3, 1) NOT NULL CHECK (score BETWEEN 0 AND 10),
+    category_scores jsonb,                               -- {"lightning": 7.5, "extreme_heat": 6.0, ...}
+    model_version   text,
+    created_at      timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (site_id, scored_for, horizon)
+);
+SELECT create_hypertable('hazard_scores', by_range('scored_for', INTERVAL '1 month'), if_not_exists => true);
+
+CREATE TABLE IF NOT EXISTS daily_briefings (
+    site_id         bigint NOT NULL REFERENCES sites,
+    briefing_date   date NOT NULL,                       -- the workday the briefing covers
+    send_at         timestamptz NOT NULL,                -- 6 PM local the evening before
+    sent_at         timestamptz,
+    hazard_score    numeric(3, 1),
+    summary         text,
+    content         jsonb,
+    PRIMARY KEY (site_id, briefing_date)
+);
+
+-- ===========================================================================================================
+-- Site <-> hazard ties: every historical event within its category's history_radius_mi of a site.
+-- Rebuilt by refresh_site_hazard_events(), so changing a radius and calling it re-ties every site.
+-- ===========================================================================================================
+CREATE TABLE IF NOT EXISTS site_hazard_events (
+    site_id             bigint NOT NULL REFERENCES sites,
+    category            text NOT NULL REFERENCES hazard_categories,
+    source              text NOT NULL CHECK (source IN ('noaa_storm_event', 'osha_injury', 'crew_report')),
+    source_id           text NOT NULL,                   -- storm_events.event_id / osha_injuries.report_id / crew_reports.report_id
+    event_time          timestamptz NOT NULL,
+    distance_mi         numeric(6, 2) NOT NULL,
+    deaths              int NOT NULL DEFAULT 0,
+    injuries            int NOT NULL DEFAULT 0,
+    damage_usd          numeric,
+    location_precision  text,                            -- point / path / zone
+    PRIMARY KEY (site_id, category, source, source_id, event_time)
+);
+SELECT create_hypertable('site_hazard_events', by_range('event_time', INTERVAL '1 year'), if_not_exists => true);
+CREATE INDEX IF NOT EXISTS site_hazard_events_site_idx ON site_hazard_events (site_id, category, event_time DESC);
+
+CREATE OR REPLACE FUNCTION refresh_site_hazard_events() RETURNS bigint LANGUAGE plpgsql AS $$
+DECLARE n bigint;
+BEGIN
+    TRUNCATE site_hazard_events;
+    INSERT INTO site_hazard_events
+    SELECT s.site_id, e.category, 'noaa_storm_event', e.event_id::text, e.begin_time,
+           round((ST_Distance(e.geog, s.geog) / 1609.344)::numeric, 2),
+           e.deaths_direct + e.deaths_indirect, e.injuries_direct + e.injuries_indirect,
+           coalesce(e.damage_property_usd, 0) + coalesce(e.damage_crops_usd, 0), e.location_precision
+      FROM hazard_categories c
+      JOIN storm_events e ON e.category = c.category
+      JOIN sites s ON ST_DWithin(e.geog, s.geog, c.history_radius_mi * 1609.344);
+    INSERT INTO site_hazard_events
+    SELECT s.site_id, o.category, 'osha_injury', o.report_id::text, o.event_time,
+           round((ST_Distance(o.geog, s.geog) / 1609.344)::numeric, 2), 0, 1, NULL, 'point'
+      FROM (SELECT r.*, cat AS category     -- crew and weather categories never overlap, so no duplicates
+              FROM osha_injuries r,
+                   unnest(r.crew_categories || CASE WHEN r.weather_category IS NULL THEN '{}'::text[]
+                                                    ELSE ARRAY[r.weather_category] END) AS cat) o
+      JOIN hazard_categories c ON c.category = o.category
+      JOIN sites s ON ST_DWithin(o.geog, s.geog, c.history_radius_mi * 1609.344);
+    INSERT INTO site_hazard_events
+    SELECT s.site_id, r.category, 'crew_report', r.report_id::text, r.reported_at,
+           round((ST_Distance(r.geog, s.geog) / 1609.344)::numeric, 2), 0, 0, NULL, 'point'
+      FROM crew_reports r
+      JOIN hazard_categories c ON c.category = r.category
+      JOIN sites s ON ST_DWithin(r.geog, s.geog, c.history_radius_mi * 1609.344);
+    -- compress history right away instead of waiting for the policy job (keeps the free tier's storage low)
+    PERFORM compress_chunk(ch, if_not_compressed => true)
+       FROM show_chunks('site_hazard_events', older_than => INTERVAL '30 days') ch;
+    SELECT count(*) INTO n FROM site_hazard_events;
+    RETURN n;
+END $$;
+
+ALTER TABLE site_hazard_events SET (timescaledb.enable_columnstore = true,
+                                    timescaledb.segmentby = 'site_id, category',
+                                    timescaledb.orderby = 'event_time DESC');
+CALL add_columnstore_policy('site_hazard_events', after => INTERVAL '30 days', if_not_exists => true);
+
+-- ===========================================================================================================
+-- Compression and retention (columnstore) for the high-volume live feeds
+-- ===========================================================================================================
+ALTER TABLE lightning_strikes SET (timescaledb.enable_columnstore = true, timescaledb.orderby = 'observed_at DESC');
+CALL add_columnstore_policy('lightning_strikes', after => INTERVAL '2 days', if_not_exists => true);
+SELECT add_retention_policy('lightning_strikes', INTERVAL '90 days', if_not_exists => true);
+
+ALTER TABLE weather_observations SET (timescaledb.enable_columnstore = true, timescaledb.segmentby = 'site_id');
+CALL add_columnstore_policy('weather_observations', after => INTERVAL '14 days', if_not_exists => true);
+
+ALTER TABLE river_gauge_readings SET (timescaledb.enable_columnstore = true, timescaledb.segmentby = 'gauge_id');
+CALL add_columnstore_policy('river_gauge_readings', after => INTERVAL '14 days', if_not_exists => true);
+
+-- ===========================================================================================================
+-- Per-site risk profile: one row per site, one set of columns per category. Every count uses that
+-- category's history_radius_mi (and thresholds) from hazard_categories, so retuning a range changes the
+-- profile on the next REFRESH MATERIALIZED VIEW site_risk_profile.
+-- ===========================================================================================================
+DROP MATERIALIZED VIEW IF EXISTS site_risk_profile;
+DROP VIEW IF EXISTS site_category_history;
+DROP VIEW IF EXISTS site_weather_days;
+
+-- Daily weather ties: each day the site's station crossed a category's warn/stop threshold.
+-- Weather is per station, so this joins through sites.weather_station_id instead of storing a copy per site.
+CREATE VIEW site_weather_days AS
+WITH d AS (
+    SELECT w.*, sum(w.precip_in) OVER (PARTITION BY w.station_id ORDER BY w.day
+                                       RANGE BETWEEN INTERVAL '6 days' PRECEDING AND CURRENT ROW) AS rain_7d_in
+      FROM weather_daily w
+), v AS (
+    SELECT station_id, day, 'extreme_heat'::text AS category, max_heat_index_f AS value FROM d
+    UNION ALL SELECT station_id, day, 'extreme_cold', min_temp_f FROM d
+    UNION ALL SELECT station_id, day, 'flooding', precip_in FROM d
+    UNION ALL SELECT station_id, day, 'high_wind', round(max_gust_kt * 1.15078, 1) FROM d    -- knots -> mph
+    UNION ALL SELECT station_id, day, 'soil_saturation', rain_7d_in FROM d
+)
+SELECT s.site_id, v.category, v.day, v.value, c.unit,
+       CASE WHEN (NOT c.lower_is_worse AND v.value >= c.stop_value) OR (c.lower_is_worse AND v.value <= c.stop_value)
+            THEN 'stop_work' ELSE 'warning' END AS level,
+       s.weather_station_id AS station_id, s.weather_station_mi AS station_distance_mi
+  FROM v
+  JOIN hazard_categories c ON c.category = v.category
+  JOIN sites s ON s.weather_station_id = v.station_id
+ WHERE (NOT c.lower_is_worse AND v.value >= c.warn_value) OR (c.lower_is_worse AND v.value <= c.warn_value);
+
+CREATE VIEW site_category_history AS        -- long form: site x category, from the stored ties
+WITH ev AS (
+    SELECT site_id, category,
+           count(*) FILTER (WHERE source = 'noaa_storm_event')                    AS storm_events,
+           coalesce(sum(deaths)     FILTER (WHERE source = 'noaa_storm_event'), 0) AS storm_deaths,
+           coalesce(sum(injuries)   FILTER (WHERE source = 'noaa_storm_event'), 0) AS storm_injuries,
+           coalesce(sum(damage_usd) FILTER (WHERE source = 'noaa_storm_event'), 0) AS storm_damage_usd,
+           max(event_time)          FILTER (WHERE source = 'noaa_storm_event')    AS last_storm_event,
+           count(*) FILTER (WHERE source = 'osha_injury')                         AS osha_reports,
+           count(*) FILTER (WHERE source = 'crew_report')                         AS crew_reports
+      FROM site_hazard_events GROUP BY site_id, category
+), fatal AS (
+    SELECT h.site_id, h.category,
+           count(*)                                AS storm_fatalities,
+           count(*) FILTER (WHERE f.crew_relevant) AS storm_fatalities_crew_relevant
+      FROM site_hazard_events h
+      JOIN storm_fatalities f ON f.event_id = h.source_id::bigint
+     WHERE h.source = 'noaa_storm_event'
+     GROUP BY h.site_id, h.category
+)
+SELECT s.site_id, c.category, c.history_radius_mi,
+       coalesce(ev.storm_events, 0)                       AS storm_events,
+       coalesce(ev.storm_deaths, 0)                       AS storm_deaths,
+       coalesce(ev.storm_injuries, 0)                     AS storm_injuries,
+       coalesce(ev.storm_damage_usd, 0)                   AS storm_damage_usd,
+       ev.last_storm_event,
+       coalesce(fatal.storm_fatalities, 0)                AS storm_fatalities,
+       coalesce(fatal.storm_fatalities_crew_relevant, 0)  AS storm_fatalities_crew_relevant,
+       coalesce(ev.osha_reports, 0)                       AS osha_reports,
+       coalesce(ev.crew_reports, 0)                       AS crew_reports
+  FROM sites s CROSS JOIN hazard_categories c
+  LEFT JOIN ev    USING (site_id, category)
+  LEFT JOIN fatal USING (site_id, category);
+
+CREATE MATERIALIZED VIEW site_risk_profile AS
+WITH h AS (SELECT * FROM site_category_history),
+wx AS (                                     -- days per year over each category's thresholds at the site's station
+    SELECT s.site_id,
+           count(*) FILTER (WHERE d.max_heat_index_f IS NOT NULL)                         AS heat_days_n,
+           count(*) FILTER (WHERE d.max_heat_index_f >= heat.warn_value)                  AS heat_warn_days,
+           count(*) FILTER (WHERE d.max_heat_index_f >= heat.stop_value)                  AS heat_stop_days,
+           count(*) FILTER (WHERE d.precip_in IS NOT NULL)                                AS rain_days_n,
+           count(*) FILTER (WHERE d.precip_in >= flood.warn_value)                        AS rain_warn_days,
+           count(*)                                                                       AS wind_days_n,
+           count(*) FILTER (WHERE d.max_gust_kt * 1.15078 >= wind.stop_value)             AS gust_stop_days,
+           count(*) FILTER (WHERE d.min_temp_f <= cold.warn_value)                        AS freeze_days
+      FROM sites s
+      JOIN weather_daily d ON d.station_id = s.weather_station_id
+      CROSS JOIN (SELECT * FROM hazard_categories WHERE category = 'extreme_heat') heat
+      CROSS JOIN (SELECT * FROM hazard_categories WHERE category = 'flooding') flood
+      CROSS JOIN (SELECT * FROM hazard_categories WHERE category = 'high_wind') wind
+      CROSS JOIN (SELECT * FROM hazard_categories WHERE category = 'extreme_cold') cold
+     GROUP BY s.site_id
+), cdc AS (
+    SELECT county_fips, sum(deaths) AS deaths, bool_or(suppressed) AS suppressed
+      FROM weather_fatalities GROUP BY county_fips
+)
+SELECT s.site_id, s.name, s.state, s.county, s.timezone, s.geog,
+    -- lightning (history radius from hazard_categories.lightning)
+    max(h.storm_events)   FILTER (WHERE h.category = 'lightning')        AS lightning_events,
+    max(h.storm_deaths)   FILTER (WHERE h.category = 'lightning')        AS lightning_deaths,
+    max(h.storm_injuries) FILTER (WHERE h.category = 'lightning')        AS lightning_injuries,
+    max(h.osha_reports)   FILTER (WHERE h.category = 'lightning')        AS lightning_osha_reports,
+    -- extreme heat
+    max(h.storm_events)   FILTER (WHERE h.category = 'extreme_heat')     AS heat_events,
+    max(h.storm_deaths)   FILTER (WHERE h.category = 'extreme_heat')     AS heat_deaths,
+    max(h.osha_reports)   FILTER (WHERE h.category = 'extreme_heat')     AS heat_osha_reports,
+    round(wx.heat_warn_days * 365.25 / nullif(wx.heat_days_n, 0), 1)     AS heat_warn_days_per_year,
+    round(wx.heat_stop_days * 365.25 / nullif(wx.heat_days_n, 0), 1)     AS heat_stop_days_per_year,
+    -- extreme cold
+    max(h.storm_events)   FILTER (WHERE h.category = 'extreme_cold')     AS cold_events,
+    max(h.storm_deaths)   FILTER (WHERE h.category = 'extreme_cold')     AS cold_deaths,
+    max(h.osha_reports)   FILTER (WHERE h.category = 'extreme_cold')     AS cold_osha_reports,
+    round(wx.freeze_days * 365.25 / nullif(wx.wind_days_n, 0), 1)        AS freeze_days_per_year,
+    -- flooding
+    max(h.storm_events)   FILTER (WHERE h.category = 'flooding')         AS flood_events,
+    max(h.storm_deaths)   FILTER (WHERE h.category = 'flooding')         AS flood_deaths,
+    max(h.storm_damage_usd) FILTER (WHERE h.category = 'flooding')       AS flood_damage_usd,
+    round(wx.rain_warn_days * 365.25 / nullif(wx.rain_days_n, 0), 1)     AS heavy_rain_days_per_year,
+    -- high wind
+    max(h.storm_events)   FILTER (WHERE h.category = 'high_wind')        AS wind_events,
+    max(h.storm_deaths)   FILTER (WHERE h.category = 'high_wind')        AS wind_deaths,
+    round(wx.gust_stop_days * 365.25 / nullif(wx.wind_days_n, 0), 1)     AS wind_stop_days_per_year,
+    -- severe storms / tornadoes
+    max(h.storm_events)   FILTER (WHERE h.category = 'severe_storm')     AS severe_storm_events,
+    max(h.storm_deaths)   FILTER (WHERE h.category = 'severe_storm')     AS severe_storm_deaths,
+    max(h.storm_injuries) FILTER (WHERE h.category = 'severe_storm')     AS severe_storm_injuries,
+    max(h.storm_damage_usd) FILTER (WHERE h.category = 'severe_storm')   AS severe_storm_damage_usd,
+    -- tropical
+    max(h.storm_events)   FILTER (WHERE h.category = 'tropical')         AS tropical_events,
+    max(h.storm_deaths)   FILTER (WHERE h.category = 'tropical')         AS tropical_deaths,
+    max(h.storm_damage_usd) FILTER (WHERE h.category = 'tropical')       AS tropical_damage_usd,
+    -- wildfire, fog, coastal
+    max(h.storm_events)   FILTER (WHERE h.category = 'wildfire')         AS wildfire_events,
+    max(h.storm_events)   FILTER (WHERE h.category = 'dense_fog')        AS fog_events,
+    max(h.storm_deaths)   FILTER (WHERE h.category = 'coastal')          AS coastal_deaths,
+    -- wildlife
+    max(h.crew_reports)   FILTER (WHERE h.category = 'wildlife')         AS wildlife_reports,
+    -- storm fatalities (all categories) and crew-relevant ones (outdoors, heavy equipment, vehicles, under trees)
+    sum(h.storm_fatalities)                                              AS storm_fatalities,
+    sum(h.storm_fatalities_crew_relevant)                                AS storm_fatalities_crew_relevant,
+    -- weather fatalities (CDC, county level; NULL deaths when suppressed)
+    cdc.deaths                                                           AS cdc_county_weather_deaths,
+    coalesce(cdc.suppressed, false)                                      AS cdc_county_suppressed,
+    -- crew hazards (OSHA history + crew reports)
+    max(h.osha_reports)   FILTER (WHERE h.category = 'ppe')              AS ppe_osha_reports,
+    max(h.crew_reports)   FILTER (WHERE h.category = 'ppe')              AS ppe_crew_reports,
+    max(h.osha_reports)   FILTER (WHERE h.category = 'heavy_machinery')  AS machinery_osha_reports,
+    max(h.crew_reports)   FILTER (WHERE h.category = 'heavy_machinery')  AS machinery_crew_reports,
+    max(h.osha_reports)   FILTER (WHERE h.category = 'slip_trip')        AS slip_trip_osha_reports,
+    max(h.crew_reports)   FILTER (WHERE h.category = 'slip_trip')        AS slip_trip_crew_reports,
+    max(h.osha_reports)   FILTER (WHERE h.category = 'osha_inspection')  AS osha_inspections,
+    now()                                                                AS refreshed_at
+  FROM sites s
+  LEFT JOIN h   ON h.site_id = s.site_id
+  LEFT JOIN wx  ON wx.site_id = s.site_id
+  LEFT JOIN cdc ON cdc.county_fips = s.county_fips
+ GROUP BY s.site_id, wx.heat_days_n, wx.heat_warn_days, wx.heat_stop_days, wx.rain_days_n, wx.rain_warn_days,
+          wx.wind_days_n, wx.gust_stop_days, wx.freeze_days, cdc.deaths, cdc.suppressed;
+CREATE UNIQUE INDEX site_risk_profile_site_idx ON site_risk_profile (site_id);
