@@ -1,0 +1,358 @@
+"Notes"	"County"	"County Code"	Deaths	Population	Crude Rate	Crude Rate Lower 95% Confidence Interval	Crude Rate Upper 95% Confidence Interval
+	"Autauga County, AL"	"01001"	Suppressed	408275	Suppressed	Suppressed	Suppressed
+	"Baldwin County, AL"	"01003"	10	1671387	0.6	0.3	1.1
+	"Barbour County, AL"	"01005"	Suppressed	172769	Suppressed	Suppressed	Suppressed
+	"Bibb County, AL"	"01007"	0	155538	0.0	0.0	0.0
+	"Blount County, AL"	"01009"	Suppressed	412077	Suppressed	Suppressed	Suppressed
+	"Bullock County, AL"	"01011"	Suppressed	70535	Suppressed	Suppressed	Suppressed
+	"Butler County, AL"	"01013"	Suppressed	132804	Suppressed	Suppressed	Suppressed
+	"Calhoun County, AL"	"01015"	11	805967	1.4	0.7	2.4
+	"Chambers County, AL"	"01017"	Suppressed	236255	Suppressed	Suppressed	Suppressed
+	"Cherokee County, AL"	"01019"	Suppressed	180624	Suppressed	Suppressed	Suppressed
+	"Chilton County, AL"	"01021"	Suppressed	317829	Suppressed	Suppressed	Suppressed
+	"Choctaw County, AL"	"01023"	Suppressed	87124	Suppressed	Suppressed	Suppressed
+	"Clarke County, AL"	"01025"	Suppressed	160587	Suppressed	Suppressed	Suppressed
+	"Clay County, AL"	"01027"	Suppressed	96360	Suppressed	Suppressed	Suppressed
+	"Cleburne County, AL"	"01029"	0	106857	0.0	0.0	0.0
+	"Coffee County, AL"	"01031"	Suppressed	378461	Suppressed	Suppressed	Suppressed
+	"Colbert County, AL"	"01033"	Suppressed	398067	Suppressed	Suppressed	Suppressed
+	"Conecuh County, AL"	"01035"	Suppressed	81012	Suppressed	Suppressed	Suppressed
+	"Coosa County, AL"	"01037"	Suppressed	73203	Suppressed	Suppressed	Suppressed
+	"Covington County, AL"	"01039"	Suppressed	261791	Suppressed	Suppressed	Suppressed
+	"Crenshaw County, AL"	"01041"	0	93600	0.0	0.0	0.0
+	"Cullman County, AL"	"01043"	Suppressed	616506	Suppressed	Suppressed	Suppressed
+	"Dale County, AL"	"01045"	Suppressed	345911	Suppressed	Suppressed	Suppressed
+	"Dallas County, AL"	"01047"	Suppressed	257700	Suppressed	Suppressed	Suppressed
+	"DeKalb County, AL"	"01049"	Suppressed	504058	Suppressed	Suppressed	Suppressed
+	"Elmore County, AL"	"01051"	Suppressed	605604	Suppressed	Suppressed	Suppressed
+	"Escambia County, AL"	"01053"	Suppressed	256215	Suppressed	Suppressed	Suppressed
+	"Etowah County, AL"	"01055"	Suppressed	719838	Suppressed	Suppressed	Suppressed
+	"Fayette County, AL"	"01057"	Suppressed	113072	Suppressed	Suppressed	Suppressed
+	"Franklin County, AL"	"01059"	Suppressed	221853	Suppressed	Suppressed	Suppressed
+	"Geneva County, AL"	"01061"	Suppressed	186727	Suppressed	Suppressed	Suppressed
+	"Greene County, AL"	"01063"	0	53853	0.0	0.0	0.0
+	"Hale County, AL"	"01065"	Suppressed	103400	Suppressed	Suppressed	Suppressed
+	"Henry County, AL"	"01067"	Suppressed	122791	Suppressed	Suppressed	Suppressed
+	"Houston County, AL"	"01069"	Suppressed	750549	Suppressed	Suppressed	Suppressed
+	"Jackson County, AL"	"01071"	Suppressed	367855	Suppressed	Suppressed	Suppressed
+	"Jefferson County, AL"	"01073"	29	4634083	0.6	0.4	0.9
+	"Lamar County, AL"	"01075"	0	96011	0.0	0.0	0.0
+	"Lauderdale County, AL"	"01077"	Suppressed	662721	Suppressed	Suppressed	Suppressed
+	"Lawrence County, AL"	"01079"	Suppressed	232111	Suppressed	Suppressed	Suppressed
+	"Lee County, AL"	"01081"	29	1224367	2.4	1.6	3.4
+	"Limestone County, AL"	"01083"	Suppressed	749330	Suppressed	Suppressed	Suppressed
+	"Lowndes County, AL"	"01085"	0	68285	0.0	0.0	0.0
+	"Macon County, AL"	"01087"	Suppressed	128342	Suppressed	Suppressed	Suppressed
+	"Madison County, AL"	"01089"	Suppressed	2753612	Suppressed	Suppressed	Suppressed
+	"Marengo County, AL"	"01091"	Suppressed	131599	Suppressed	Suppressed	Suppressed
+	"Marion County, AL"	"01093"	0	206144	0.0	0.0	0.0
+	"Marshall County, AL"	"01095"	Suppressed	690436	Suppressed	Suppressed	Suppressed
+	"Mobile County, AL"	"01097"	14	2888146	0.5	0.3	0.8
+	"Monroe County, AL"	"01099"	0	139597	0.0	0.0	0.0
+	"Montgomery County, AL"	"01101"	Suppressed	1581557	Suppressed	Suppressed	Suppressed
+	"Morgan County, AL"	"01103"	Suppressed	857747	Suppressed	Suppressed	Suppressed
+	"Perry County, AL"	"01105"	Suppressed	58597	Suppressed	Suppressed	Suppressed
+	"Pickens County, AL"	"01107"	Suppressed	134355	Suppressed	Suppressed	Suppressed
+	"Pike County, AL"	"01109"	0	231684	0.0	0.0	0.0
+	"Randolph County, AL"	"01111"	0	158688	0.0	0.0	0.0
+	"Russell County, AL"	"01113"	Suppressed	408837	Suppressed	Suppressed	Suppressed
+	"St. Clair County, AL"	"01115"	Suppressed	648100	Suppressed	Suppressed	Suppressed
+	"Shelby County, AL"	"01117"	Suppressed	1580823	Suppressed	Suppressed	Suppressed
+	"Sumter County, AL"	"01119"	Suppressed	84694	Suppressed	Suppressed	Suppressed
+	"Talladega County, AL"	"01121"	Suppressed	564526	Suppressed	Suppressed	Suppressed
+	"Tallapoosa County, AL"	"01123"	Suppressed	284373	Suppressed	Suppressed	Suppressed
+	"Tuscaloosa County, AL"	"01125"	Suppressed	1571396	Suppressed	Suppressed	Suppressed
+	"Walker County, AL"	"01127"	Suppressed	449520	Suppressed	Suppressed	Suppressed
+	"Washington County, AL"	"01129"	Suppressed	108989	Suppressed	Suppressed	Suppressed
+	"Wilcox County, AL"	"01131"	Suppressed	71520	Suppressed	Suppressed	Suppressed
+	"Winston County, AL"	"01133"	0	165684	0.0	0.0	0.0
+	"Alachua County, FL"	"12001"	Suppressed	1951261	Suppressed	Suppressed	Suppressed
+	"Baker County, FL"	"12003"	Suppressed	201342	Suppressed	Suppressed	Suppressed
+	"Bay County, FL"	"12005"	12	1286103	0.9	0.5	1.6
+	"Bradford County, FL"	"12007"	Suppressed	196312	Suppressed	Suppressed	Suppressed
+	"Brevard County, FL"	"12009"	18	4356997	0.4	0.2	0.7
+	"Broward County, FL"	"12011"	33	13740155	0.2	0.2	0.3
+	"Calhoun County, FL"	"12013"	Suppressed	96623	Suppressed	Suppressed	Suppressed
+	"Charlotte County, FL"	"12015"	Suppressed	1384379	Suppressed	Suppressed	Suppressed
+	"Citrus County, FL"	"12017"	Suppressed	1108078	Suppressed	Suppressed	Suppressed
+	"Clay County, FL"	"12019"	Suppressed	1575243	Suppressed	Suppressed	Suppressed
+	"Collier County, FL"	"12021"	Suppressed	2760880	Suppressed	Suppressed	Suppressed
+	"Columbia County, FL"	"12023"	Suppressed	504176	Suppressed	Suppressed	Suppressed
+	"DeSoto County, FL"	"12027"	Suppressed	256453	Suppressed	Suppressed	Suppressed
+	"Dixie County, FL"	"12029"	Suppressed	119888	Suppressed	Suppressed	Suppressed
+	"Duval County, FL"	"12031"	22	6977116	0.3	0.2	0.5
+	"Escambia County, FL"	"12033"	21	2261685	0.9	0.6	1.4
+	"Flagler County, FL"	"12035"	Suppressed	861419	Suppressed	Suppressed	Suppressed
+	"Franklin County, FL"	"12037"	Suppressed	86705	Suppressed	Suppressed	Suppressed
+	"Gadsden County, FL"	"12039"	Suppressed	311932	Suppressed	Suppressed	Suppressed
+	"Gilchrist County, FL"	"12041"	Suppressed	132895	Suppressed	Suppressed	Suppressed
+	"Glades County, FL"	"12043"	0	92339	0.0	0.0	0.0
+	"Gulf County, FL"	"12045"	Suppressed	104583	Suppressed	Suppressed	Suppressed
+	"Hamilton County, FL"	"12047"	0	98274	0.0	0.0	0.0
+	"Hardee County, FL"	"12049"	Suppressed	183902	Suppressed	Suppressed	Suppressed
+	"Hendry County, FL"	"12051"	Suppressed	297506	Suppressed	Suppressed	Suppressed
+	"Hernando County, FL"	"12053"	Suppressed	1422068	Suppressed	Suppressed	Suppressed
+	"Highlands County, FL"	"12055"	0	744590	0.0	0.0	0.0
+	"Hillsborough County, FL"	"12057"	31	10515298	0.3	0.2	0.4
+	"Holmes County, FL"	"12059"	Suppressed	137943	Suppressed	Suppressed	Suppressed
+	"Indian River County, FL"	"12061"	Suppressed	1152802	Suppressed	Suppressed	Suppressed
+	"Jackson County, FL"	"12063"	Suppressed	335311	Suppressed	Suppressed	Suppressed
+	"Jefferson County, FL"	"12065"	0	104045	0.0	0.0	0.0
+	"Lafayette County, FL"	"12067"	0	58522	0.0	0.0	0.0
+	"Lake County, FL"	"12069"	Suppressed	2773714	Suppressed	Suppressed	Suppressed
+	"Lee County, FL"	"12071"	55	5621915	1.0	0.7	1.3
+	"Leon County, FL"	"12073"	10	2069131	0.5	0.2	0.9
+	"Levy County, FL"	"12075"	Suppressed	308215	Suppressed	Suppressed	Suppressed
+	"Liberty County, FL"	"12077"	0	56339	0.0	0.0	0.0
+	"Madison County, FL"	"12079"	0	129098	0.0	0.0	0.0
+	"Manatee County, FL"	"12081"	12	2950602	0.4	0.2	0.7
+	"Marion County, FL"	"12083"	12	2720263	0.4	0.2	0.8
+	"Martin County, FL"	"12085"	Suppressed	1134929	Suppressed	Suppressed	Suppressed
+	"Miami-Dade County, FL"	"12086"	23	19047766	0.1	0.1	0.2
+	"Monroe County, FL"	"12087"	Suppressed	548555	Suppressed	Suppressed	Suppressed
+	"Nassau County, FL"	"12089"	Suppressed	663535	Suppressed	Suppressed	Suppressed
+	"Okaloosa County, FL"	"12091"	Suppressed	1499511	Suppressed	Suppressed	Suppressed
+	"Okeechobee County, FL"	"12093"	0	290476	0.0	0.0	0.0
+	"Orange County, FL"	"12095"	18	10059027	0.2	0.1	0.3
+	"Osceola County, FL"	"12097"	Suppressed	2860725	Suppressed	Suppressed	Suppressed
+	"Palm Beach County, FL"	"12099"	27	10622631	0.3	0.2	0.4
+	"Pasco County, FL"	"12101"	Suppressed	4148960	Suppressed	Suppressed	Suppressed
+	"Pinellas County, FL"	"12103"	22	6772898	0.3	0.2	0.5
+	"Polk County, FL"	"12105"	12	5389470	0.2	0.1	0.4
+	"Putnam County, FL"	"12107"	Suppressed	525653	Suppressed	Suppressed	Suppressed
+	"St. Johns County, FL"	"12109"	Suppressed	2051993	Suppressed	Suppressed	Suppressed
+	"St. Lucie County, FL"	"12111"	10	2453150	0.4	0.2	0.7
+	"Santa Rosa County, FL"	"12113"	Suppressed	1355882	Suppressed	Suppressed	Suppressed
+	"Sarasota County, FL"	"12115"	12	3158885	0.4	0.2	0.7
+	"Seminole County, FL"	"12117"	10	3341570	0.3	0.1	0.6
+	"Sumter County, FL"	"12119"	Suppressed	987058	Suppressed	Suppressed	Suppressed
+	"Suwannee County, FL"	"12121"	Suppressed	317021	Suppressed	Suppressed	Suppressed
+	"Taylor County, FL"	"12123"	0	151315	0.0	0.0	0.0
+	"Union County, FL"	"12125"	0	108424	0.0	0.0	0.0
+	"Volusia County, FL"	"12127"	21	3999052	0.5	0.3	0.8
+	"Wakulla County, FL"	"12129"	Suppressed	243951	Suppressed	Suppressed	Suppressed
+	"Walton County, FL"	"12131"	Suppressed	561487	Suppressed	Suppressed	Suppressed
+	"Washington County, FL"	"12133"	Suppressed	179240	Suppressed	Suppressed	Suppressed
+	"Appling County, GA"	"13001"	Suppressed	129260	Suppressed	Suppressed	Suppressed
+	"Atkinson County, GA"	"13003"	0	58157	0.0	0.0	0.0
+	"Bacon County, GA"	"13005"	Suppressed	77824	Suppressed	Suppressed	Suppressed
+	"Baker County, GA"	"13007"	0	20183	0.0	0.0	0.0
+	"Baldwin County, GA"	"13009"	0	309268	0.0	0.0	0.0
+	"Banks County, GA"	"13011"	0	135571	0.0	0.0	0.0
+	"Barrow County, GA"	"13013"	Suppressed	614680	Suppressed	Suppressed	Suppressed
+	"Bartow County, GA"	"13015"	0	779780	0.0	0.0	0.0
+	"Ben Hill County, GA"	"13017"	Suppressed	118401	Suppressed	Suppressed	Suppressed
+	"Berrien County, GA"	"13019"	Suppressed	131654	Suppressed	Suppressed	Suppressed
+	"Bibb County, GA"	"13021"	Suppressed	1085518	Suppressed	Suppressed	Suppressed
+	"Bleckley County, GA"	"13023"	Suppressed	88621	Suppressed	Suppressed	Suppressed
+	"Brantley County, GA"	"13025"	Suppressed	130688	Suppressed	Suppressed	Suppressed
+	"Brooks County, GA"	"13027"	0	111439	0.0	0.0	0.0
+	"Bryan County, GA"	"13029"	Suppressed	314498	Suppressed	Suppressed	Suppressed
+	"Bulloch County, GA"	"13031"	Suppressed	573025	Suppressed	Suppressed	Suppressed
+	"Burke County, GA"	"13033"	Suppressed	165062	Suppressed	Suppressed	Suppressed
+	"Butts County, GA"	"13035"	Suppressed	180999	Suppressed	Suppressed	Suppressed
+	"Calhoun County, GA"	"13037"	0	40648	0.0	0.0	0.0
+	"Camden County, GA"	"13039"	Suppressed	393625	Suppressed	Suppressed	Suppressed
+	"Candler County, GA"	"13043"	0	76850	0.0	0.0	0.0
+	"Carroll County, GA"	"13045"	Suppressed	863315	Suppressed	Suppressed	Suppressed
+	"Catoosa County, GA"	"13047"	Suppressed	478069	Suppressed	Suppressed	Suppressed
+	"Charlton County, GA"	"13049"	Suppressed	91292	Suppressed	Suppressed	Suppressed
+	"Chatham County, GA"	"13051"	15	2076515	0.7	0.4	1.2
+	"Chattahoochee County, GA"	"13053"	0	67218	0.0	0.0	0.0
+	"Chattooga County, GA"	"13055"	0	174818	0.0	0.0	0.0
+	"Cherokee County, GA"	"13057"	Suppressed	1914204	Suppressed	Suppressed	Suppressed
+	"Clarke County, GA"	"13059"	Suppressed	901970	Suppressed	Suppressed	Suppressed
+	"Clay County, GA"	"13061"	Suppressed	19982	Suppressed	Suppressed	Suppressed
+	"Clayton County, GA"	"13063"	Suppressed	2064184	Suppressed	Suppressed	Suppressed
+	"Clinch County, GA"	"13065"	Suppressed	46852	Suppressed	Suppressed	Suppressed
+	"Cobb County, GA"	"13067"	14	5382985	0.3	0.1	0.4
+	"Coffee County, GA"	"13069"	Suppressed	303310	Suppressed	Suppressed	Suppressed
+	"Colquitt County, GA"	"13071"	Suppressed	321452	Suppressed	Suppressed	Suppressed
+	"Columbia County, GA"	"13073"	Suppressed	1126074	Suppressed	Suppressed	Suppressed
+	"Cook County, GA"	"13075"	Suppressed	122050	Suppressed	Suppressed	Suppressed
+	"Coweta County, GA"	"13077"	0	1062185	0.0	0.0	0.0
+	"Crawford County, GA"	"13079"	0	85872	0.0	0.0	0.0
+	"Crisp County, GA"	"13081"	Suppressed	145693	Suppressed	Suppressed	Suppressed
+	"Dade County, GA"	"13083"	Suppressed	113039	Suppressed	Suppressed	Suppressed
+	"Dawson County, GA"	"13085"	0	202419	0.0	0.0	0.0
+	"Decatur County, GA"	"13087"	Suppressed	195934	Suppressed	Suppressed	Suppressed
+	"DeKalb County, GA"	"13089"	33	5331701	0.6	0.4	0.9
+	"Dodge County, GA"	"13091"	Suppressed	140729	Suppressed	Suppressed	Suppressed
+	"Dooly County, GA"	"13093"	0	83894	0.0	0.0	0.0
+	"Dougherty County, GA"	"13095"	0	598549	0.0	0.0	0.0
+	"Douglas County, GA"	"13097"	Suppressed	1033839	Suppressed	Suppressed	Suppressed
+	"Early County, GA"	"13099"	Suppressed	72674	Suppressed	Suppressed	Suppressed
+	"Echols County, GA"	"13101"	Suppressed	26800	Suppressed	Suppressed	Suppressed
+	"Effingham County, GA"	"13103"	Suppressed	472722	Suppressed	Suppressed	Suppressed
+	"Elbert County, GA"	"13105"	Suppressed	137207	Suppressed	Suppressed	Suppressed
+	"Emanuel County, GA"	"13107"	Suppressed	159753	Suppressed	Suppressed	Suppressed
+	"Evans County, GA"	"13109"	Suppressed	75003	Suppressed	Suppressed	Suppressed
+	"Fannin County, GA"	"13111"	Suppressed	182036	Suppressed	Suppressed	Suppressed
+	"Fayette County, GA"	"13113"	Suppressed	834763	Suppressed	Suppressed	Suppressed
+	"Floyd County, GA"	"13115"	Suppressed	694746	Suppressed	Suppressed	Suppressed
+	"Forsyth County, GA"	"13117"	Suppressed	1812137	Suppressed	Suppressed	Suppressed
+	"Franklin County, GA"	"13119"	0	167779	0.0	0.0	0.0
+	"Fulton County, GA"	"13121"	68	7500880	0.9	0.7	1.1
+	"Gilmer County, GA"	"13123"	0	224783	0.0	0.0	0.0
+	"Glascock County, GA"	"13125"	0	20770	0.0	0.0	0.0
+	"Glynn County, GA"	"13127"	0	598609	0.0	0.0	0.0
+	"Gordon County, GA"	"13129"	Suppressed	412141	Suppressed	Suppressed	Suppressed
+	"Grady County, GA"	"13131"	Suppressed	178135	Suppressed	Suppressed	Suppressed
+	"Greene County, GA"	"13133"	0	136347	0.0	0.0	0.0
+	"Gwinnett County, GA"	"13135"	18	6733952	0.3	0.2	0.4
+	"Habersham County, GA"	"13137"	0	329434	0.0	0.0	0.0
+	"Hall County, GA"	"13139"	Suppressed	1472253	Suppressed	Suppressed	Suppressed
+	"Hancock County, GA"	"13141"	Suppressed	59675	Suppressed	Suppressed	Suppressed
+	"Haralson County, GA"	"13143"	0	216059	0.0	0.0	0.0
+	"Harris County, GA"	"13145"	Suppressed	251276	Suppressed	Suppressed	Suppressed
+	"Hart County, GA"	"13147"	0	187636	0.0	0.0	0.0
+	"Heard County, GA"	"13149"	0	83218	0.0	0.0	0.0
+	"Henry County, GA"	"13151"	Suppressed	1711447	Suppressed	Suppressed	Suppressed
+	"Houston County, GA"	"13153"	Suppressed	1156773	Suppressed	Suppressed	Suppressed
+	"Irwin County, GA"	"13155"	0	65220	0.0	0.0	0.0
+	"Jackson County, GA"	"13157"	Suppressed	566260	Suppressed	Suppressed	Suppressed
+	"Jasper County, GA"	"13159"	0	107645	0.0	0.0	0.0
+	"Jeff Davis County, GA"	"13161"	Suppressed	105143	Suppressed	Suppressed	Suppressed
+	"Jefferson County, GA"	"13163"	Suppressed	107099	Suppressed	Suppressed	Suppressed
+	"Jenkins County, GA"	"13165"	Suppressed	60896	Suppressed	Suppressed	Suppressed
+	"Johnson County, GA"	"13167"	0	65880	0.0	0.0	0.0
+	"Jones County, GA"	"13169"	0	201026	0.0	0.0	0.0
+	"Lamar County, GA"	"13171"	0	136976	0.0	0.0	0.0
+	"Lanier County, GA"	"13173"	0	72494	0.0	0.0	0.0
+	"Laurens County, GA"	"13175"	Suppressed	341818	Suppressed	Suppressed	Suppressed
+	"Lee County, GA"	"13177"	0	224988	0.0	0.0	0.0
+	"Liberty County, GA"	"13179"	Suppressed	457494	Suppressed	Suppressed	Suppressed
+	"Lincoln County, GA"	"13181"	Suppressed	55385	Suppressed	Suppressed	Suppressed
+	"Long County, GA"	"13183"	Suppressed	134261	Suppressed	Suppressed	Suppressed
+	"Lowndes County, GA"	"13185"	Suppressed	833804	Suppressed	Suppressed	Suppressed
+	"Lumpkin County, GA"	"13187"	Suppressed	241099	Suppressed	Suppressed	Suppressed
+	"McDuffie County, GA"	"13189"	Suppressed	150914	Suppressed	Suppressed	Suppressed
+	"McIntosh County, GA"	"13191"	0	88709	0.0	0.0	0.0
+	"Macon County, GA"	"13193"	Suppressed	86219	Suppressed	Suppressed	Suppressed
+	"Madison County, GA"	"13195"	Suppressed	217307	Suppressed	Suppressed	Suppressed
+	"Marion County, GA"	"13197"	0	55190	0.0	0.0	0.0
+	"Meriwether County, GA"	"13199"	Suppressed	147407	Suppressed	Suppressed	Suppressed
+	"Miller County, GA"	"13201"	0	40323	0.0	0.0	0.0
+	"Mitchell County, GA"	"13205"	0	149737	0.0	0.0	0.0
+	"Monroe County, GA"	"13207"	Suppressed	203341	Suppressed	Suppressed	Suppressed
+	"Montgomery County, GA"	"13209"	0	62012	0.0	0.0	0.0
+	"Morgan County, GA"	"13211"	Suppressed	142831	Suppressed	Suppressed	Suppressed
+	"Murray County, GA"	"13213"	Suppressed	282823	Suppressed	Suppressed	Suppressed
+	"Muscogee County, GA"	"13215"	Suppressed	1398311	Suppressed	Suppressed	Suppressed
+	"Newton County, GA"	"13217"	Suppressed	811701	Suppressed	Suppressed	Suppressed
+	"Oconee County, GA"	"13219"	0	296220	0.0	0.0	0.0
+	"Oglethorpe County, GA"	"13221"	0	108231	0.0	0.0	0.0
+	"Paulding County, GA"	"13223"	Suppressed	1229984	Suppressed	Suppressed	Suppressed
+	"Peach County, GA"	"13225"	0	197790	0.0	0.0	0.0
+	"Pickens County, GA"	"13227"	Suppressed	239097	Suppressed	Suppressed	Suppressed
+	"Pierce County, GA"	"13229"	Suppressed	139614	Suppressed	Suppressed	Suppressed
+	"Pike County, GA"	"13231"	0	137314	0.0	0.0	0.0
+	"Polk County, GA"	"13233"	Suppressed	303961	Suppressed	Suppressed	Suppressed
+	"Pulaski County, GA"	"13235"	Suppressed	73573	Suppressed	Suppressed	Suppressed
+	"Putnam County, GA"	"13237"	0	158529	0.0	0.0	0.0
+	"Quitman County, GA"	"13239"	0	15944	0.0	0.0	0.0
+	"Rabun County, GA"	"13241"	Suppressed	120755	Suppressed	Suppressed	Suppressed
+	"Randolph County, GA"	"13243"	Suppressed	44859	Suppressed	Suppressed	Suppressed
+	"Richmond County, GA"	"13245"	10	1430181	0.7	0.3	1.3
+	"Rockdale County, GA"	"13247"	Suppressed	655092	Suppressed	Suppressed	Suppressed
+	"Schley County, GA"	"13249"	0	33692	0.0	0.0	0.0
+	"Screven County, GA"	"13251"	0	98497	0.0	0.0	0.0
+	"Seminole County, GA"	"13253"	0	61155	0.0	0.0	0.0
+	"Spalding County, GA"	"13255"	Suppressed	477283	Suppressed	Suppressed	Suppressed
+	"Stephens County, GA"	"13257"	0	186425	0.0	0.0	0.0
+	"Stewart County, GA"	"13259"	Suppressed	38981	Suppressed	Suppressed	Suppressed
+	"Sumter County, GA"	"13261"	Suppressed	204561	Suppressed	Suppressed	Suppressed
+	"Talbot County, GA"	"13263"	0	41572	0.0	0.0	0.0
+	"Taliaferro County, GA"	"13265"	0	11094	0.0	0.0	0.0
+	"Tattnall County, GA"	"13267"	0	171729	0.0	0.0	0.0
+	"Taylor County, GA"	"13269"	Suppressed	55210	Suppressed	Suppressed	Suppressed
+	"Telfair County, GA"	"13271"	0	94205	0.0	0.0	0.0
+	"Terrell County, GA"	"13273"	0	60799	0.0	0.0	0.0
+	"Thomas County, GA"	"13275"	Suppressed	316377	Suppressed	Suppressed	Suppressed
+	"Tift County, GA"	"13277"	0	287820	0.0	0.0	0.0
+	"Toombs County, GA"	"13279"	Suppressed	188966	Suppressed	Suppressed	Suppressed
+	"Towns County, GA"	"13281"	Suppressed	88202	Suppressed	Suppressed	Suppressed
+	"Treutlen County, GA"	"13283"	0	45964	0.0	0.0	0.0
+	"Troup County, GA"	"13285"	0	492336	0.0	0.0	0.0
+	"Turner County, GA"	"13287"	0	59519	0.0	0.0	0.0
+	"Twiggs County, GA"	"13289"	0	55366	0.0	0.0	0.0
+	"Union County, GA"	"13291"	0	180504	0.0	0.0	0.0
+	"Upson County, GA"	"13293"	Suppressed	191489	Suppressed	Suppressed	Suppressed
+	"Walker County, GA"	"13295"	Suppressed	485541	Suppressed	Suppressed	Suppressed
+	"Walton County, GA"	"13297"	Suppressed	704383	Suppressed	Suppressed	Suppressed
+	"Ware County, GA"	"13299"	Suppressed	251352	Suppressed	Suppressed	Suppressed
+	"Warren County, GA"	"13301"	Suppressed	36386	Suppressed	Suppressed	Suppressed
+	"Washington County, GA"	"13303"	Suppressed	140087	Suppressed	Suppressed	Suppressed
+	"Wayne County, GA"	"13305"	Suppressed	214539	Suppressed	Suppressed	Suppressed
+	"Webster County, GA"	"13307"	0	17160	0.0	0.0	0.0
+	"Wheeler County, GA"	"13309"	Suppressed	52427	Suppressed	Suppressed	Suppressed
+	"White County, GA"	"13311"	Suppressed	207804	Suppressed	Suppressed	Suppressed
+	"Whitfield County, GA"	"13313"	Suppressed	727264	Suppressed	Suppressed	Suppressed
+	"Wilcox County, GA"	"13315"	Suppressed	61132	Suppressed	Suppressed	Suppressed
+	"Wilkes County, GA"	"13317"	Suppressed	67544	Suppressed	Suppressed	Suppressed
+	"Wilkinson County, GA"	"13319"	Suppressed	61706	Suppressed	Suppressed	Suppressed
+	"Worth County, GA"	"13321"	Suppressed	142031	Suppressed	Suppressed	Suppressed
+"Total"			1149	265381656	0.4	0.4	0.5
+"---"
+"Dataset: Underlying Cause of Death, 2018-2024, Single Race"
+"Query Parameters:"
+"ICD-10 Codes: X30 (Exposure to excessive natural heat); X31 (Exposure to excessive natural cold); X32 (Exposure to sunlight);"
+"X33 (Victim of lightning); X34 (Victim of earthquake); X34.0 (Victim of cataclysmic earth movements caused by earthquake); X34.1"
+"(Victim of tsunami); X34.8 (Victim of other specified effects of earthquake); X34.9 (Victim of unspecified effect of"
+"earthquake); X35 (Victim of volcanic eruption); X36 (Victim of avalanche, landslide and other earth movements); X37 (Victim of"
+"cataclysmic storm); X38 (Victim of flood); X39 (Exposure to other and unspecified forces of nature)"
+"States: Alabama (01); Florida (12); Georgia (13)"
+"Group By: County"
+"Show Totals: True"
+"Show Zero Values: True"
+"Show Suppressed: True"
+"Calculate Rates Per: 100,000"
+"Rate Options: Default intercensal populations for years 2001-2009 (except Infant Age Groups)"
+"---"
+"Help: See http://wonder.cdc.gov/wonder/help/ucd-expanded.html for more information."
+"---"
+"Query Date: Oct 17, 2026 2:52:51 AM"
+"---"
+"Suggested Citation: Centers for Disease Control and Prevention, National Center for Health Statistics. National Vital Statistics"
+"System, Mortality 2018-2024 on CDC WONDER Online Database, released in 2026. Data are from the Multiple Cause of Death Files,"
+"2018-2024, as compiled from data provided by the 57 vital statistics jurisdictions through the Vital Statistics Cooperative"
+"Program. Accessed at http://wonder.cdc.gov/ucd-icd10-expanded.html on Oct 17, 2026 2:52:51 AM"
+"---"
+Caveats:
+"1. Data are Suppressed when the data meet the criteria for confidentiality constraints. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Assurance of Confidentiality."
+"2. The method used to calculate 95% confidence intervals is documented here: More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Confidence-Intervals."
+"3. The population figures for year 2024 are single-race estimates of the July 1 resident population, from the Vintage 2024"
+"postcensal series released by the Census Bureau on June 27, 2024. The 2024 series is based on the Modified Blended Base produced"
+"by the US Census Bureau in lieu of the April 1, 2020 decennial population count. The Modified Blended Base consists of the blend"
+"of Vintage 2020 postcensal population estimates for April 1, 2020, 2020 Demographic Analysis Estimates, and 2020 Census data"
+"from the internal Census Edited File (CEF). The population figures for year 2023 are single-race estimates of the July 1"
+"resident population, from the Vintage 2023 postcensal series released by the Census Bureau on June 27, 2024. The 2023 series is"
+"based on the Modified Blended Base produced by the US Census Bureau in lieu of the April 1, 2020 decennial population count. The"
+"Modified Blended Base consists of the blend of Vintage 2020 postcensal population estimates for April 1, 2020, 2020 Demographic"
+"Analysis Estimates, and 2020 Census data from the internal Census Edited File (CEF). The population figures for years 2022 are"
+"single-race estimates of the July 1 resident population, from the Vintage 2022 postcensal series released by the Census Bureau"
+"on June 22, 2023. The 2022 series is based on the Modified Blended Base produced by the US Census Bureau in lieu of the April 1,"
+"2020 decennial population count. The Modified Blended Base consists of the blend of Vintage 2020 postcensal population estimates"
+"for April 1, 2020, 2020 Demographic Analysis Estimates, and 2020 Census data from the internal Census Edited File (CEF). The"
+"population figures for years 2021 are single-race estimates of the July 1 resident population, based on the Blended Base"
+"produced by the US Census Bureau in lieu of the April 1, 2020 decennial population count, from the Vintage 2021 postcensal"
+"series released by the Census Bureau on June 30, 2022. The population figures for year 2020 are single-race estimates of the"
+"July 1 resident population, from the Vintage 2020 postcensal series based on April 2010 Census, released by the Census Bureau on"
+"July 27, 2021. The population figures for year 2019 are single-race estimates of the July 1 resident population, from the"
+"Vintage 2019 postcensal series based on April 2010 Census, released by the Census Bureau on June 25, 2020. The population"
+"figures for year 2018 are single-race estimates of the July 1 resident population, from the Vintage 2018 postcensal series based"
+"on April 2010 Census, released by the Census Bureau on June 20, 2019. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Population Data."
+"4. The population figures used in the calculation of death rates for the age group 'under 1 year' are the estimates of the"
+"resident population that is under one year of age. More information: http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Age"
+"Group."
+"5. After the creation of the final 2023 dataset, North Carolina updated the cause of death information for over 900 death"
+"certificates to include a cause of death code indicating drug overdose (ICD-10 underlying cause-of-death codes: X40-X44,"
+"X60-X64, X85, and Y10-Y14). Jurisdictions can continue to update death certificates after the closing of the mortality file. As"
+"a result, users should consider that the actual death count for drug overdose deaths for North Carolina in 2023 is over 4,400"
+"deaths, with a crude rate of approximately 41.0 per 100,000 population, and an age-adjusted rate of approximately 42.1 per"
+"100,000 population. These deaths will not be updated on the final mortality datasets."
+"6. Changes to cause of death classification affect reporting trends. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#ICD-10 Changes."
