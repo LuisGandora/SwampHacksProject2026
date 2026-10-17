@@ -57,7 +57,7 @@ Open the Command Palette (Ctrl+Shift+P), choose **Python: Select Interpreter**, 
 
 | Folder or file | What it is | How to run |
 |---|---|---|
-| [frontend/](frontend/) | React (Vite) app: map, hazard index, crew reports, supervisor ranking | `cd frontend; npm install; npm run dev` |
+| [frontend/](frontend/) | React + MapLibre globe dashboard: hazard ranking, live alerts, site cards, AI reports, crew reports with photos (see [Frontend](#frontend)) | `cd frontend; npm install; npm run dev` |
 | [backend/](backend/) | Python FastAPI API and live-data worker (see [Backend](#backend-fastapi--live-data-worker)) | `python -m uvicorn backend.app:app --reload` and `python -m backend.worker` |
 | [ml/](ml/) | **Hazard Index model** (site-day XGBoost, scores today and tomorrow into the DB), **answer key**, **economic impact** | see [Hazard Index model](#hazard-index-model) |
 | [hardzardModel.py](hardzardModel.py) | First model (v0): one static score per plant, written to `data/hazard_scores.csv`. Replaced by `ml/hazard_model.py`; kept for reference. | `python hardzardModel.py` |
@@ -119,6 +119,34 @@ These are correlations with small samples for the monthly series (n = 58), not p
 `POST /sites/{id}/report` ([backend/reports.py](backend/reports.py)). Code gathers every fact and **decides go / caution / no-go**; Gemini only explains it. Each fact group has a source ID (`S1`–`S7`) that the report must cite, and the assumptions it relies on are listed. A **number audit** flags any number in Gemini's text that isn't in the facts (`verified: false`, with `unverified_numbers`). Gemini gets two retries per model, then the fallback model is tried, then a deterministic template report is used. Reports are cached for 30 minutes.
 
 Set `GEMINI_API_KEY`, and `GEMINI_MODEL` / `GEMINI_FALLBACK_MODEL`; check Google's current model names. Without a key, the template report is returned.
+
+## Frontend
+
+[frontend/](frontend/) is a React (Vite) app on a **MapLibre GL globe** with keyless Esri satellite imagery, styled after an ops-room HUD. It opens on North America and is wired to every backend endpoint.
+
+```powershell
+python -m uvicorn backend.app:app --reload     # terminal 1: API (add $env:PLANIT_DEV="1" for demo controls)
+cd frontend; npm install; npm run dev          # terminal 2: open http://localhost:5173
+```
+
+| Feature | What it does | API |
+|---|---|---|
+| **Hazard ranking** (the dashboard requirement) | All 694 plants ranked by Hazard Index, **Today or Tomorrow**. Band tiles (Critical / High / Moderate / Low / Stop work) double as filters. State filter and search. Each row shows its hazard bar, band label, top hazard and alert badges. Click a row to fly to the site. | `GET /sites?horizon=` |
+| Globe | Plants colored by band, pulsing red rings on stop-work sites, lightning from the last 30 min, your GPS location, a draft report pin. 🌎 returns to North America, ◎ fits all sites. | `/sites`, `/lightning/recent` |
+| Site card | Today and tomorrow scores, what drives the score (weather drivers), expected crew impact (labeled estimate), live alerts with all-clear countdowns, 48 h forecast chart (with a table view), 6 PM briefing, site history, economic impact, crew reports with photos | `/sites/{id}`, `/forecast`, `/briefings/{id}`, `/economics`, `/crew-reports` |
+| **AI safety report** | GO / CAUTION / NO-GO decided by code, hazards with source chips, actions, uncertainty, assumptions, number-audit badge, regenerate | `POST /sites/{id}/report` |
+| **Crew hazard report** | Category, description, severity, location (site / GPS / tap the map to pin), optional photo. **Web:** attach a photo. **Phone:** *Take photo* (camera) or *Choose from library*. Photos are shrunk to ≤1600 px JPEG on the device before upload. The site is alerted immediately. | `POST /uploads`, `POST /crew-reports` |
+| Live alerts | Every active alert, stop work first, with countdowns. New stop-work alerts show a toast and vibrate on phones; there's an optional desktop notification. Polls every 20 s. | `GET /alerts/active` |
+| Sensor modes | STD / NVG / FLIR / CRT looks, after the reference project. They tint the data too, so use STD to read colors. | (none) |
+| Demo controls | With `PLANIT_DEV=1`: run the brief's scenario on a site, fake a lightning strike, clear the demo | `/dev/...` |
+
+**Hazard colors** use the fixed status palette (green Low < 2.5, yellow Moderate < 5, orange High < 7.5, red Critical) and always come with a text label, never color alone.
+
+**Testing on a phone:** the phone must reach both servers.
+- **Same Wi-Fi:** run `npm run dev -- --host` and `python -m uvicorn backend.app:app --host 0.0.0.0`. Put `VITE_API_URL=http://<your-laptop-ip>:8000` in `frontend/.env` (see `.env.example`).
+- **Recommended: a `cloudflared` tunnel (HTTPS).** Browsers only allow GPS ("My GPS") on HTTPS pages or localhost. Camera and library photo picking work either way.
+
+The page can also be added to a phone's home screen (it has a web manifest).
 
 ## Power plant scraper
 

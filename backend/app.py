@@ -49,7 +49,9 @@ def many(sql, params=()):
 
 @app.get("/health")
 def health():
-    return one("SELECT now() AS db_time, (SELECT count(*) FROM sites) AS sites")
+    """Database time, site count, and whether the /dev demo endpoints are on (the UI shows demo controls)."""
+    return {**one("SELECT now() AS db_time, (SELECT count(*) FROM sites) AS sites"),
+            "dev": os.environ.get("PLANIT_DEV") == "1"}
 
 
 @app.get("/hazard-categories")
@@ -59,21 +61,42 @@ def hazard_categories():
 
 
 @app.get("/sites")
-def sites(state: str | None = None, limit: int = Query(100, le=1000)):
-    """Dashboard ranking: latest hazard score first, then active stop-work and warning alerts."""
+def sites(state: str | None = None, horizon: Literal["now", "next_day"] = "next_day",
+          limit: int = Query(1000, le=1000)):
+    """Dashboard ranking by hazard index for the chosen horizon (today or tomorrow), then active stop-work and
+    warning alerts. Each site also carries the other horizon's score and its top hazard category."""
     return many(f"""
+        WITH latest AS (
+            SELECT DISTINCT ON (site_id, horizon) site_id, horizon, score, category_scores, scored_for
+              FROM hazard_scores ORDER BY site_id, horizon, scored_for DESC, created_at DESC
+        ), alerts AS (
+            SELECT site_id, count(*) FILTER (WHERE level = 'stop_work') AS stop_work_alerts,
+                   count(*) FILTER (WHERE level = 'warning') AS warning_alerts
+              FROM active_site_alerts GROUP BY site_id
+        )
         SELECT s.site_id, s.name, s.operator, s.state, s.county, s.timezone, s.capacity_mw, s.primary_technology,
-               {LATLON.format('s.geog')}, hs.score, hs.horizon, hs.scored_for, hs.category_scores,
-               count(a.alert_id) FILTER (WHERE a.level = 'stop_work') AS stop_work_alerts,
-               count(a.alert_id) FILTER (WHERE a.level = 'warning')   AS warning_alerts
+               s.coord_check, {LATLON.format('s.geog')},
+               h.score, %(horizon)s AS horizon, h.scored_for, h.category_scores,
+               n.score AS score_now, t.score AS score_next_day,
+               (SELECT k FROM jsonb_each(h.category_scores) e(k, v) WHERE k <> '_meta'
+                 ORDER BY (v ->> 'score')::numeric DESC LIMIT 1) AS top_category,
+               coalesce(a.stop_work_alerts, 0) AS stop_work_alerts, coalesce(a.warning_alerts, 0) AS warning_alerts
           FROM sites s
-          LEFT JOIN LATERAL (SELECT * FROM hazard_scores h WHERE h.site_id = s.site_id
-                              ORDER BY scored_for DESC, created_at DESC LIMIT 1) hs ON true
-          LEFT JOIN active_site_alerts a ON a.site_id = s.site_id
+          LEFT JOIN latest h ON h.site_id = s.site_id AND h.horizon = %(horizon)s
+          LEFT JOIN latest n ON n.site_id = s.site_id AND n.horizon = 'now'
+          LEFT JOIN latest t ON t.site_id = s.site_id AND t.horizon = 'next_day'
+          LEFT JOIN alerts a ON a.site_id = s.site_id
          WHERE %(state)s::text IS NULL OR s.state = upper(%(state)s)
-         GROUP BY s.site_id, hs.score, hs.horizon, hs.scored_for, hs.category_scores
-         ORDER BY hs.score DESC NULLS LAST, stop_work_alerts DESC, warning_alerts DESC, s.capacity_mw DESC NULLS LAST
-         LIMIT %(limit)s""", {"state": state, "limit": limit})
+         ORDER BY h.score DESC NULLS LAST, stop_work_alerts DESC, warning_alerts DESC, s.capacity_mw DESC NULLS LAST
+         LIMIT %(limit)s""", {"state": state, "horizon": horizon, "limit": limit})
+
+
+@app.get("/lightning/recent")
+def recent_lightning(minutes: int = Query(30, le=240)):
+    """Lightning strikes near the sites in the last `minutes` (GOES-19 GLM and demo strikes), newest first."""
+    return many(f"""SELECT observed_at, source, {LATLON.format('geog')} FROM lightning_strikes
+                     WHERE observed_at > now() - make_interval(mins => %s) ORDER BY observed_at DESC LIMIT 2000""",
+                (minutes,))
 
 
 @app.get("/sites/{site_id}")
