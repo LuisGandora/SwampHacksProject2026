@@ -1,235 +1,203 @@
-import { useState, useEffect } from "react";
-import { CITIES, MAP_SIZE, latLonToPixel } from "./data.js";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { API, api } from "./api.js";
+import AlertsPanel from "./components/AlertsPanel.jsx";
+import CrewReportForm from "./components/CrewReportForm.jsx";
+import GlobeMap from "./components/GlobeMap.jsx";
+import RankingPanel from "./components/RankingPanel.jsx";
+import ReportModal from "./components/ReportModal.jsx";
+import SiteCard from "./components/SiteCard.jsx";
+import { categoryLabel } from "./hazard.js";
 
-// Green (safe) -> Yellow-ish (in the middle) ->  red (big hazard) for a 0-10 index.
-const hazardColor = (v) => `hsl(${120 - v * 12}, 70%, 42%)`;
+const SENSORS = [["normal", "STD"], ["nvg", "NVG"], ["flir", "FLIR"], ["crt", "CRT"]];
+const POLL = { sites: 60000, alerts: 20000, lightning: 60000 };
+
+function usePoll(fn, ms, deps = []) {
+  useEffect(() => {
+    let live = true;
+    const tick = () => live && fn();
+    tick();
+    const id = setInterval(tick, ms);
+    return () => { live = false; clearInterval(id); };
+  }, deps); // eslint-disable-line react-hooks/exhaustive-deps
+}
 
 export default function App() {
-  const [me, setMe] = useState(null);
-  const [locError, setLocError] = useState("");
   const [now, setNow] = useState(new Date());
+  const [health, setHealth] = useState(null);
+  const [apiError, setApiError] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [horizon, setHorizon] = useState("next_day");
+  const [sites, setSites] = useState([]);
+  const [loadingSites, setLoadingSites] = useState(true);
+  const [alerts, setAlerts] = useState([]);
+  const [lightning, setLightning] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  const [crewOpen, setCrewOpen] = useState(false);
+  const [pinMode, setPinMode] = useState(false);
+  const [pin, setPin] = useState(null);
+  const [me, setMe] = useState(null);
+  const [sensor, setSensor] = useState("normal");
+  const [aiSite, setAiSite] = useState(null);
+  const [toasts, setToasts] = useState([]);
+  const [tab, setTab] = useState("rank");
+  const [notifyOn, setNotifyOn] = useState(() => "Notification" in window && Notification.permission === "granted");
+  const [refreshKey, setRefreshKey] = useState(0);
+  const seenAlerts = useRef(null);
+  const globe = useRef(null);
 
-  useEffect(() => {
-  if (!navigator.geolocation) {
-    setLocError("Location is not supported in this browser.");
-    return;
-  }
-  const watchId = navigator.geolocation.watchPosition(
-    (pos) => setMe({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-    (err) => setLocError(err.message)
-  );
-  
-  const id = setInterval(() => setNow(new Date()), 1000);
-
-  return () => navigator.geolocation.clearWatch(watchId);
+  const toast = useCallback((text, kind = "info") => {
+    const id = Math.random();
+    setToasts((t) => [...t.slice(-3), { id, text, kind }]);
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), kind === "stop" ? 12000 : 5000);
   }, []);
 
-  const myPixel = me ? latLonToPixel(me.lat, me.lon) : null;
-  const onMap =
-  myPixel &&
-  myPixel.x >= 0 && myPixel.x <= MAP_SIZE.width &&
-  myPixel.y >= 0 && myPixel.y <= MAP_SIZE.height;
+  useEffect(() => { const id = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(id); }, []);
+  useEffect(() => {
+    api.health().then((h) => { setHealth(h); setApiError(""); }).catch((e) => setApiError(e.message));
+    api.categories().then(setCategories).catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    const w = navigator.geolocation.watchPosition((p) => setMe({ lat: p.coords.latitude, lon: p.coords.longitude }),
+                                                  () => {}, { enableHighAccuracy: true, maximumAge: 60000 });
+    return () => navigator.geolocation.clearWatch(w);
+  }, []);
 
-  const [cities, setCities] = useState(CITIES);
-  const [selectedName, setSelectedName] = useState(null);
-  const [rankOpen, setRankOpen] = useState(false);
+  const loadSites = () => api.sites(horizon)
+    .then((s) => { setSites(s); setApiError(""); })
+    .catch((e) => setApiError(e.message))
+    .finally(() => setLoadingSites(false));
+  usePoll(loadSites, POLL.sites, [horizon, refreshKey]);
 
-  const [reports, setReports] = useState({});
-  const [reportOpen, setReportOpen] = useState(false);
-  const [reportType, setReportType] = useState("Wildlife");
-  const [reportText, setReportText] = useState("");
+  const loadAlerts = () => api.alerts().then((list) => {
+    setAlerts(list);
+    const ids = new Set(list.map((a) => a.alert_id));
+    if (seenAlerts.current) {  // announce stop-work alerts that are new since the last poll
+      list.filter((a) => a.level === "stop_work" && !seenAlerts.current.has(a.alert_id)).forEach((a) => {
+        toast(`⛔ STOP WORK at ${a.site_name}: ${a.message || categoryLabel(a.category, categories)}`, "stop");
+        if (notifyOn) new Notification(`STOP WORK: ${a.site_name}`, { body: a.message || a.title, tag: String(a.alert_id) });
+        navigator.vibrate?.([200, 100, 200]);
+      });
+    }
+    seenAlerts.current = ids;
+  }).catch(() => {});
+  usePoll(loadAlerts, POLL.alerts, [notifyOn, refreshKey]);
+  usePoll(() => api.lightning().then(setLightning).catch(() => {}), POLL.lightning, [refreshKey]);
 
-  const selected = cities.find((c) => c.name === selectedName) ?? null;
+  const selected = sites.find((s) => s.site_id === selectedId) || null;
+  const select = useCallback((id) => {
+    setSelectedId(id);
+    setTab("site");
+    const s = sites.find((x) => x.site_id === id);
+    if (s) globe.current?.flyTo(s.lon, s.lat, 9);
+  }, [sites]);
 
-  const siteReports = selected ? reports[selected.name] ?? [] : [];
-
-  const submitReport = (e) => {
-    e.preventDefault();
-    const text = reportText.trim();
-    if (!text || !selected) return;
-    const entry = {
-      id: Date.now(),
-      type: reportType,
-      text,
-      time: new Date().toISOString(),
-    };
-    setReports((prev) => ({
-      ...prev,
-      [selected.name]: [entry, ...(prev[selected.name] ?? [])], // newest first
-    }));
-    setReportText("");
-    setReportOpen(false);
+  const refreshAll = () => setRefreshKey((k) => k + 1);
+  const toggleNotify = async () => {
+    if (notifyOn) return setNotifyOn(false);
+    const p = await Notification.requestPermission();
+    setNotifyOn(p === "granted");
+    if (p !== "granted") toast("Desktop alerts are blocked in this browser's settings.");
+  };
+  const dev = (fn, msg) => async () => {
+    try { await fn(selectedId); toast(msg); refreshAll(); } catch (e) { toast(e.message, "error"); }
   };
 
-  const setHazard = (value) =>
-    setCities((prev) =>
-      prev.map((c) => (c.name === selectedName ? { ...c, hazard: value } : c))
-    );
+  const counts = { stop: alerts.filter((a) => a.level === "stop_work").length, warn: alerts.filter((a) => a.level === "warning").length };
+  const online = health && !apiError;
 
   return (
-    <div className="page">
-      <header className="header">
-        <h1 className="title">Plan It By Planet</h1>
-        <p className="location">
-        {me
-          ? `Your location: ${me.lat.toFixed(3)}, ${me.lon.toFixed(3)}`
-          : locError || "Finding your location..."}
-        </p>
-        <p className="clock">{now.toLocaleTimeString()}</p>
-        <p className="index">
-          Hazard Index:{" "}
-          {selected ? (
-            <strong style={{ color: hazardColor(selected.hazard) }}>
-              {selected.hazard} / 10
-            </strong>
-          ) : (
-            "0 - 10"
-          )}
-        </p>
+    <div className="app">
+      <GlobeMap ref={globe} sites={sites} lightning={lightning} selectedId={selectedId} onSelect={select}
+                pinMode={pinMode} pin={pin} onPin={(p) => { setPin(p); setPinMode(false); setTab("site"); }}
+                me={me} sensor={sensor} />
+      {sensor === "crt" && <div className="scanlines" aria-hidden="true" />}
+
+      <header className="hud">
+        <div className="brand">
+          <span className="brand-mark" aria-hidden="true">◎</span>
+          <div>
+            <h1>PLANIT CONTROL</h1>
+            <p className="mono small">FIELD HAZARD OPS · FL / GA / AL</p>
+          </div>
+        </div>
+        <div className="hud-stats mono small">
+          <span className={online ? "ok" : "warn"}>● {online ? "LIVE" : "OFFLINE"}</span>
+          <span>{sites.length} SITES</span>
+          <span className="stop">{counts.stop} STOP</span>
+          <span className="warn">{counts.warn} WARN</span>
+          <span className="hide-sm">⚡ {lightning.length}/30m</span>
+          <span className="hide-sm">UTC {now.toISOString().slice(11, 19)}</span>
+        </div>
+        <div className="hud-controls">
+          <div className="seg" role="group" aria-label="Sensor mode">
+            {SENSORS.map(([k, label]) => (
+              <button key={k} className={sensor === k ? "on" : ""} onClick={() => setSensor(k)}>{label}</button>
+            ))}
+          </div>
+          <button onClick={() => globe.current?.flyHome()} title="North America" aria-label="Show North America">🌎</button>
+          <button onClick={() => globe.current?.flySites()} title="All sites" aria-label="Show all sites">◎<span className="hide-sm"> Sites</span></button>
+        </div>
       </header>
 
-      <main className="layout">
-        <section className="map-wrap" aria-label="Map of Alabama, Georgia and Florida">
-          <div
-            className="map"
-            style={{ aspectRatio: `${MAP_SIZE.width} / ${MAP_SIZE.height}` }}
-          >
-            <img src="/map.png" alt="Map of Alabama, Georgia and Florida" />
-            {cities.map((c) => (
-              <button
-                key={c.name}
-                className={`pin ${c.name === selectedName ? "pin--active" : ""}`}
-                style={{
-                  left: `${(c.x / MAP_SIZE.width) * 100}%`,
-                  top: `${(c.y / MAP_SIZE.height) * 100}%`,
-                  background: hazardColor(c.hazard),
-                }}
-                onClick={() => {
-                  setSelectedName(c.name);
-                  setRankOpen(false);
-                }}
-                aria-label={`${c.name}, hazard index ${c.hazard} of 10`}
-                title={c.name}
-              />
-            ))}
-            {onMap && (
-              <div
-                className="me-marker"
-                style={{
-                  left: `${(myPixel.x / MAP_SIZE.width) * 100}%`,
-                  top: `${(myPixel.y / MAP_SIZE.height) * 100}%`,
-                }}
-                title="You are here!"
-              />
-            )}
-          </div>
-        </section>
+      {apiError && (
+        <div className="banner" role="alert">
+          {apiError} Start it with <code>python -m uvicorn backend.app:app</code>, or set <code>VITE_API_URL</code> (now {API}).
+        </div>
+      )}
+      {pinMode && <div className="banner banner--pin">Tap the map where the hazard is · <button className="link" onClick={() => setPinMode(false)}>Cancel</button></div>}
 
-        <aside className="panel">
-          <div className="info">
-            {selected ? (
-              <>
-                <div className="city-head">
-                  <h2 className="city">{selected.name}</h2>
-                  <span className="city-time">
-                    {now.toLocaleTimeString("en-US", {
-                      timeZone: selected.tz,
-                      timeZoneName: "short",
-                    })}
-                  </span>
-                </div>
-                {selected.info.map((line) => (
-                  <p key={line} className="info-line">
-                    {line}
-                  </p>
-                ))}
+      <nav className="tabs" aria-label="Panels">
+        {[["rank", "Ranking"], ["site", "Site"], ["alerts", `Alerts${counts.stop ? ` (${counts.stop})` : ""}`]].map(([k, label]) => (
+          <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{label}</button>
+        ))}
+      </nav>
 
-                <div className="reports">
-                <h3 className="reports-title">Crew reports ({siteReports.length})</h3>
-                <br></br>
-                {siteReports.length === 0 && (
-                  <p className="hint">No reports for this site yet.</p>
-                )}
-                {siteReports.map((r) => (
-                  <article key={r.id} className="report">
-                    <p className="report-meta">
-                      <strong>{r.type}</strong> · {new Date(r.time).toLocaleString()}
-                    </p>
-                    <p className="report-text">{r.text}</p>
-                  </article>
-                ))}  
-              </div>
-              </>
-            ) : (
-              <>
-                <p className="info-line">General Info 1</p>
-                <p className="info-line">General Info 2</p>
-                <p className="info-line">General Info 3</p>
-                <p className="hint">Select a city on the map to see its details.</p>
-              </>
-            )}
-          </div>
+      <div className={`dock dock--left tab-${tab === "rank" ? "show" : "hide"}`}>
+        <RankingPanel sites={sites} horizon={horizon} setHorizon={setHorizon} selectedId={selectedId}
+                      onSelect={select} categories={categories} loading={loadingSites} />
+      </div>
 
-          <div className="supervisor">
-            <button
-              className="rank-btn"
-              disabled={!selected}
-              onClick={() => setRankOpen((o) => !o)}
-            >
-              SUPERVISOR RANK BUTTON
-            </button>
+      <div className="dock dock--right">
+        <div className={`tab-${tab === "site" ? "show" : "hide"}`}>
+          {crewOpen ? (
+            <section className="panel">
+              <CrewReportForm site={selected} categories={categories} pin={pin} pinMode={pinMode} setPinMode={setPinMode}
+                              me={me} onCancel={() => { setCrewOpen(false); setPinMode(false); setPin(null); }}
+                              onDone={(r) => {
+                                setCrewOpen(false); setPin(null);
+                                toast(`Report sent${r.site_id ? "; site alerted" : ""}. Thanks for keeping the crew safe.`);
+                                refreshAll();
+                              }} />
+            </section>
+          ) : selected ? (
+            <SiteCard summary={selected} horizon={horizon} categories={categories} alerts={alerts} now={now}
+                      dev={health?.dev} refreshKey={refreshKey} onClose={() => setSelectedId(null)}
+                      onReport={() => setCrewOpen(true)} onAiReport={() => setAiSite(selected)}
+                      onScenario={dev(api.startScenario, "Demo scenario running on this site.")}
+                      onStrike={dev(api.fakeStrike, "Strike recorded 3 mi away: all-clear countdown restarted.")}
+                      onClearScenario={dev(api.stopScenario, "Demo cleared.")} />
+          ) : (
+            <section className="panel empty">
+              <h2>Select a site</h2>
+              <p className="muted">Tap a dot on the globe or a row in the ranking. Dots are colored by hazard index:
+                Low, Moderate, High, Critical. Red rings pulse at sites under a stop-work alert; yellow flashes are
+                lightning in the last 30 minutes.</p>
+              <button onClick={() => setCrewOpen(true)}>📍 Report a hazard anywhere</button>
+            </section>
+          )}
+        </div>
+        <div className={`tab-${tab === "alerts" ? "show" : "hide"}`}>
+          <AlertsPanel alerts={alerts} categories={categories} now={now} onSelect={select}
+                       notifyOn={notifyOn} onToggleNotify={toggleNotify} />
+        </div>
+      </div>
 
-            {rankOpen && selected && (
-              <div className="rank-picker" role="group" aria-label="Set hazard rank">
-                <p>Set hazard rank for {selected.name}</p>
-                <div className="rank-options">
-                  {Array.from({ length: 11 }, (_, n) => (
-                    <button
-                      key={n}
-                      className={n === selected.hazard ? "on" : ""}
-                      onClick={() => setHazard(n)}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            <br></br>
-            <button
-              className="rank-btn crew-btn"
-              disabled={!selected}
-              onClick={() => {
-                setReportOpen((o) => !o);
-                setRankOpen(false);
-              }}
-            >
-              CREW REPORT BUTTON
-            </button>
+      {aiSite && <ReportModal site={aiSite} categories={categories} onClose={() => setAiSite(null)} />}
 
-            {reportOpen && selected && (
-              <form className="report-form" onSubmit={submitReport}>
-                <p>New report for {selected.name}</p>
-                <select value={reportType} onChange={(e) => setReportType(e.target.value)}>
-                  <option>Wildlife</option>
-                  <option>Weather</option>
-                  <option>Accident</option>
-                  <option>Equipment</option>
-                  <option>Other</option>
-                </select>
-                <textarea
-                  value={reportText}
-                  onChange={(e) => setReportText(e.target.value)}
-                  placeholder="Describe what you're seeing, e.g. alligator near the east gate"
-                  rows={4}
-                  required
-                />
-                <button type="submit">Submit report</button>
-              </form>
-            )}
-          </div>
-        </aside>
-      </main>
+      <div className="toasts" aria-live="polite">
+        {toasts.map((t) => <div key={t.id} className={`toast toast--${t.kind}`}>{t.text}</div>)}
+      </div>
     </div>
   );
 }
