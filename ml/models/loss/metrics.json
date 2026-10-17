@@ -1,0 +1,37 @@
+{
+  "version": "loss-outage-xgb-v1",
+  "features": [
+    "max_temp_f",
+    "min_temp_f",
+    "max_heat_index_f",
+    "precip_in",
+    "rain_prior_6d_in",
+    "max_gust_kt",
+    "doy_sin",
+    "doy_cos",
+    "lat",
+    "lon"
+  ],
+  "target": "customer_hours_out/customers (scaled back)",
+  "trained_at": "2026-10-17T15:27:23.972798",
+  "rows": 1267788,
+  "train_rows": 813997,
+  "test_rows": 453791,
+  "test_mean_actual": 651.4,
+  "test_mae": 1925.4,
+  "test_spearman": 0.269,
+  "test_total_pred_over_actual": 2.99,
+  "test_top10pct_capture": 0.491,
+  "feature_gain_share": {
+    "doy_sin": 0.332,
+    "rain_prior_6d_in": 0.172,
+    "max_gust_kt": 0.143,
+    "doy_cos": 0.101,
+    "lon": 0.065,
+    "precip_in": 0.053,
+    "lat": 0.041,
+    "min_temp_f": 0.037,
+    "max_heat_index_f": 0.036,
+    "max_temp_f": 0.022
+  }
+}
