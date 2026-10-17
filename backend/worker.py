@@ -3,8 +3,9 @@
     python -m backend.worker                 # run on schedule
     python -m backend.worker alerts points   # run named jobs once and exit
 
-Schedule: lightning every minute, NWS alerts every 2 min, forecasts hourly, 6 PM briefings every 15 min,
-site grid lookups daily (only sites not looked up yet).
+Schedule (see main): lightning and notifications every minute, NWS alerts every 2 min, station observations
+every 10 min, river gauges and fires every 15 min, wildlife every 30 min, forecasts hourly, 6 PM briefings
+every 15 min, site grid lookups daily (only sites not looked up yet).
 """
 import datetime as dt
 import sys
@@ -12,15 +13,20 @@ import time
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from backend import briefings, lightning, nws
+from backend import briefings, fires, lightning, notify, nws, observations, rivers, wildlife
 from backend.db import connection, pool
 
 JOBS = {
     "points": nws.sync_points,
     "alerts": nws.sync_alerts,
     "forecasts": nws.sync_forecasts,
+    "observations": observations.sync,
+    "rivers": rivers.sync,
     "lightning": lightning.sync,
+    "wildlife": wildlife.sync,
+    "fires": fires.sync,
     "briefings": briefings.run_due,
+    "notify": notify.sync,
 }
 
 
@@ -45,8 +51,13 @@ def main():
     s.add_job(run, "interval", days=1, args=["points"], next_run_time=now)
     s.add_job(run, "interval", minutes=1, args=["lightning"], next_run_time=now)
     s.add_job(run, "interval", minutes=2, args=["alerts"], next_run_time=now)
+    s.add_job(run, "interval", minutes=10, args=["observations"], next_run_time=now)
+    s.add_job(run, "interval", minutes=15, args=["rivers"], next_run_time=now)
+    s.add_job(run, "interval", minutes=15, args=["fires"], next_run_time=now)
+    s.add_job(run, "interval", minutes=30, args=["wildlife"], next_run_time=now)
     s.add_job(run, "cron", minute=5, args=["forecasts"], next_run_time=now + dt.timedelta(minutes=1))
     s.add_job(run, "cron", minute="*/15", args=["briefings"])
+    s.add_job(run, "interval", minutes=1, args=["notify"], next_run_time=now + dt.timedelta(seconds=30))
     print("Worker running. Ctrl+C to stop.", flush=True)
     s.start()
 
