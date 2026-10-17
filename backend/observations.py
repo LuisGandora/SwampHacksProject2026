@@ -84,25 +84,38 @@ def raise_alerts(conn):
     return sum(conn.execute(q).fetchone()["count"] for q in (RAISE_FROM_READINGS, RAISE_FROM_RAIN, RAISE_FROM_WEEK_RAIN))
 
 
-def sync(conn):
+def reading(p, station):
+    v = lambda k: (p.get(k) or {}).get("value")
+    return (dt.datetime.fromisoformat(p["timestamp"]), c_to_f(v("temperature")), c_to_f(v("heatIndex")),
+            c_to_f(v("windChill")), c_to_f(v("dewpoint")), v("relativeHumidity"), kmh_to_mph(v("windSpeed")),
+            kmh_to_mph(v("windGust")), mm_to_in(v("precipitationLastHour")), m_to_mi(v("visibility")), f"nws:K{station}")
+
+
+def sync(conn, site_ids=None, history_days=0):
+    """Latest reading at each site's station (or just site_ids). history_days > 0 also back-fills that many days
+    (NWS keeps about 7), so a site opened after the worker was off still shows its week."""
     stations = conn.execute("SELECT weather_station_id AS station, array_agg(site_id) AS sites FROM sites "
-                            "WHERE weather_station_id IS NOT NULL GROUP BY 1").fetchall()
+                            "WHERE weather_station_id IS NOT NULL AND (%s::bigint[] IS NULL OR site_id = ANY(%s)) "
+                            "GROUP BY 1", (site_ids, site_ids)).fetchall()
     rows = 0
     for s in stations:
         try:  # NWS station ids are the ICAO code: K + the 3-letter FAA id for the lower 48
-            p = get(f"/stations/K{s['station']}/observations/latest")["properties"]
+            if history_days:  # NWS returns at most 500 readings per call (~40 h at busy stations): one call per day
+                now = dt.datetime.now(dt.timezone.utc)
+                props = [f["properties"] for d in range(history_days, 0, -1)
+                         for f in get(f"/stations/K{s['station']}/observations",
+                                      start=(now - dt.timedelta(days=d)).isoformat(timespec="seconds"),
+                                      end=(now - dt.timedelta(days=d - 1)).isoformat(timespec="seconds"))["features"]]
+            else:
+                props = [get(f"/stations/K{s['station']}/observations/latest")["properties"]]
         except httpx.HTTPError as e:
             print(f"  observations: K{s['station']} skipped ({e})")
             continue
-        v = lambda k: (p.get(k) or {}).get("value")
-        reading = (dt.datetime.fromisoformat(p["timestamp"]), c_to_f(v("temperature")), c_to_f(v("heatIndex")),
-                   c_to_f(v("windChill")), c_to_f(v("dewpoint")), v("relativeHumidity"), kmh_to_mph(v("windSpeed")),
-                   kmh_to_mph(v("windGust")), mm_to_in(v("precipitationLastHour")), m_to_mi(v("visibility")),
-                   f"nws:K{s['station']}")
+        readings = [reading(p, s["station"]) for p in props if p.get("timestamp")]
         conn.cursor().executemany(
             "INSERT INTO weather_observations (site_id, observed_at, temp_f, heat_index_f, wind_chill_f, dewpoint_f, rh, "
             "wind_mph, wind_gust_mph, precip_1h_in, visibility_mi, source) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING",
-            [(site, *reading) for site in s["sites"]])
-        rows += len(s["sites"])
+            [(site, *r) for site in s["sites"] for r in readings])
+        rows += len(s["sites"]) * len(readings)
     return f"{rows} site readings from {len(stations)} stations, {raise_alerts(conn)} site alerts raised or extended"

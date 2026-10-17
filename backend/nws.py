@@ -13,7 +13,7 @@ import httpx
 API = "https://api.weather.gov"
 HEADERS = {"User-Agent": os.environ.get("NWS_USER_AGENT", "PlanIT-Control/0.1 (SwampHacks 2026)"),
            "Accept": "application/geo+json"}
-FORECAST_HOURS = 48  # covers tomorrow in full when the 6 PM briefing runs
+FORECAST_HOURS = 168  # NWS gridpoints go out 7 days; tomorrow is covered in full when the 6 PM briefing runs
 client = httpx.Client(headers=HEADERS, timeout=30)
 
 
@@ -83,10 +83,11 @@ def sync_points(conn):
     return f"{done} sites looked up"
 
 
-def sync_forecasts(conn):
-    """Next 48 h of hourly forecasts for every site, one request per NWS grid cell."""
+def sync_forecasts(conn, site_ids=None):
+    """Next 7 days of hourly forecasts for every site (or just site_ids), one request per NWS grid cell."""
     grids = conn.execute("SELECT nws_grid_id AS g, nws_grid_x AS x, nws_grid_y AS y, array_agg(site_id) AS sites "
-                         "FROM sites WHERE nws_grid_id IS NOT NULL GROUP BY 1, 2, 3").fetchall()
+                         "FROM sites WHERE nws_grid_id IS NOT NULL AND (%s::bigint[] IS NULL OR site_id = ANY(%s)) "
+                         "GROUP BY 1, 2, 3", (site_ids, site_ids)).fetchall()
     now = dt.datetime.now(dt.timezone.utc).replace(minute=0, second=0, microsecond=0)
     hours = [now + dt.timedelta(hours=i) for i in range(FORECAST_HOURS)]
     written = 0

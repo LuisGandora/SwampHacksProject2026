@@ -505,15 +505,29 @@ SELECT a.*, s.name AS site_name, s.timezone,
   FROM site_alerts a JOIN sites s USING (site_id) JOIN hazard_categories c USING (category)
  WHERE a.cleared_at IS NULL AND (a.all_clear_at IS NULL OR a.all_clear_at > now());
 
--- Live adjustment of today's Hazard Index: what's happening now sets a floor under the model's forecast score.
--- Stop-work alert -> 8, any other active warning -> 5, open crew report (last 12 h) -> 4; the highest wins, with
--- its reason. Applied at read time (GET /sites), so it moves the moment an alert opens or clears.
+-- Live adjustment of today's Hazard Index: what's happening now sets a floor under the model's forecast score,
+-- graded by how close and how intense the hazard is. Stop work -> 8 to 10, warning -> 5 to 7, open crew report -> 4;
+-- the highest wins, with its reason. Applied at read time (GET /sites), so it moves the moment an alert changes.
+--   proximity (lightning, wildfire, wildlife; trigger_value = miles away): a strike at the site scores 10, one at the
+--     10-mile stop-work edge 8; between 10 and 20 mi, 7 down to 5.
+--   intensity (heat, cold, wind, fog, rain, soil saturation; trigger_value = the reading): from the warn threshold
+--     to the stop threshold scores 5 to 7; past the stop threshold, 8 rising to 10 one band further.
+--   NWS warnings and river gauges carry no comparable value and keep the base (8 or 5).
 CREATE VIEW site_live_floor AS
 SELECT DISTINCT ON (site_id) site_id, floor, reason
-  FROM (SELECT site_id,
-               CASE WHEN level = 'stop_work' THEN 8 WHEN message LIKE 'Crew report:%' THEN 4 ELSE 5 END AS floor,
-               title || coalesce(': ' || message, '') AS reason
-          FROM active_site_alerts
+  FROM (SELECT a.site_id,
+               CASE WHEN a.message LIKE '%Crew report:%' THEN 4
+                    ELSE round((CASE a.level WHEN 'stop_work' THEN 8 ELSE 5 END) + 2 * coalesce(g.r, 0), 1) END AS floor,
+               a.title || coalesce(': ' || a.message, '') AS reason
+          FROM active_site_alerts a JOIN hazard_categories c USING (category)
+          CROSS JOIN LATERAL (SELECT least(1, greatest(0, CASE
+                   WHEN a.trigger_value IS NULL THEN NULL
+                   WHEN a.category IN ('lightning', 'wildfire', 'wildlife') THEN
+                        CASE WHEN a.level = 'stop_work' THEN 1 - a.trigger_value / nullif(c.stop_radius_mi, 0)
+                             ELSE (c.warn_radius_mi - a.trigger_value) / nullif(c.warn_radius_mi - c.stop_radius_mi, 0) END
+                   WHEN a.category = 'flooding' AND a.message NOT LIKE 'Flood risk:%' THEN NULL  -- river stage, not rain
+                   ELSE (a.trigger_value - CASE a.level WHEN 'stop_work' THEN c.stop_value ELSE c.warn_value END)
+                        / nullif(c.stop_value - c.warn_value, 0) END)) AS r) g
         UNION ALL
         SELECT site_id, 4, 'Open crew report: ' || replace(category, '_', ' ')
           FROM crew_reports

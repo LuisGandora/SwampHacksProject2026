@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { band, categoryLabel, countdown, fmtScore, usd } from "../hazard.js";
-import ForecastChart from "./ForecastChart.jsx";
+import WeatherScanner from "./WeatherScanner.jsx";
 
 const COORD = {
   ok: ["✓ Location verified (OSM)", "ok"], corrected: ["✓ Location corrected to OSM outline", "ok"],
@@ -22,21 +22,18 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
                                    onChanged,
                                    onScenario, onStrike, onClearScenario, refreshKey, onClose }) {
   const [detail, setDetail] = useState(null);
-  const [forecast, setForecast] = useState([]);
   const [crew, setCrew] = useState([]);
   const [briefing, setBriefing] = useState(undefined);
   const [econ, setEcon] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
   const id = summary.site_id;
 
   useEffect(() => {
     let live = true;
-    setError(""); setBriefing(undefined); setEcon(null); setLoading(true);
-    Promise.all([api.site(id), api.forecast(id), api.crewReports(id)])
-      .then(([d, f, c]) => live && (setDetail(d), setForecast(f), setCrew(c)))
-      .catch((e) => live && setError(e.message))
-      .finally(() => live && setLoading(false));
+    setError(""); setBriefing(undefined); setEcon(null);
+    Promise.all([api.site(id), api.crewReports(id)])
+      .then(([d, c]) => live && (setDetail(d), setCrew(c)))
+      .catch((e) => live && setError(e.message));
     return () => { live = false; };
   }, [id, refreshKey]);
 
@@ -155,7 +152,7 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
         )}
       </section>
 
-      {loading ? <p className="muted small">Loading forecast…</p> : <ForecastChart rows={forecast} timezone={tz} />}
+      <WeatherScanner siteId={id} timezone={tz} refreshKey={refreshKey} />
 
       <details key={`b${id}`} onToggle={loadBriefing}>
         <summary>6 PM next-day briefing</summary>

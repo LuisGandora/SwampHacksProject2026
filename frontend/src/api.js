@@ -47,6 +47,7 @@ export const api = {
   sites: (horizon) => request(`/sites?horizon=${horizon}&limit=1000`),
   site: (id) => request(`/sites/${id}`),
   forecast: (id) => request(`/sites/${id}/forecast?hours=48`),
+  weather: (id, refresh = false) => request(`/sites/${id}/weather${refresh ? "?refresh=true" : ""}`, { timeout: 90000 }),
   alerts: () => request("/alerts/active"),
   lightning: () => request("/lightning/recent?minutes=30"),
   briefing: (id) => request(`/briefings/${id}`),

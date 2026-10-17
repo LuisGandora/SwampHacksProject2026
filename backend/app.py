@@ -22,7 +22,7 @@ from pydantic import BaseModel, Field
 from db.setup_db import load_env
 load_env()  # read .env (GEMINI_API_KEY, GEMINI_MODEL, ...) into os.environ before reports/briefings read them
 
-from backend import briefings, compliance, lightning, notify, reports, scenario
+from backend import briefings, compliance, lightning, notify, nws, observations, reports, scenario
 from backend.auth import current_user, rate_limit, require_supervisor
 from backend.db import connection
 
@@ -146,12 +146,91 @@ def site(site_id: int):
 
 
 @app.get("/sites/{site_id}/forecast")
-def forecast(site_id: int, hours: int = Query(48, le=48)):
+def forecast(site_id: int, hours: int = Query(48, le=168)):
     """Hourly NWS forecast for the site (latest issue), from now on."""
     return many("SELECT valid_at, temp_f, heat_index_f, wind_chill_f, precip_chance, precip_in, wind_gust_mph, "
                 "thunder_chance, visibility_mi, short_forecast, issued_at FROM weather_forecasts "
                 "WHERE site_id = %s AND valid_at >= date_trunc('hour', now()) "
                 "AND valid_at < now() + make_interval(hours => %s) ORDER BY valid_at", (site_id, hours))
+
+
+COMPASS = "N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW".split()
+PAST_HOURS = """
+SELECT date_trunc('hour', observed_at) AS valid_at, max(temp_f) AS temp_f, min(temp_f) AS temp_min_f,
+       max(heat_index_f) AS heat_index_f, max(precip_1h_in) AS precip_in, max(wind_mph) AS wind_mph,
+       max(wind_gust_mph) AS wind_gust_mph
+  FROM weather_observations WHERE site_id = %s AND observed_at > now() - interval '7 days' AND source LIKE 'nws:%%'
+ GROUP BY 1 ORDER BY 1
+"""
+NEXT_HOURS = """
+SELECT valid_at, temp_f, temp_f AS temp_min_f, heat_index_f, precip_in, precip_chance, wind_mph, wind_gust_mph,
+       thunder_chance, short_forecast, issued_at
+  FROM weather_forecasts WHERE site_id = %s AND valid_at >= date_trunc('hour', now()) ORDER BY valid_at
+"""
+LIGHTNING_NEAR = """
+SELECT count(*) FILTER (WHERE d <= 10) AS within_10_mi, count(*) FILTER (WHERE d <= 20) AS within_20_mi,
+       count(*) AS within_100_mi, round(min(d)::numeric, 1) AS nearest_mi,
+       (array_agg(az ORDER BY d))[1] AS bearing_deg, (array_agg(t ORDER BY d))[1] AS nearest_at
+  FROM (SELECT ST_Distance(l.geog, s.geog) / 1609.344 AS d, degrees(ST_Azimuth(s.geog, l.geog)) AS az,
+               l.observed_at AS t
+          FROM lightning_strikes l JOIN sites s ON s.site_id = %s
+         WHERE l.observed_at > now() - interval '30 minutes' AND ST_DWithin(l.geog, s.geog, 100 * 1609.344)) n
+"""
+
+
+def daily(past, future, tz):
+    """Per local day: high, low, rain, max gust, max heat index, max thunder; 'measured', 'forecast' or both (today)."""
+    from zoneinfo import ZoneInfo
+    days = {}
+    for kind, rows in (("measured", past), ("forecast", future)):
+        for r in rows:
+            day = r["valid_at"].astimezone(ZoneInfo(tz)).date()
+            d = days.setdefault(day, {"day": day, "sources": set(), "temps": [], "rain_in": 0.0, "gust": [], "heat": [],
+                                      "thunder": []})
+            d["sources"].add(kind)
+            d["temps"] += [float(v) for v in (r["temp_f"], r["temp_min_f"]) if v is not None]
+            d["rain_in"] += float(r["precip_in"] or 0)
+            d["gust"] += [float(r["wind_gust_mph"])] if r["wind_gust_mph"] is not None else []
+            d["heat"] += [float(r["heat_index_f"])] if r["heat_index_f"] is not None else []
+            d["thunder"] += [float(r.get("thunder_chance"))] if r.get("thunder_chance") is not None else []
+    top = lambda xs: round(max(xs)) if xs else None
+    return [{"day": d["day"], "source": " + ".join(sorted(d["sources"])), "high_f": top(d["temps"]),
+             "low_f": round(min(d["temps"])) if d["temps"] else None, "rain_in": round(d["rain_in"], 2),
+             "max_gust_mph": top(d["gust"]), "max_heat_index_f": top(d["heat"]), "max_thunder_pct": top(d["thunder"])}
+            for d in sorted(days.values(), key=lambda d: d["day"])]
+
+
+@app.get("/sites/{site_id}/weather")
+def site_weather(site_id: int, refresh: bool = False):
+    """Weather scanner: the past 7 days measured at the site's station, today so far, the next 7 days forecast
+    (hourly and by day), and the nearest lightning in the last 30 minutes with distance and direction.
+    Opening it pulls fresh NWS data when it's stale (readings over 20 min old, forecast over 2 h; refresh=true:
+    over 2 min). The worker also refreshes every site at 6 PM local, right before its briefing."""
+    with connection() as conn:
+        s = conn.execute("SELECT site_id, timezone, weather_station_id FROM sites WHERE site_id = %s", (site_id,)).fetchone()
+        if s is None:
+            raise HTTPException(404, "Not found")
+        age = conn.execute(
+            "SELECT now() - max(observed_at) FILTER (WHERE source LIKE 'nws:%%') AS obs_age, "
+            "count(DISTINCT date_trunc('hour', observed_at)) FILTER (WHERE observed_at > now() - interval '7 days' "
+            "AND source LIKE 'nws:%%') AS week_hours, "
+            "(SELECT now() - max(issued_at) FROM weather_forecasts WHERE site_id = %(s)s) AS fc_age "
+            "FROM weather_observations WHERE site_id = %(s)s", {"s": site_id}).fetchone()
+        limit = dt.timedelta(minutes=2) if refresh else None
+        if age["obs_age"] is None or age["obs_age"] > (limit or dt.timedelta(minutes=20)):
+            observations.sync(conn, [site_id], history_days=7 if age["week_hours"] < 150 else 0)  # of 168
+        if age["fc_age"] is None or age["fc_age"] > (limit or dt.timedelta(hours=2)):
+            nws.sync_forecasts(conn, [site_id])
+        past = conn.execute(PAST_HOURS, (site_id,)).fetchall()
+        future = conn.execute(NEXT_HOURS, (site_id,)).fetchall()
+        bolt = conn.execute(LIGHTNING_NEAR, (site_id,)).fetchone()
+        latest = conn.execute("SELECT * FROM weather_observations WHERE site_id = %s AND source LIKE 'nws:%%' "
+                              "ORDER BY observed_at DESC LIMIT 1", (site_id,)).fetchone()
+    if bolt["nearest_mi"] is not None:
+        bolt["direction"] = COMPASS[round(float(bolt["bearing_deg"]) / 22.5) % 16]
+    return {"site_id": site_id, "timezone": s["timezone"], "station": s["weather_station_id"], "latest_reading": latest,
+            "forecast_issued_at": future[0]["issued_at"] if future else None,
+            "past_hours": past, "next_hours": future, "daily": daily(past, future, s["timezone"]), "lightning": bolt}
 
 
 @app.get("/sites/{site_id}/hazard-events")
