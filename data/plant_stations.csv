@@ -1,0 +1,695 @@
+plant_id,plant_name,state,station,station_name,station_distance_mi,nws_office,fl_climate_region,days_of_data,heat_index_105f_days_per_year,rain_2in_days_per_year,gust_40kt_days_per_year
+56407,West County Energy Center,FL,DJT,WEST PALM BEACH,17.0,MFL,South Florida,1826,25.8,5.8,5.4
+628,Crystal River,FL,BKV,BROOKSVILLE (ASOS),37.0,TBW,West Central,1826,32.7,5.0,9.0
+621,Turkey Point,FL,TMB,MIAMI/KENDALL-TAMIA,15.7,MFL,South Florida,1826,36.3,5.3,2.6
+6042,Manatee,FL,SRQ,SARASOTA-BRADENTON,19.2,TBW,West Central,1826,18.0,5.0,7.2
+612,Fort Myers,FL,FMY,FORT MYERS/PAGE FLD,9.1,TBW,West Central,1826,22.1,5.4,5.0
+6043,Martin,FL,FPR,FT PIERCE/ST LUCIE,32.8,MLB,East Central,1826,13.2,4.4,5.2
+620,Sanford,FL,SFB,SANFORD/ORLANDO,6.6,MLB,East Central,1826,16.0,4.4,7.8
+7873,H L Culbreath Bayside Power Station,FL,TPA,TAMPA INTL AIRPORT,8.1,TBW,West Central,1826,30.0,4.8,4.4
+7302,Hines Energy Complex,FL,GIF,WINTER HAVEN (ASOS),20.3,TBW,West Central,1826,22.2,3.0,6.0
+6045,St Lucie,FL,FPR,FT PIERCE/ST LUCIE,13.1,MLB,East Central,1826,13.2,4.4,5.2
+641,Gulf Clean Energy Center,FL,PNS,PENSACOLA REGIONAL,6.5,MOB,North/Panhandle,1826,15.2,6.2,7.6
+136,Seminole (FL),FL,NIP,JACKSONVILLE NAS,34.7,JAX,North/Panhandle,1826,20.4,3.7,11.0
+645,Big Bend,FL,SPG,St Petersburg,13.8,TBW,West Central,1826,26.8,2.6,8.6
+60345,Okeechobee Clean Energy Center,FL,VRB,Vero Beach,22.9,MLB,East Central,1826,19.0,4.2,7.6
+634,P L Bartow,FL,PIE,SAINT PETERSBURG,6.3,TBW,West Central,1826,31.9,3.6,7.8
+7242,Polk,FL,GIF,WINTER HAVEN (ASOS),27.2,TBW,West Central,1826,22.2,3.0,6.0
+65978,Dania Beach 7,FL,FLL,Fort Lauderdale - Hollywood,2.4,MFL,South Florida,1826,15.8,6.6,4.4
+667,Northside Generating Station,FL,CRG,JACKSONVILLE/CRAIG,6.0,JAX,North/Panhandle,1826,22.2,4.2,7.8
+617,Port Everglades,FL,FLL,Fort Lauderdale - Hollywood,2.3,MFL,South Florida,1826,15.8,6.6,4.4
+609,Cape Canaveral,FL,MLB,MELBOURNE REGIONAL,26.4,MLB,East Central,1826,9.4,3.8,8.4
+619,Riviera,FL,DJT,WEST PALM BEACH,6.3,MFL,South Florida,1826,25.8,5.8,5.4
+564,Stanton Energy Center,FL,MCO,Orlando International,9.3,MLB,East Central,1826,15.6,3.8,9.0
+613,Lauderdale,FL,FLL,Fort Lauderdale - Hollywood,2.4,MFL,South Florida,1826,15.8,6.6,4.4
+8049,Intercession City,FL,MCO,Orlando International,18.6,MLB,East Central,1826,15.6,3.8,9.0
+8048,Anclote,FL,PIE,SAINT PETERSBURG,19.9,TBW,West Central,1826,31.9,3.6,7.8
+55286,Oleander Power Project LP,FL,MLB,MELBOURNE REGIONAL,20.3,MLB,East Central,1826,9.4,3.8,8.4
+7380,Midulla Generating Station,FL,GIF,WINTER HAVEN (ASOS),31.8,TBW,West Central,1826,22.2,3.0,6.0
+7846,Brandy Branch,FL,NEN,Jacksonville - Whitehouse,5.2,JAX,North/Panhandle,1826,15.8,5.0,3.2
+6046,DeBary,FL,SFB,SANFORD/ORLANDO,10.1,MLB,East Central,1826,16.0,4.4,7.8
+55415,Vandolah Power Station,FL,GIF,WINTER HAVEN (ASOS),38.7,TBW,West Central,1826,22.2,3.0,6.0
+7238,Cane Island,FL,MCO,Orlando International,17.2,MLB,East Central,1826,15.6,3.8,9.0
+55821,Curtis H Stanton Energy Center,FL,MCO,Orlando International,9.5,MLB,East Central,1826,15.6,3.8,9.0
+688,Arvah B Hopkins,FL,TLH,TALLAHASSEE RGNL,5.0,TAE,North/Panhandle,1826,20.8,4.8,5.2
+676,C D McIntosh Jr,FL,GIF,WINTER HAVEN (ASOS),10.4,TBW,West Central,1826,22.2,3.0,6.0
+643,Lansing Smith,FL,ECP,Panama City,8.4,TAE,North/Panhandle,1826,25.8,5.2,4.4
+55412,Osprey Energy Center Power Plant,FL,GIF,WINTER HAVEN (ASOS),3.4,TBW,West Central,1826,22.2,3.0,6.0
+55318,Indian River,FL,MLB,MELBOURNE REGIONAL,28.2,MLB,East Central,1826,9.4,3.8,8.4
+55192,Osceola Generating Station (FL),FL,MCO,Orlando International,24.4,MLB,East Central,1826,15.6,3.8,9.0
+55414,Shady Hills Generating Station,FL,BKV,BROOKSVILLE (ASOS),9.7,TBW,West Central,1826,32.7,5.0,9.0
+60014,Manatee Solar Energy Center,FL,SRQ,SARASOTA-BRADENTON,18.9,TBW,West Central,1826,18.0,5.0,7.2
+663,Deerhaven Generating Station,FL,GNV,GAINESVILLE RGNL,8.2,JAX,North/Panhandle,1826,14.0,5.2,7.0
+50949,Hardee Power Station,FL,GIF,WINTER HAVEN (ASOS),32.1,TBW,West Central,1826,22.2,3.0,6.0
+56400,Treasure Coast Energy Center,FL,FPR,FT PIERCE/ST LUCIE,7.9,MLB,East Central,1826,13.2,4.4,5.2
+56799,Greenland Energy Center,FL,NIP,JACKSONVILLE NAS,10.7,JAX,North/Panhandle,1826,20.4,3.7,11.0
+666,J D Kennedy,FL,CRG,JACKSONVILLE/CRAIG,6.9,JAX,North/Panhandle,1826,22.2,4.2,7.8
+683,Indian River Plant,FL,MLB,MELBOURNE REGIONAL,28.2,MLB,East Central,1826,9.4,3.8,8.4
+7699,Tiger Bay,FL,GIF,WINTER HAVEN (ASOS),22.6,TBW,West Central,1826,22.2,3.0,6.0
+55242,Santa Rosa Energy Center,FL,PNS,PENSACOLA REGIONAL,7.5,MOB,North/Panhandle,1826,15.2,6.2,7.6
+689,S O Purdom,FL,TLH,TALLAHASSEE RGNL,18.3,TAE,North/Panhandle,1826,20.8,4.8,5.2
+638,Suwannee River,FL,VLD,VALDOSTA REGIONAL,28.6,TAE,North/Panhandle,1826,26.3,4.3,2.6
+627,Bayboro,FL,SPG,St Petersburg,0.7,TBW,West Central,1826,26.8,2.6,8.6
+54365,Orange Cogeneration Facility,FL,GIF,WINTER HAVEN (ASOS),14.0,TBW,West Central,1826,22.2,3.0,6.0
+65422,FPL Chipola River Solar Energy Center,FL,MAI,MARIANA,26.9,TAE,North/Panhandle,1826,16.0,3.6,3.8
+65429,FPL Shirer Branch Solar Energy Center,FL,ECP,Panama City,30.9,TAE,North/Panhandle,1826,25.8,5.2,4.4
+65433,Blackwater River Solar Energy Center,FL,NDZ,Milton,6.4,MOB,North/Panhandle,1826,17.8,5.5,5.6
+65866,Canoe,FL,NDZ,Milton,14.5,MOB,North/Panhandle,1826,17.8,5.5,5.6
+65886,Tenmile Creek,FL,MAI,MARIANA,23.0,TAE,North/Panhandle,1826,16.0,3.6,3.8
+65888,Kayak,FL,DTS,Destin - Fort Walton Beach,3.0,MOB,North/Panhandle,1826,24.0,3.4,3.8
+65927,Fourmile Creek,FL,MAI,MARIANA,27.9,TAE,North/Panhandle,1826,16.0,3.6,3.8
+664,John R Kelly,FL,GNV,GAINESVILLE RGNL,4.1,JAX,North/Panhandle,1826,14.0,5.2,7.0
+10434,Mosaic New Wales Operations,FL,GIF,WINTER HAVEN (ASOS),24.1,TBW,West Central,1826,22.2,3.0,6.0
+675,Larsen Memorial,FL,GIF,WINTER HAVEN (ASOS),10.4,TBW,West Central,1826,22.2,3.0,6.0
+54627,Okeelanta Cogeneration,FL,DJT,WEST PALM BEACH,40.7,MFL,South Florida,1826,25.8,5.8,5.4
+54426,Mulberry Cogeneration Facility,FL,GIF,WINTER HAVEN (ASOS),16.6,TBW,West Central,1826,22.2,3.0,6.0
+6584,Stock Island,FL,EYW,Key West,1.7,KEY,South Florida,1826,36.0,3.2,6.2
+54466,Orlando Cogen LP,FL,MCO,Orlando International,6.3,MLB,East Central,1826,15.6,3.8,9.0
+57241,Deerhaven Renewable,FL,GNV,GAINESVILLE RGNL,8.9,JAX,North/Panhandle,1826,14.0,5.2,7.0
+61667,Wimauma Solar and Battery Storage,FL,SPG,St Petersburg,22.4,TBW,West Central,1826,26.8,2.6,8.6
+66128,Lake Mabel Solar and Battery Storage,FL,GIF,WINTER HAVEN (ASOS),10.5,TBW,West Central,1826,22.2,3.0,6.0
+61763,Sunshine Gateway Solar Energy Center,FL,VLD,VALDOSTA REGIONAL,46.3,TAE,North/Panhandle,1826,26.3,4.3,2.6
+62490,Echo River Solar,FL,VLD,VALDOSTA REGIONAL,41.6,TAE,North/Panhandle,1826,26.3,4.3,2.6
+10416,Pensacola Florida Plant,FL,PNS,PENSACOLA REGIONAL,9.0,MOB,North/Panhandle,1826,15.2,6.2,7.6
+673,Tom G Smith,FL,DJT,WEST PALM BEACH,5.3,MFL,South Florida,1826,25.8,5.8,5.4
+10202,Fernandina Beach Mill,FL,JAX,Jacksonville Intl,19.0,JAX,North/Panhandle,1826,22.2,4.6,11.4
+57898,Palm Beach Renewable Energy Facility 2,FL,DJT,WEST PALM BEACH,6.6,MFL,South Florida,1826,25.8,5.8,5.4
+59993,Babcock Solar Energy Center Hybrid,FL,PGD,PUNTA GORDA,15.3,TBW,West Central,1826,36.6,3.6,7.2
+50250,International Paper Pensacola,FL,PNS,PENSACOLA REGIONAL,11.7,MOB,North/Panhandle,1826,15.2,6.2,7.6
+50633,Mosaic Co Bartow Facility,FL,GIF,WINTER HAVEN (ASOS),14.7,TBW,West Central,1826,22.2,3.0,6.0
+10611,Georgia-Pacific Palatka Operations,FL,GNV,GAINESVILLE RGNL,35.7,JAX,North/Panhandle,1826,14.0,5.2,7.0
+60061,Citrus Solar Energy Center Hybrid,FL,PGD,PUNTA GORDA,30.1,TBW,West Central,1826,36.6,3.6,7.2
+50884,Pinellas County Resource Recovery,FL,PIE,SAINT PETERSBURG,2.7,TBW,West Central,1826,31.9,3.6,7.8
+66920,South Tampa Resilience Project,FL,TPA,TAMPA INTL AIRPORT,7.0,TBW,West Central,1826,30.0,4.8,4.4
+68595,Whistling Duck I,FL,GNV,GAINESVILLE RGNL,17.8,JAX,North/Panhandle,1826,14.0,5.2,7.0
+61807,Hamilton Solar Power Plant,FL,VLD,VALDOSTA REGIONAL,24.0,TAE,North/Panhandle,1826,26.3,4.3,2.6
+61982,Columbia Solar Power Plant,FL,GNV,GAINESVILLE RGNL,28.4,JAX,North/Panhandle,1826,14.0,5.2,7.0
+62543,Trenton Solar Power Plant,FL,GNV,GAINESVILLE RGNL,34.3,JAX,North/Panhandle,1826,14.0,5.2,7.0
+63517,Santa Fe Solar Power Plant,FL,GNV,GAINESVILLE RGNL,30.3,JAX,North/Panhandle,1826,14.0,5.2,7.0
+63518,Twin Rivers Solar Power Plant,FL,VLD,VALDOSTA REGIONAL,28.5,TAE,North/Panhandle,1826,26.3,4.3,2.6
+63982,Charlie Creek Solar Power Plant,FL,GIF,WINTER HAVEN (ASOS),29.9,TBW,West Central,1826,22.2,3.0,6.0
+64145,Bay Trail Solar Power Plant,FL,BKV,BROOKSVILLE (ASOS),38.7,TBW,West Central,1826,32.7,5.0,9.0
+64146,Sandy Creek Solar Power Plant,FL,ECP,Panama City,29.0,TAE,North/Panhandle,1826,25.8,5.2,4.4
+64533,Fort Green Solar Power Plant,FL,GIF,WINTER HAVEN (ASOS),31.3,TBW,West Central,1826,22.2,3.0,6.0
+65170,Hildreth Solar Power Plant,FL,GNV,GAINESVILLE RGNL,37.8,JAX,North/Panhandle,1826,14.0,5.2,7.0
+65171,Bay Ranch Solar Power Plant,FL,ECP,Panama City,22.5,TAE,North/Panhandle,1826,25.8,5.2,4.4
+65172,High Springs Solar Power Plant,FL,GNV,GAINESVILLE RGNL,23.3,JAX,North/Panhandle,1826,14.0,5.2,7.0
+65173,Hardeetown Solar Power Plant,FL,GNV,GAINESVILLE RGNL,36.9,JAX,North/Panhandle,1826,14.0,5.2,7.0
+65292,Rice Creek,FL,NIP,JACKSONVILLE NAS,34.1,JAX,North/Panhandle,1826,20.4,3.7,11.0
+65501,Mule Creek Renewable Energy Center,FL,ECP,Panama City,29.3,TAE,North/Panhandle,1826,25.8,5.2,4.4
+66553,Winquepin Renewable Energy Center,FL,VLD,VALDOSTA REGIONAL,34.6,TAE,North/Panhandle,1826,26.3,4.3,2.6
+66639,Falmouth Renewable Energy Center,FL,VLD,VALDOSTA REGIONAL,31.2,TAE,North/Panhandle,1826,26.3,4.3,2.6
+67049,County Line Renewable Energy Center,FL,GNV,GAINESVILLE RGNL,25.4,JAX,North/Panhandle,1826,14.0,5.2,7.0
+67692,Sundance Renewable Energy Center,FL,VLD,VALDOSTA REGIONAL,35.6,TAE,North/Panhandle,1826,26.3,4.3,2.6
+68472,Long Branch Solar,FL,SRQ,SARASOTA-BRADENTON,28.3,TBW,West Central,1826,18.0,5.0,7.2
+69354,Rattler Solar Plant,FL,BKV,BROOKSVILLE (ASOS),15.0,TBW,West Central,1826,32.7,5.0,9.0
+69355,Half Moon Solar Plant,FL,LEE,LEESBURG MUNICIPAL AIRPORT,23.1,MLB,East Central,1826,14.0,3.2,4.8
+69627,Jumper Creek Solar Plant,FL,LEE,LEESBURG MUNICIPAL AIRPORT,24.0,MLB,East Central,1826,14.0,3.2,4.8
+61020,Indian River Solar Center,FL,VRB,Vero Beach,11.3,MLB,East Central,1826,19.0,4.2,7.6
+61021,Horizon Solar Energy Center,FL,GNV,GAINESVILLE RGNL,13.2,JAX,North/Panhandle,1826,14.0,5.2,7.0
+61022,Coral Farms Solar Energy Center,FL,GNV,GAINESVILLE RGNL,23.2,JAX,North/Panhandle,1826,14.0,5.2,7.0
+61024,Hammock Solar,FL,RSW,FT MYERS/SW FLORIDA,28.7,TBW,West Central,1826,32.7,3.7,5.0
+61029,Blue Cypress Solar Energy Center,FL,VRB,Vero Beach,8.0,MLB,East Central,1826,19.0,4.2,7.6
+61050,Wildflower Solar Energy Center,FL,PGD,PUNTA GORDA,30.4,TBW,West Central,1826,36.6,3.6,7.2
+61051,Barefoot Bay Solar Energy Center,FL,VRB,Vero Beach,15.8,MLB,East Central,1826,19.0,4.2,7.6
+61052,Loggerhead Solar Energy Center,FL,FPR,FT PIERCE/ST LUCIE,20.6,MLB,East Central,1826,13.2,4.4,5.2
+61663,Lithia Solar,FL,TPA,TAMPA INTL AIRPORT,27.1,TBW,West Central,1826,30.0,4.8,4.4
+61766,Miami Dade Solar Energy Center,FL,TMB,MIAMI/KENDALL-TAMIA,3.4,MFL,South Florida,1826,36.3,5.3,2.6
+61767,Pioneer Trail Solar Energy Center,FL,DAB,DAYTONA BEACH RGNL,7.4,MLB,East Central,1826,17.2,4.0,6.2
+61768,Interstate Solar Energy Center,FL,FPR,FT PIERCE/ST LUCIE,3.9,MLB,East Central,1826,13.2,4.4,5.2
+62206,Hibiscus Solar Energy Center,FL,DJT,WEST PALM BEACH,13.8,MFL,South Florida,1826,25.8,5.8,5.4
+62394,Sweetbay Solar Center,FL,FPR,FT PIERCE/ST LUCIE,30.9,MLB,East Central,1826,13.2,4.4,5.2
+62491,Okeechobee Solar,FL,VRB,Vero Beach,23.1,MLB,East Central,1826,19.0,4.2,7.6
+62493,Southfork Solar,FL,SRQ,SARASOTA-BRADENTON,25.4,TBW,West Central,1826,18.0,5.0,7.2
+62542,Debary Solar Power Plant,FL,SFB,SANFORD/ORLANDO,9.8,MLB,East Central,1826,16.0,4.4,7.8
+62631,Blue Heron Solar,FL,RSW,FT MYERS/SW FLORIDA,40.4,TBW,West Central,1826,32.7,3.7,5.0
+62632,Cattle Ranch,FL,PGD,PUNTA GORDA,30.1,TBW,West Central,1826,36.6,3.6,7.2
+62633,Twin Lakes,FL,GNV,GAINESVILLE RGNL,26.5,JAX,North/Panhandle,1826,14.0,5.2,7.0
+62634,Babcock Preserve,FL,PGD,PUNTA GORDA,14.9,TBW,West Central,1826,36.6,3.6,7.2
+62645,Northern Preserve Solar,FL,NEN,Jacksonville - Whitehouse,22.6,JAX,North/Panhandle,1826,15.8,5.0,3.2
+62750,Little Manatee River Solar,FL,SPG,St Petersburg,14.2,TBW,West Central,1826,26.8,2.6,8.6
+62914,Nassau Solar Center,FL,NEN,Jacksonville - Whitehouse,10.7,JAX,North/Panhandle,1826,15.8,5.0,3.2
+62915,Magnolia Springs Solar Center,FL,NIP,JACKSONVILLE NAS,23.2,JAX,North/Panhandle,1826,20.4,3.7,11.0
+62916,Trailside Solar Center,FL,NIP,JACKSONVILLE NAS,35.0,JAX,North/Panhandle,1826,20.4,3.7,11.0
+62917,Rodeo Solar Center,FL,PGD,PUNTA GORDA,30.0,TBW,West Central,1826,36.6,3.6,7.2
+62919,Orange Blossom Solar Center,FL,VRB,Vero Beach,10.2,MLB,East Central,1826,19.0,4.2,7.6
+62921,Palm Bay Solar,FL,MLB,MELBOURNE REGIONAL,18.0,MLB,East Central,1826,9.4,3.8,8.4
+62922,Lakeside Solar Center,FL,FPR,FT PIERCE/ST LUCIE,29.9,MLB,East Central,1826,13.2,4.4,5.2
+62923,Union Springs Solar Center,FL,GNV,GAINESVILLE RGNL,19.6,JAX,North/Panhandle,1826,14.0,5.2,7.0
+62924,Pelican Solar Center,FL,FPR,FT PIERCE/ST LUCIE,10.6,MLB,East Central,1826,13.2,4.4,5.2
+62925,Egret Solar Center,FL,NEN,Jacksonville - Whitehouse,19.5,JAX,North/Panhandle,1826,15.8,5.0,3.2
+63109,Discovery Solar Center,FL,MLB,MELBOURNE REGIONAL,29.5,MLB,East Central,1826,9.4,3.8,8.4
+63110,Sabal Palm Solar Center,FL,DJT,WEST PALM BEACH,17.0,MFL,South Florida,1826,25.8,5.8,5.4
+63582,Harmony Solar (FL),FL,MCO,Orlando International,22.5,MLB,East Central,1826,15.6,3.8,9.0
+63583,Taylor Creek Solar,FL,MCO,Orlando International,16.6,MLB,East Central,1826,15.6,3.8,9.0
+63754,Gulf Power Blue Indigo Energy,FL,BCR,Tri-County,12.1,TAE,North/Panhandle,1826,25.1,1.6,0.6
+63978,Duette Solar Power Plant,FL,SRQ,SARASOTA-BRADENTON,33.0,TBW,West Central,1826,18.0,5.0,7.2
+64300,Fort Drum Energy Center,FL,VRB,Vero Beach,21.1,MLB,East Central,1826,19.0,4.2,7.6
+64301,Willow Solar Energy Center,FL,SRQ,SARASOTA-BRADENTON,29.5,TBW,West Central,1826,18.0,5.0,7.2
+64631,Jamison Solar (FL),FL,GIF,WINTER HAVEN (ASOS),21.6,TBW,West Central,1826,22.2,3.0,6.0
+64657,Magnolia Solar,FL,GIF,WINTER HAVEN (ASOS),20.6,TBW,West Central,1826,22.2,3.0,6.0
+64757,Blue Springs,FL,MAI,MARIANA,7.2,TAE,North/Panhandle,1826,16.0,3.6,3.8
+65036,Cotton Creek Solar Energy Center,FL,NSE,WHITING FLD NAS-N.,20.8,MOB,North/Panhandle,1826,14.6,4.4,4.2
+65037,Sawgrass Solar Energy Center,FL,RSW,FT MYERS/SW FLORIDA,44.8,TBW,West Central,1826,32.7,3.7,5.0
+65038,Ghost Orchid Solar Energy Center,FL,RSW,FT MYERS/SW FLORIDA,45.4,TBW,West Central,1826,32.7,3.7,5.0
+65039,Sundew,FL,FPR,FT PIERCE/ST LUCIE,19.2,MLB,East Central,1826,13.2,4.4,5.2
+65040,Immokalee,FL,RSW,FT MYERS/SW FLORIDA,20.5,TBW,West Central,1826,32.7,3.7,5.0
+65041,Elder Branch,FL,SRQ,SARASOTA-BRADENTON,23.1,TBW,West Central,1826,18.0,5.0,7.2
+65042,Grove,FL,VRB,Vero Beach,15.3,MLB,East Central,1826,19.0,4.2,7.6
+65420,Bluefield Preserve Solar,FL,FPR,FT PIERCE/ST LUCIE,25.2,MLB,East Central,1826,13.2,4.4,5.2
+65421,Chautauqua Solar Energy Center,FL,0J4,Florala,13.2,MOB,North/Panhandle,1826,9.1,5.5,2.6
+65423,Everglades Solar Energy Center,FL,TMB,MIAMI/KENDALL-TAMIA,10.2,MFL,South Florida,1826,36.3,5.3,2.6
+65424,First City Solar Energy Center,FL,NSE,WHITING FLD NAS-N.,23.2,MOB,North/Panhandle,1826,14.6,4.4,4.2
+65427,FPL Flowers Creek Solar Energy Center,FL,MAI,MARIANA,20.2,TAE,North/Panhandle,1826,16.0,3.6,3.8
+65428,Pink Trial Solar Energy Center,FL,FPR,FT PIERCE/ST LUCIE,17.2,MLB,East Central,1826,13.2,4.4,5.2
+65430,Wild Azalea Solar Energy Center,FL,MAI,MARIANA,28.6,TAE,North/Panhandle,1826,16.0,3.6,3.8
+65431,Anhinga Solar Energy Center,FL,NIP,JACKSONVILLE NAS,24.3,JAX,North/Panhandle,1826,20.4,3.7,11.0
+65432,Apalachee,FL,MAI,MARIANA,8.5,TAE,North/Panhandle,1826,16.0,3.6,3.8
+65438,FPL Cavendish Solar Energy Center,FL,VRB,Vero Beach,23.7,MLB,East Central,1826,19.0,4.2,7.6
+65519,Bell Ridge Solar,FL,GNV,GAINESVILLE RGNL,26.2,JAX,North/Panhandle,1826,14.0,5.2,7.0
+65592,FPL Saw Palmetto Solar Energy Center,FL,ECP,Panama City,21.5,TAE,North/Panhandle,1826,25.8,5.2,4.4
+65593,FPL Cypress Pond Solar,FL,ECP,Panama City,21.6,TAE,North/Panhandle,1826,25.8,5.2,4.4
+65594,FPL Etonia Creek,FL,GNV,GAINESVILLE RGNL,30.4,JAX,North/Panhandle,1826,14.0,5.2,7.0
+65862,Big Juniper Solar,FL,NDZ,Milton,7.3,MOB,North/Panhandle,1826,17.8,5.5,5.6
+65863,Three Creeks,FL,SRQ,SARASOTA-BRADENTON,22.0,TBW,West Central,1826,18.0,5.0,7.2
+65864,Sambucus,FL,SRQ,SARASOTA-BRADENTON,30.5,TBW,West Central,1826,18.0,5.0,7.2
+65865,Pineapple,FL,FPR,FT PIERCE/ST LUCIE,20.6,MLB,East Central,1826,13.2,4.4,5.2
+65867,Sparkleberry,FL,PNS,PENSACOLA REGIONAL,24.5,MOB,North/Panhandle,1826,15.2,6.2,7.6
+65868,Prairie Creek FL,FL,PGD,PUNTA GORDA,21.1,TBW,West Central,1826,36.6,3.6,7.2
+65869,White Tail,FL,FPR,FT PIERCE/ST LUCIE,29.0,MLB,East Central,1826,13.2,4.4,5.2
+65871,Caloosahatchee,FL,RSW,FT MYERS/SW FLORIDA,38.3,TBW,West Central,1826,32.7,3.7,5.0
+65872,Monarch,FL,FPR,FT PIERCE/ST LUCIE,33.5,MLB,East Central,1826,13.2,4.4,5.2
+65873,Turnpike,FL,VRB,Vero Beach,15.2,MLB,East Central,1826,19.0,4.2,7.6
+65874,Beautyberry,FL,RSW,FT MYERS/SW FLORIDA,46.8,TBW,West Central,1826,32.7,3.7,5.0
+65875,Woodyard,FL,RSW,FT MYERS/SW FLORIDA,44.7,TBW,West Central,1826,32.7,3.7,5.0
+65877,Ibis,FL,MLB,MELBOURNE REGIONAL,17.9,MLB,East Central,1826,9.4,3.8,8.4
+65878,Silver Palm,FL,DJT,WEST PALM BEACH,17.1,MFL,South Florida,1826,25.8,5.8,5.4
+65879,Pecan Tree,FL,0J4,Florala,8.5,MOB,North/Panhandle,1826,9.1,5.5,2.6
+65882,Terrill Creek,FL,NIP,JACKSONVILLE NAS,24.9,JAX,North/Panhandle,1826,20.4,3.7,11.0
+65883,North Orange,FL,FPR,FT PIERCE/ST LUCIE,11.9,MLB,East Central,1826,13.2,4.4,5.2
+65885,Boardwalk,FL,RSW,FT MYERS/SW FLORIDA,18.3,TBW,West Central,1826,32.7,3.7,5.0
+65887,Price Creek,FL,GNV,GAINESVILLE RGNL,36.6,JAX,North/Panhandle,1826,14.0,5.2,7.0
+65905,Mare Branch,FL,PGD,PUNTA GORDA,30.0,TBW,West Central,1826,36.6,3.6,7.2
+65906,Long Creek,FL,SRQ,SARASOTA-BRADENTON,27.9,TBW,West Central,1826,18.0,5.0,7.2
+65907,Georges Lake,FL,GNV,GAINESVILLE RGNL,31.3,JAX,North/Panhandle,1826,14.0,5.2,7.0
+65908,Norton Creek,FL,VLD,VALDOSTA REGIONAL,27.4,TAE,North/Panhandle,1826,26.3,4.3,2.6
+65909,Hendry Isles,FL,RSW,FT MYERS/SW FLORIDA,37.8,TBW,West Central,1826,32.7,3.7,5.0
+65910,Wild Quail,FL,0J4,Florala,10.8,MOB,North/Panhandle,1826,9.1,5.5,2.6
+65911,Mitchell Creek,FL,NSE,WHITING FLD NAS-N.,20.1,MOB,North/Panhandle,1826,14.6,4.4,4.2
+65912,Big Water,FL,FPR,FT PIERCE/ST LUCIE,26.3,MLB,East Central,1826,13.2,4.4,5.2
+65913,Speckled Perch,FL,FPR,FT PIERCE/ST LUCIE,30.2,MLB,East Central,1826,13.2,4.4,5.2
+65914,Redlands,FL,TMB,MIAMI/KENDALL-TAMIA,9.8,MFL,South Florida,1826,36.3,5.3,2.6
+65915,Hog Bay,FL,PGD,PUNTA GORDA,14.8,TBW,West Central,1826,36.6,3.6,7.2
+65916,Fox Trail,FL,MLB,MELBOURNE REGIONAL,17.8,MLB,East Central,1826,9.4,3.8,8.4
+65917,Thomas Creek,FL,NEN,Jacksonville - Whitehouse,11.8,JAX,North/Panhandle,1826,15.8,5.0,3.2
+65918,Green Pasture,FL,PGD,PUNTA GORDA,15.1,TBW,West Central,1826,36.6,3.6,7.2
+65919,Fawn,FL,FPR,FT PIERCE/ST LUCIE,30.6,MLB,East Central,1826,13.2,4.4,5.2
+65920,Buttonwood,FL,VRB,Vero Beach,17.1,MLB,East Central,1826,19.0,4.2,7.6
+65921,Honeybell,FL,VRB,Vero Beach,22.0,MLB,East Central,1826,19.0,4.2,7.6
+65922,Holopaw,FL,DJT,WEST PALM BEACH,20.2,MFL,South Florida,1826,25.8,5.8,5.4
+65924,Nature Trail,FL,NEN,Jacksonville - Whitehouse,18.1,JAX,North/Panhandle,1826,15.8,5.0,3.2
+65925,Orchard,FL,VRB,Vero Beach,11.5,MLB,East Central,1826,19.0,4.2,7.6
+65926,Hawthorne Creek,FL,PGD,PUNTA GORDA,14.7,TBW,West Central,1826,36.6,3.6,7.2
+67182,Tupelo Solar,FL,DAB,DAYTONA BEACH RGNL,40.7,MLB,East Central,1826,17.2,4.0,6.2
+67203,Bullfrog Creek Solar,FL,SPG,St Petersburg,21.5,TBW,West Central,1826,26.8,2.6,8.6
+67205,Gadsden County Solar,FL,TLH,TALLAHASSEE RGNL,28.7,TAE,North/Panhandle,1826,20.8,4.8,5.2
+67206,Columbia County Solar,FL,GNV,GAINESVILLE RGNL,30.5,JAX,North/Panhandle,1826,14.0,5.2,7.0
+67207,Gilchrist County Solar,FL,GNV,GAINESVILLE RGNL,24.2,JAX,North/Panhandle,1826,14.0,5.2,7.0
+67208,Harmony Florida Solar II,FL,MCO,Orlando International,22.7,MLB,East Central,1826,15.6,3.8,9.0
+67209,Storey Bend Solar,FL,MCO,Orlando International,17.2,MLB,East Central,1826,15.6,3.8,9.0
+67672,Cedar Trail,FL,NEN,Jacksonville - Whitehouse,19.4,JAX,North/Panhandle,1826,15.8,5.0,3.2
+67673,Swallowtail,FL,0J4,Florala,9.6,MOB,North/Panhandle,1826,9.1,5.5,2.6
+68276,Swamp Cabbage,FL,RSW,FT MYERS/SW FLORIDA,34.7,TBW,West Central,1826,32.7,3.7,5.0
+68372,Bronson Solar,FL,GNV,GAINESVILLE RGNL,26.1,JAX,North/Panhandle,1826,14.0,5.2,7.0
+68551,Cottonmouth Ranch Solar,FL,SPG,St Petersburg,22.0,TBW,West Central,1826,26.8,2.6,8.6
+68817,Mallard,FL,MLB,MELBOURNE REGIONAL,18.8,MLB,East Central,1826,9.4,3.8,8.4
+68818,Sand Pine,FL,MAI,MARIANA,27.2,TAE,North/Panhandle,1826,16.0,3.6,3.8
+68819,Sea Grape,FL,FPR,FT PIERCE/ST LUCIE,11.9,MLB,East Central,1826,13.2,4.4,5.2
+68820,Big Brook,FL,MAI,MARIANA,27.5,TAE,North/Panhandle,1826,16.0,3.6,3.8
+68821,Clover FL,FL,FPR,FT PIERCE/ST LUCIE,8.9,MLB,East Central,1826,13.2,4.4,5.2
+68822,Flatford,FL,SRQ,SARASOTA-BRADENTON,28.2,TBW,West Central,1826,18.0,5.0,7.2
+68823,Goldenrod,FL,RSW,FT MYERS/SW FLORIDA,16.8,TBW,West Central,1826,32.7,3.7,5.0
+61654,Balm Solar,FL,TPA,TAMPA INTL AIRPORT,23.2,TBW,West Central,1826,30.0,4.8,4.4
+10204,Mosaic Co Tampa Facility,FL,TPA,TAMPA INTL AIRPORT,11.5,TBW,West Central,1826,30.0,4.8,4.4
+61665,Payne Creek Solar,FL,GIF,WINTER HAVEN (ASOS),30.4,TBW,West Central,1826,22.2,3.0,6.0
+65683,Juniper Solar (FL),FL,GIF,WINTER HAVEN (ASOS),25.8,TBW,West Central,1826,22.2,3.0,6.0
+50887,Wheelabrator South Broward,FL,FLL,Fort Lauderdale - Hollywood,2.4,MFL,South Florida,1826,15.8,6.6,4.4
+50071,Palm Beach Renewable Energy Facility 1,FL,DJT,WEST PALM BEACH,6.5,MFL,South Florida,1826,25.8,5.8,5.4
+62541,Lake Placid Solar Power Plant,FL,PGD,PUNTA GORDA,48.0,TBW,West Central,1826,36.6,3.6,7.2
+65684,Laurel Oaks Solar,FL,GIF,WINTER HAVEN (ASOS),21.4,TBW,West Central,1826,22.2,3.0,6.0
+61656,Grange Hall Solar,FL,SPG,St Petersburg,28.9,TBW,West Central,1826,26.8,2.6,8.6
+61653,Alafia Solar,FL,GIF,WINTER HAVEN (ASOS),28.8,TBW,West Central,1826,22.2,3.0,6.0
+63495,Durrance,FL,GIF,WINTER HAVEN (ASOS),24.0,TBW,West Central,1826,22.2,3.0,6.0
+52010,Lee County Solid Waste Energy,FL,RSW,FT MYERS/SW FLORIDA,6.5,TBW,West Central,1826,32.7,3.7,5.0
+61666,Peace Creek Solar,FL,GIF,WINTER HAVEN (ASOS),10.9,TBW,West Central,1826,22.2,3.0,6.0
+65687,Riverside Solar,FL,SPG,St Petersburg,11.0,TBW,West Central,1826,26.8,2.6,8.6
+61664,Mountain View Solar (FL),FL,BKV,BROOKSVILLE (ASOS),15.2,TBW,West Central,1826,32.7,5.0,9.0
+7345,University of Florida,FL,GNV,GAINESVILLE RGNL,5.6,JAX,North/Panhandle,1826,14.0,5.2,7.0
+61988,Citrus Ridge Solar,FL,MCO,Orlando International,18.8,MLB,East Central,1826,15.6,3.8,9.0
+7997,Winston,FL,GIF,WINTER HAVEN (ASOS),16.2,TBW,West Central,1826,22.2,3.0,6.0
+59691,Gulf Coast Solar Center III,FL,PNS,PENSACOLA REGIONAL,8.8,MOB,North/Panhandle,1826,15.2,6.2,7.6
+61657,Lake Hancock Solar,FL,GIF,WINTER HAVEN (ASOS),29.3,TBW,West Central,1826,22.2,3.0,6.0
+50482,Clewiston Sugar House,FL,DJT,WEST PALM BEACH,51.9,MFL,South Florida,1826,25.8,5.8,5.4
+7954,Field Street,FL,DAB,DAYTONA BEACH RGNL,11.6,MLB,East Central,1826,17.2,4.0,6.2
+50858,Hillsborough County Resource Recovery,FL,TPA,TAMPA INTL AIRPORT,12.2,TBW,West Central,1826,30.0,4.8,4.4
+50971,Tropicana Products Bradenton,FL,SRQ,SARASOTA-BRADENTON,5.7,TBW,West Central,1826,18.0,5.0,7.2
+64641,Big Bend II Solar,FL,SPG,St Petersburg,14.5,TBW,West Central,1826,26.8,2.6,8.6
+690,J Woodruff,FL,MAI,MARIANA,20.9,TAE,North/Panhandle,1826,16.0,3.6,3.8
+10562,Fernandina Plant,FL,JAX,Jacksonville Intl,17.2,JAX,North/Panhandle,1826,22.2,4.6,11.4
+63187,"FL Solar 4, LLC",FL,TLH,TALLAHASSEE RGNL,13.3,TAE,North/Panhandle,1826,20.8,4.8,5.2
+59690,Gulf Coast Solar Center II,FL,NFJ,Choctaw,6.5,MOB,North/Panhandle,1676,18.4,5.7,3.5
+66129,Dover Solar and Battery Storage,FL,TPA,TAMPA INTL AIRPORT,20.7,TBW,West Central,1826,30.0,4.8,4.4
+10004,Mosaic South Pierce Operations,FL,GIF,WINTER HAVEN (ASOS),23.5,TBW,West Central,1826,22.2,3.0,6.0
+61655,Bonnie Mine Solar,FL,GIF,WINTER HAVEN (ASOS),18.6,TBW,West Central,1826,22.2,3.0,6.0
+665,G W Ivey,FL,TMB,MIAMI/KENDALL-TAMIA,11.7,MFL,South Florida,1826,36.3,5.3,2.6
+69187,Big Bend 1 Solar and Battery Storage,FL,SPG,St Petersburg,14.9,TBW,West Central,1826,26.8,2.6,8.6
+50666,Pasco Cnty Solid Waste Resource Recovery,FL,BKV,BROOKSVILLE (ASOS),9.6,TBW,West Central,1826,32.7,5.0,9.0
+50803,Seminole Mill,FL,CRG,JACKSONVILLE/CRAIG,7.5,JAX,North/Panhandle,1826,22.2,4.2,7.8
+59689,Gulf Coast Solar Center I,FL,DTS,Destin - Fort Walton Beach,9.0,MOB,North/Panhandle,1826,24.0,3.4,3.8
+56929,DeSoto Next Generation Solar Energy,FL,PGD,PUNTA GORDA,30.4,TBW,West Central,1826,36.6,3.6,7.2
+66921,English Creek Solar,FL,GIF,WINTER HAVEN (ASOS),20.8,TBW,West Central,1826,22.2,3.0,6.0
+50875,McKay Bay Facility,FL,TPA,TAMPA INTL AIRPORT,7.3,TBW,West Central,1826,30.0,4.8,4.4
+60025,Eight Flags Energy,FL,JAX,Jacksonville Intl,17.3,JAX,North/Panhandle,1826,22.2,4.6,11.4
+60582,CoTAL Solar Farm,FL,TLH,TALLAHASSEE RGNL,1.0,TAE,North/Panhandle,1826,20.8,4.8,5.2
+69165,Bayside Battery Storage,FL,TPA,TAMPA INTL AIRPORT,8.7,TBW,West Central,1826,30.0,4.8,4.4
+50474,Swift Creek Chemical Complex,FL,VLD,VALDOSTA REGIONAL,33.5,TAE,North/Panhandle,1826,26.3,4.3,2.6
+61080,Sub 12,FL,TLH,TALLAHASSEE RGNL,7.1,TAE,North/Panhandle,1826,20.8,4.8,5.2
+50629,Covanta Lake County Energy,FL,LEE,LEESBURG MUNICIPAL AIRPORT,7.3,MLB,East Central,1826,14.0,3.2,4.8
+7715,Pea Ridge,FL,PNS,PENSACOLA REGIONAL,8.5,MOB,North/Panhandle,1826,15.2,6.2,7.6
+50310,Standby Generation Plant,FL,PNS,PENSACOLA REGIONAL,2.9,MOB,North/Panhandle,1826,15.2,6.2,7.6
+57202,Jacksonville Solar,FL,NEN,Jacksonville - Whitehouse,5.7,JAX,North/Panhandle,1826,15.8,5.0,3.2
+66392,Jax LNG,FL,CRG,JACKSONVILLE/CRAIG,4.8,JAX,North/Panhandle,1826,22.2,4.2,7.8
+56518,South Energy Center,FL,GNV,GAINESVILLE RGNL,5.3,JAX,North/Panhandle,1826,14.0,5.2,7.0
+50572,CSL Gas Recovery,FL,PMP,POMPANO BEACH,4.5,MFL,South Florida,1826,35.6,6.1,4.2
+63995,Trenton,FL,GNV,GAINESVILLE RGNL,32.3,JAX,North/Panhandle,1826,14.0,5.2,7.0
+10275,Florida's Natural Growers,FL,GIF,WINTER HAVEN (ASOS),14.0,TBW,West Central,1826,22.2,3.0,6.0
+56930,Space Coast Next Gen Solar Energy,FL,MLB,MELBOURNE REGIONAL,24.7,MLB,East Central,1826,9.4,3.8,8.4
+63186,Imeson Solar,FL,JAX,Jacksonville Intl,3.0,JAX,North/Panhandle,1826,22.2,4.6,11.4
+64546,Wynwood Energy Storage,FL,MIA,MIAMI INTL AIRPORT,7.5,MFL,South Florida,1826,22.8,5.8,1.4
+57123,Trail Ridge Landfill Gas Recovery,FL,NEN,Jacksonville - Whitehouse,13.3,JAX,North/Panhandle,1826,15.8,5.0,3.2
+60701,JED Solid Waste Mgmt Renewable Energy,FL,MLB,MELBOURNE REGIONAL,27.7,MLB,East Central,1826,9.4,3.8,8.4
+10008,Baptist Medical Center,FL,NIP,JACKSONVILLE NAS,5.6,JAX,North/Panhandle,1826,20.4,3.7,11.0
+60788,Suwannee Solar Facility,FL,VLD,VALDOSTA REGIONAL,28.7,TAE,North/Panhandle,1826,26.3,4.3,2.6
+10431,Anheuser-Busch Jacksonville,FL,JAX,Jacksonville Intl,4.9,JAX,North/Panhandle,1826,22.2,4.6,11.4
+63999,Micanopy Energy Storage Facility,FL,GNV,GAINESVILLE RGNL,12.5,JAX,North/Panhandle,1826,14.0,5.2,7.0
+10188,Cutrale Citrus Juices USA II,FL,GIF,WINTER HAVEN (ASOS),2.8,TBW,West Central,1826,22.2,3.0,6.0
+54624,South District Wastewater Treatment Plt,FL,TMB,MIAMI/KENDALL-TAMIA,8.9,MFL,South Florida,1826,36.3,5.3,2.6
+61879,Bartow Solar Energy LLC,FL,GIF,WINTER HAVEN (ASOS),10.3,TBW,West Central,1826,22.2,3.0,6.0
+61388,AEP Jacksonville Solar Project,FL,JAX,Jacksonville Intl,2.0,JAX,North/Panhandle,1826,22.2,4.6,11.4
+59686,Sarasota County LFGTE Facility,FL,SRQ,SARASOTA-BRADENTON,17.3,TBW,West Central,1826,18.0,5.0,7.2
+61777,Brevard,FL,MLB,MELBOURNE REGIONAL,22.9,MLB,East Central,1826,9.4,3.8,8.4
+59611,"LKL BLBD, LLC",FL,GIF,WINTER HAVEN (ASOS),16.1,TBW,West Central,1826,22.2,3.0,6.0
+63996,Cape San Blas,FL,AAF,APALACHICOLA MUNI (ASOS),21.8,TAE,North/Panhandle,1826,24.9,7.8,5.2
+63998,Jennings Energy Storage Facility,FL,VLD,VALDOSTA REGIONAL,16.3,TAE,North/Panhandle,1826,26.3,4.3,2.6
+57565,"RP-Orlando, LLC",FL,MCO,Orlando International,8.7,MLB,East Central,1826,15.6,3.8,9.0
+60071,Perry Solar Facility,FL,VLD,VALDOSTA REGIONAL,48.8,TAE,North/Panhandle,1826,26.3,4.3,2.6
+62940,Starratt Solar,FL,JAX,Jacksonville Intl,5.2,JAX,North/Panhandle,1826,22.2,4.6,11.4
+69250,Suwannee,FL,VLD,VALDOSTA REGIONAL,28.6,TAE,North/Panhandle,1826,26.3,4.3,2.6
+59973,Walt Disney World Solar Facility,FL,MCO,Orlando International,15.9,MLB,East Central,1826,15.6,3.8,9.0
+61694,Lockheed Martin Solar,FL,ORL,ORLANDO/HERNDON,7.1,MLB,East Central,1826,18.1,3.2,7.6
+54623,Central District Wastewater Treat Plant,FL,MIA,MIAMI INTL AIRPORT,10.6,MFL,South Florida,1826,22.8,5.8,1.4
+56522,Springhill Gas Recovery Plant,FL,BCR,Tri-County,11.9,TAE,North/Panhandle,1826,25.1,1.6,0.6
+61246,ACE-Stanton PV,FL,MCO,Orlando International,8.5,MLB,East Central,1826,15.6,3.8,9.0
+61780,Seminole Energy,FL,SFB,SANFORD/ORLANDO,9.4,MLB,East Central,1826,16.0,4.4,7.8
+10020,Cutrale Citrus Juices USA I,FL,LEE,LEESBURG MUNICIPAL AIRPORT,3.4,MLB,East Central,1826,14.0,3.2,4.8
+61247,ACE-Stanton A PV,FL,MCO,Orlando International,9.0,MLB,East Central,1826,15.6,3.8,9.0
+57168,Waste Management Naples LFGTE Project,FL,APF,NAPLES MUNICIPAL,7.3,MFL,South Florida,1826,45.4,4.6,2.4
+62778,Hecate Energy Blair Road LLC,FL,NEN,Jacksonville - Whitehouse,4.8,JAX,North/Panhandle,1826,15.8,5.0,3.2
+70179,"FL Solar D1, LLC",FL,TLH,TALLAHASSEE RGNL,18.6,TAE,North/Panhandle,1826,20.8,4.8,5.2
+59954,Osceola Solar Facility,FL,MCO,Orlando International,26.0,MLB,East Central,1826,15.6,3.8,9.0
+59754,Lakeland Electric Co. (FL) - Airport II,FL,GIF,WINTER HAVEN (ASOS),18.6,TBW,West Central,1826,22.2,3.0,6.0
+64752,John Hopkins Middle School Microgrid,FL,SPG,St Petersburg,1.7,TBW,West Central,1826,26.8,2.6,8.6
+57502,Perdido,FL,PNS,PENSACOLA REGIONAL,13.7,MOB,North/Panhandle,1826,15.2,6.2,7.6
+59240,Port Charlotte Energy LLC,FL,PGD,PUNTA GORDA,8.9,TBW,West Central,1826,36.6,3.6,7.2
+60124,Goldfinch,FL,GIF,WINTER HAVEN (ASOS),18.5,TBW,West Central,1826,22.2,3.0,6.0
+66202,"Old Plank Road Solar Farm, LLC",FL,NEN,Jacksonville - Whitehouse,2.5,JAX,North/Panhandle,1826,15.8,5.0,3.2
+54347,Howard F Curren Advncd Wastewater Plant,FL,TPA,TAMPA INTL AIRPORT,6.4,TBW,West Central,1826,30.0,4.8,4.4
+59744,Lakeland Electric Co. (FL)-Airport 1,FL,GIF,WINTER HAVEN (ASOS),18.7,TBW,West Central,1826,22.2,3.0,6.0
+67491,Mount Dora Solar Farm F,FL,LEE,LEESBURG MUNICIPAL AIRPORT,7.7,MLB,East Central,1826,14.0,3.2,4.8
+70180,"FL Solar D2, LLC",FL,TLH,TALLAHASSEE RGNL,7.9,TAE,North/Panhandle,1826,20.8,4.8,5.2
+59867,Lockheed Martin Solar System,FL,PIE,SAINT PETERSBURG,9.5,TBW,West Central,1826,31.9,3.6,7.8
+67492,Mount Dora Solar Farm W,FL,LEE,LEESBURG MUNICIPAL AIRPORT,11.5,MLB,East Central,1826,14.0,3.2,4.8
+57438,"Solar Park Gainesville, LLC",FL,GNV,GAINESVILLE RGNL,3.8,JAX,North/Panhandle,1826,14.0,5.2,7.0
+59769,TIA Solar,FL,TPA,TAMPA INTL AIRPORT,0.5,TBW,West Central,1826,30.0,4.8,4.4
+60005,Daytona International Speedway Solar,FL,DAB,DAYTONA BEACH RGNL,0.8,MLB,East Central,1826,17.2,4.0,6.2
+63254,Altamonte Mall,FL,ORL,ORLANDO/HERNDON,8.8,MLB,East Central,1826,18.1,3.2,7.6
+60371,Legoland Solar,FL,GIF,WINTER HAVEN (ASOS),6.6,TBW,West Central,1826,22.2,3.0,6.0
+61821,IKEA Jacksonville Rooftop PV System,FL,CRG,JACKSONVILLE/CRAIG,7.3,JAX,North/Panhandle,1826,22.2,4.2,7.8
+58618,Butler Plaza,FL,GNV,GAINESVILLE RGNL,7.8,JAX,North/Panhandle,1826,14.0,5.2,7.0
+60006,FIU Solar,FL,MIA,MIAMI INTL AIRPORT,3.4,MFL,South Florida,1826,22.8,5.8,1.4
+63256,Pembroke Lakes Mall,FL,HWO,HOLLYWOOD/N. PERRY,4.0,MFL,South Florida,1826,32.5,5.7,4.6
+58012,IKEA Tampa 042,FL,TPA,TAMPA INTL AIRPORT,6.6,TBW,West Central,1826,30.0,4.8,4.4
+61173,IKEA Miami 327,FL,MIA,MIAMI INTL AIRPORT,4.2,MFL,South Florida,1826,22.8,5.8,1.4
+65771,Big Bend Agrivoltaics,FL,SPG,St Petersburg,13.9,TBW,West Central,1826,26.8,2.6,8.6
+65772,Big Bend Floating Solar I,FL,SPG,St Petersburg,14.2,TBW,West Central,1826,26.8,2.6,8.6
+69000,MLH 2,FL,GNV,GAINESVILLE RGNL,1.3,JAX,North/Panhandle,1826,14.0,5.2,7.0
+69001,MLH 3,FL,GNV,GAINESVILLE RGNL,1.3,JAX,North/Panhandle,1826,14.0,5.2,7.0
+57128,G2 Energy Marion LLC,FL,LEE,LEESBURG MUNICIPAL AIRPORT,25.7,MLB,East Central,1826,14.0,3.2,4.8
+649,Vogtle,GA,AGS,AUGUSTA/BUSH FIELD,19.6,CAE,,1826,8.3,3.6,5.2
+703,Bowen,GA,VPC,CARTERSVILLE AIRPORT,4.2,FFC,,1826,8.9,1.4,1.0
+710,Jack McDonough,GA,FTY,ATLANTA/FULTON CO.,4.0,FFC,,1826,1.2,3.2,5.8
+6257,Scherer,GA,MCN,MACON/LEWIS WILSON,27.0,FFC,,1826,12.4,2.8,6.0
+6051,Edwin I Hatch,GA,AMG,ALMA/BACON CO.,29.1,JAX,,1826,11.1,3.6,3.6
+56150,McIntosh Combined Cycle Facility,GA,SAV,Savannah - Hilton Head,15.0,CHS,,1826,14.8,3.0,6.4
+55965,Wansley Combined Cycle,GA,FFC,PEACHTREE CITY,27.4,FFC,,1826,1.4,3.2,3.4
+55382,Thomas A Smith Energy Facility,GA,RMG,ROME/RUSSELL(RAMOS),28.6,FFC,,1826,4.2,3.2,3.6
+55061,Tenaska Georgia Generation Facility,GA,FFC,PEACHTREE CITY,25.0,FFC,,1826,1.4,3.2,3.4
+7709,Dahlberg,GA,AHN,ATHENS MUNICIPAL,7.7,FFC,,1826,4.0,3.0,3.4
+6189,Rocky Mountain Hydroelectric Plant,GA,RMG,ROME/RUSSELL(RAMOS),8.2,FFC,,1826,4.2,3.2,3.6
+6124,McIntosh,GA,SAV,Savannah - Hilton Head,15.7,CHS,,1826,14.8,3.0,6.4
+728,Yates,GA,FFC,PEACHTREE CITY,20.5,FFC,,1826,1.4,3.2,3.4
+55332,Washington County Power LLC,GA,MCN,MACON/LEWIS WILSON,47.6,FFC,,1826,12.4,2.8,6.0
+7916,Talbot County Energy,GA,CSG,COLUMBUS METRO ARPT,15.4,FFC,,1826,7.9,4.6,6.8
+55267,Edward L. Addison Generating Plant,GA,FFC,PEACHTREE CITY,34.2,FFC,,1826,1.4,3.2,3.4
+55672,AL Sandersville LLC,GA,DNL,Augusta,53.2,CAE,,1826,3.1,2.2,1.6
+6132,Richard B Russell,GA,AHN,ATHENS MUNICIPAL,42.2,FFC,,1826,4.0,3.0,3.4
+55406,Bobby C Smith Jr Energy Facility,GA,SAV,Savannah - Hilton Head,11.2,CHS,,1826,14.8,3.0,6.4
+7946,Wansley Unit 9,GA,FFC,PEACHTREE CITY,27.6,FFC,,1826,1.4,3.2,3.4
+7813,Sewell Creek Energy,GA,VPC,CARTERSVILLE AIRPORT,27.3,FFC,,1826,8.9,1.4,1.0
+715,McManus,GA,SSI,BRUNSWICK/MALCOLM,10.1,JAX,,1826,44.8,4.5,5.2
+7917,Chattahoochee Energy Facility,GA,FFC,PEACHTREE CITY,27.4,FFC,,1826,1.4,3.2,3.4
+68512,McGrau Ford Battery Storage Facility,GA,GVL,GAINSVILLE,28.7,FFC,,1826,0.0,3.8,9.4
+6130,Carters,GA,RMG,ROME/RUSSELL(RAMOS),33.2,FFC,,1826,4.2,3.2,3.6
+55141,Hawk Road Facility,GA,FFC,PEACHTREE CITY,24.5,FFC,,1826,1.4,3.2,3.4
+55128,Walton County Energy Facility,GA,AHN,ATHENS MUNICIPAL,23.1,FFC,,1826,4.0,3.0,3.4
+754,Hartwell Lake,GA,AHN,ATHENS MUNICIPAL,40.3,FFC,,1826,4.0,3.0,3.4
+55244,Doyle Energy Facility,GA,AHN,ATHENS MUNICIPAL,22.7,FFC,,1826,4.0,3.0,3.4
+7764,MPC Generating,GA,AHN,ATHENS MUNICIPAL,23.2,FFC,,1826,4.0,3.0,3.4
+54538,Hartwell Energy Facility,GA,AHN,ATHENS MUNICIPAL,39.6,FFC,,1826,4.0,3.0,3.4
+55040,Mid-Georgia Cogeneration Facility,GA,MCN,MACON/LEWIS WILSON,14.6,FFC,,1826,12.4,2.8,6.0
+6087,Wallace Dam,GA,AHN,ATHENS MUNICIPAL,42.5,FFC,,1826,4.0,3.0,3.4
+6258,Wilson,GA,AGS,AUGUSTA/BUSH FIELD,20.3,CAE,,1826,8.3,3.6,5.2
+66626,Wadley Solar,GA,AGS,AUGUSTA/BUSH FIELD,45.9,CAE,,1826,8.3,3.6,5.2
+61648,Robins Air Force Base Solar,GA,MCN,MACON/LEWIS WILSON,2.1,FFC,,1826,12.4,2.8,6.0
+63721,Cool Springs Solar (Hybrid),GA,MAI,MARIANA,30.5,TAE,,1826,16.0,3.6,3.8
+67127,"SR Toombs, LLC",GA,AMG,ALMA/BACON CO.,52.7,JAX,,1826,11.1,3.6,3.6
+7829,Smarr Energy Center,GA,MCN,MACON/LEWIS WILSON,23.2,FFC,,1826,12.4,2.8,6.0
+63522,Hickory Park Solar Hybrid,GA,ABY,ALBANY MUNICIPAL,18.4,TAE,,1826,13.6,3.4,3.2
+61696,Twiggs Solar,GA,MCN,MACON/LEWIS WILSON,11.0,FFC,,1826,12.4,2.8,6.0
+67047,Decatur Solar,GA,TLH,TALLAHASSEE RGNL,32.4,TAE,,1826,20.8,4.8,5.2
+7348,Robins,GA,MCN,MACON/LEWIS WILSON,8.8,FFC,,1826,12.4,2.8,6.0
+61785,Camilla Solar Energy Project,GA,ABY,ALBANY MUNICIPAL,18.5,TAE,,1826,13.6,3.4,3.2
+761,Walter F George,GA,EUF,Eufaula,22.9,BMX,,1826,14.1,3.5,1.2
+64841,"SR DeSoto I, LLC",GA,ABY,ALBANY MUNICIPAL,26.3,TAE,,1826,13.6,3.4,3.2
+62584,Quitman Solar,GA,VLD,VALDOSTA REGIONAL,22.2,TAE,,1826,26.3,4.3,2.6
+64335,Quitman II Solar,GA,VLD,VALDOSTA REGIONAL,22.9,TAE,,1826,26.3,4.3,2.6
+66990,Washington County Solar,GA,AGS,AUGUSTA/BUSH FIELD,50.7,CAE,,1826,8.3,3.6,5.2
+59897,Taylor County Solar,GA,CSG,COLUMBUS METRO ARPT,37.8,FFC,,1826,7.9,4.6,6.8
+10361,Savannah River Mill,GA,SAV,Savannah - Hilton Head,13.8,CHS,,1826,14.8,3.0,6.4
+65892,Timberland Solar,GA,AHN,ATHENS MUNICIPAL,29.3,FFC,,1826,4.0,3.0,3.4
+759,Buford,GA,GVL,GAINSVILLE,16.0,FFC,,1826,0.0,3.8,9.4
+55304,Baconton Power Plant,GA,ABY,ALBANY MUNICIPAL,12.3,TAE,,1826,13.6,3.4,3.2
+62375,"Dougherty County Solar, LLC",GA,ABY,ALBANY MUNICIPAL,9.0,TAE,,1826,13.6,3.4,3.2
+65376,SR Snipesville II,GA,AMG,ALMA/BACON CO.,17.1,JAX,,1826,11.1,3.6,3.6
+66171,SR Snipesville III,GA,AMG,ALMA/BACON CO.,18.8,JAX,,1826,11.1,3.6,3.6
+64838,"SR Clay, LLC",GA,EUF,Eufaula,31.1,BMX,,1826,14.1,3.5,1.2
+59896,Butler Solar Project 103,GA,MCN,MACON/LEWIS WILSON,37.6,FFC,,1826,12.4,2.8,6.0
+62367,SR Arlington II,GA,DHN,DOTHAN MUNICIPAL,37.1,TAE,,1826,15.8,3.4,3.8
+60064,"White Pine Solar, LLC",GA,MCN,MACON/LEWIS WILSON,37.7,FFC,,1826,12.4,2.8,6.0
+64191,SR Lumpkin,GA,EUF,Eufaula,23.8,BMX,,1826,14.1,3.5,1.2
+7768,Sowega Power,GA,ABY,ALBANY MUNICIPAL,12.3,TAE,,1826,13.6,3.4,3.2
+62377,Moody Air Force Base Solar,GA,VLD,VALDOSTA REGIONAL,12.5,TAE,,1826,26.3,4.3,2.6
+760,Allatoona,GA,VPC,CARTERSVILLE AIRPORT,7.4,FFC,,1826,8.9,1.4,1.0
+62165,Snipesville,GA,AMG,ALMA/BACON CO.,18.9,JAX,,1826,11.1,3.6,3.6
+54358,Clearwater Paper Corporation - Augusta,GA,AGS,AUGUSTA/BUSH FIELD,3.0,CAE,,1826,8.3,3.6,5.2
+54004,"WestRock Southeast, LLC.",GA,MCN,MACON/LEWIS WILSON,48.6,FFC,,1826,12.4,2.8,6.0
+56015,Walton Bainbridge Power Facility,GA,TLH,TALLAHASSEE RGNL,37.6,TAE,,1826,20.8,4.8,5.2
+59450,"Decatur Parkway Solar Project, LLC",GA,MAI,MARIANA,34.3,TAE,,1826,16.0,3.6,3.8
+64150,Lancaster Solar GA,GA,EUF,Eufaula,23.3,BMX,,1826,14.1,3.5,1.2
+66025,Blackwater Solar,GA,AMG,ALMA/BACON CO.,12.0,JAX,,1826,11.1,3.6,3.6
+66173,SR Ailey,GA,AMG,ALMA/BACON CO.,45.5,JAX,,1826,11.1,3.6,3.6
+66542,Bulldog Solar LLC,GA,DNL,Augusta,37.5,CAE,,1826,3.1,2.2,1.6
+67021,CPV Stagecoach Solar,GA,MCN,MACON/LEWIS WILSON,42.1,FFC,,1826,12.4,2.8,6.0
+68549,"Pineview Solar, LLC",GA,MCN,MACON/LEWIS WILSON,48.6,FFC,,1826,12.4,2.8,6.0
+50465,Flint River Operations,GA,MCN,MACON/LEWIS WILSON,38.9,FFC,,1826,12.4,2.8,6.0
+60082,"White Oak Solar, LLC",GA,AGS,AUGUSTA/BUSH FIELD,24.5,CAE,,1826,8.3,3.6,5.2
+62058,SR Terrell,GA,ABY,ALBANY MUNICIPAL,25.2,TAE,,1826,13.6,3.4,3.2
+6133,West Point (GA),GA,CSG,COLUMBUS METRO ARPT,31.3,FFC,,1826,7.9,4.6,6.8
+50804,Port Wentworth Mill,GA,SAV,Savannah - Hilton Head,3.1,CHS,,1826,14.8,3.0,6.4
+10605,Brunswick Cellulose,GA,SSI,BRUNSWICK/MALCOLM,7.7,JAX,,1826,44.8,4.5,5.2
+723,Tallulah Falls,GA,GVL,GAINSVILLE,40.7,FFC,,1826,0.0,3.8,9.4
+50398,International Paper Savanna Mill,GA,SAV,Savannah - Hilton Head,5.0,CHS,,1826,14.8,3.0,6.4
+10426,Inland Paperboard Packaging Rome,GA,RMG,ROME/RUSSELL(RAMOS),11.5,FFC,,1826,4.2,3.2,3.6
+64840,"SR Cedar Springs, LLC",GA,DHN,DOTHAN MUNICIPAL,22.0,TAE,,1826,15.8,3.4,3.8
+66026,Hobnail Solar,GA,AGS,AUGUSTA/BUSH FIELD,14.4,CAE,,1826,8.3,3.6,5.2
+60084,PCA-Valdosta Mill,GA,VLD,VALDOSTA REGIONAL,6.3,TAE,,1826,26.3,4.3,2.6
+10560,Jesup Plant,GA,AMG,ALMA/BACON CO.,39.9,JAX,,1826,11.1,3.6,3.6
+54464,Graphic Packaging Intl Macon Mill,GA,MCN,MACON/LEWIS WILSON,5.6,FFC,,1826,12.4,2.8,6.0
+64151,SR Perry,GA,MCN,MACON/LEWIS WILSON,21.6,FFC,,1826,12.4,2.8,6.0
+65018,Mossy Branch Battery Facility,GA,CSG,COLUMBUS METRO ARPT,25.8,FFC,,1826,7.9,4.6,6.8
+66172,SR DeSoto II,GA,ABY,ALBANY MUNICIPAL,25.0,TAE,,1826,13.6,3.4,3.2
+720,Oliver Dam,GA,CSG,COLUMBUS METRO ARPT,3.4,FFC,,1826,7.9,4.6,6.8
+57909,Piedmont Green Power,GA,FFC,PEACHTREE CITY,33.3,FFC,,1826,1.4,3.2,3.4
+66825,SR DeSoto III,GA,ABY,ALBANY MUNICIPAL,25.5,TAE,,1826,13.6,3.4,3.2
+60550,GRP Franklin Renewable Energy Facility,GA,GVL,GAINSVILLE,29.4,FFC,,1826,0.0,3.8,9.4
+61213,GRP Madison Renewable Energy Facility,GA,AHN,ATHENS MUNICIPAL,9.9,FFC,,1826,4.0,3.0,3.4
+63350,OE_GA3,GA,ABY,ALBANY MUNICIPAL,23.6,TAE,,1826,13.6,3.4,3.2
+60340,Albany Green Energy,GA,ABY,ALBANY MUNICIPAL,5.2,TAE,,1826,13.6,3.4,3.2
+60554,Hazlehurst II,GA,AMG,ALMA/BACON CO.,20.4,JAX,,1826,11.1,3.6,3.6
+60063,"Live Oak Solar, LLC",GA,SAV,Savannah - Hilton Head,56.4,CHS,,1826,14.8,3.0,6.4
+722,Sinclair Dam,GA,MCN,MACON/LEWIS WILSON,40.4,FFC,,1826,12.4,2.8,6.0
+725,Tugalo,GA,GVL,GAINSVILLE,40.9,FFC,,1826,0.0,3.8,9.4
+62057,Hazlehurst III,GA,AMG,ALMA/BACON CO.,21.2,JAX,,1826,11.1,3.6,3.6
+66024,Bird Dog Solar,GA,AGS,AUGUSTA/BUSH FIELD,16.9,CAE,,1826,8.3,3.6,5.2
+66418,Sonny Solar LLC,GA,AHN,ATHENS MUNICIPAL,35.3,FFC,,1826,4.0,3.0,3.4
+66027,Wolfskin Solar,GA,AHN,ATHENS MUNICIPAL,6.5,FFC,,1826,4.0,3.0,3.4
+59876,Marine Corps Logistics Base Solar,GA,ABY,ALBANY MUNICIPAL,6.2,TAE,,1826,13.6,3.4,3.2
+59894,Pawpaw Solar Plant,GA,MCN,MACON/LEWIS WILSON,36.3,FFC,,1826,12.4,2.8,6.0
+54239,Naval Submarine Base Kings Bay,GA,JAX,Jacksonville Intl,22.5,JAX,,1826,22.2,4.6,11.4
+58628,Simon Solar Farm LLC,GA,AHN,ATHENS MUNICIPAL,27.4,FFC,,1826,4.0,3.0,3.4
+59863,Fort Gordon Solar Facility,GA,DNL,Augusta,8.1,CAE,,1826,3.1,2.2,1.6
+59864,Kings Bay Solar Facility,GA,JAX,Jacksonville Intl,24.3,JAX,,1826,22.2,4.6,11.4
+59865,Fort Stewart Solar Facility,GA,SAV,Savannah - Hilton Head,27.8,CHS,,1826,14.8,3.0,6.4
+719,North Highlands,GA,CSG,COLUMBUS METRO ARPT,3.4,FFC,,1826,7.9,4.6,6.8
+64211,Baxley,GA,AMG,ALMA/BACON CO.,25.7,JAX,,1826,11.1,3.6,3.6
+757,Blue Ridge,GA,GVL,GAINSVILLE,49.5,FFC,,1826,0.0,3.8,9.4
+729,Yonah,GA,GVL,GAINSVILLE,39.7,FFC,,1826,0.0,3.8,9.4
+753,Crisp Plant,GA,ABY,ALBANY MUNICIPAL,26.1,TAE,,1826,13.6,3.4,3.2
+59891,Butler Solar Farm 20,GA,CSG,COLUMBUS METRO ARPT,36.7,FFC,,1826,7.9,4.6,6.8
+59449,Decatur County Solar Project,GA,MAI,MARIANA,34.3,TAE,,1826,16.0,3.6,3.8
+59535,SR Hazlehurst,GA,AMG,ALMA/BACON CO.,19.4,JAX,,1826,11.1,3.6,3.6
+59874,Richland Solar Center,GA,MCN,MACON/LEWIS WILSON,16.2,FFC,,1826,12.4,2.8,6.0
+62436,SR Arlington I,GA,DHN,DOTHAN MUNICIPAL,36.6,TAE,,1826,15.8,3.4,3.8
+63814,SR Odom,GA,VLD,VALDOSTA REGIONAL,27.4,TAE,,1826,26.3,4.3,2.6
+60741,Old Midville Solar,GA,AGS,AUGUSTA/BUSH FIELD,38.0,CAE,,1826,8.3,3.6,5.2
+60702,Rincon Solar I,GA,SAV,Savannah - Hilton Head,12.1,CHS,,1826,14.8,3.0,6.4
+60469,Solar Glynn,GA,SSI,BRUNSWICK/MALCOLM,7.2,JAX,,1826,44.8,4.5,5.2
+736,Stevens Creek,GA,DNL,Augusta,6.7,CAE,,1826,3.1,2.2,1.6
+752,Lake Blackshear Project,GA,ABY,ALBANY MUNICIPAL,26.2,TAE,,1826,13.6,3.4,3.2
+717,Morgan Falls,GA,PDK,ATLANTA/DEKALB,7.9,FFC,,1826,1.2,3.4,5.8
+724,Terrora,GA,GVL,GAINSVILLE,41.4,FFC,,1826,0.0,3.8,9.4
+58892,Camilla Solar Plant,GA,ABY,ALBANY MUNICIPAL,24.6,TAE,,1826,13.6,3.4,3.2
+758,Nottely,GA,GVL,GAINSVILLE,49.7,FFC,,1826,0.0,3.8,9.4
+712,Lloyd Shoals,GA,ATL,ATLANTA INTL ARPT,40.7,FFC,,1826,2.0,3.0,13.4
+50146,Imperial Savannah LP,GA,SAV,Savannah - Hilton Head,3.4,CHS,,1826,14.8,3.0,6.4
+61387,Georgia LFG Richland Creek Plant,GA,GVL,GAINSVILLE,15.3,FFC,,1826,0.0,3.8,9.4
+55274,State Farm Support Center East,GA,PDK,ATLANTA/DEKALB,14.9,FFC,,1826,1.2,3.4,5.8
+63062,Fort Valley State University Solar,GA,MCN,MACON/LEWIS WILSON,19.0,FFC,,1826,12.4,2.8,6.0
+67864,McIntosh Solar,GA,SAV,Savannah - Hilton Head,15.3,CHS,,1826,14.8,3.0,6.4
+69688,Allatoona Substation #10,GA,VPC,CARTERSVILLE AIRPORT,7.8,FFC,,1826,8.9,1.4,1.0
+69745,MCLB Biosteam to Energy,GA,ABY,ALBANY MUNICIPAL,5.3,TAE,,1826,13.6,3.4,3.2
+56870,Taylor,GA,CSG,COLUMBUS METRO ARPT,32.6,FFC,,1826,7.9,4.6,6.8
+58482,"Azalea Solar, LLC",GA,AGS,AUGUSTA/BUSH FIELD,45.1,CAE,,1826,8.3,3.6,5.2
+58484,MAS ASB Cogen Plant,GA,ATL,ATLANTA INTL ARPT,3.2,FFC,,1826,2.0,3.0,13.4
+61385,Georgia LFG Oak Grove Plant,GA,GVL,GAINSVILLE,21.5,FFC,,1826,0.0,3.8,9.4
+61386,Georgia LFG Pine Ridge Plant,GA,FFC,PEACHTREE CITY,26.8,FFC,,1826,1.4,3.2,3.4
+59556,Dalton 2,GA,RMG,ROME/RUSSELL(RAMOS),28.7,FFC,,1826,4.2,3.2,3.6
+57026,Superior Landfill Gas Recovery,GA,SAV,Savannah - Hilton Head,8.1,CHS,,1826,14.8,3.0,6.4
+59221,Pecan Row Landfill To Electric Facility,GA,VLD,VALDOSTA REGIONAL,5.6,TAE,,1826,26.3,4.3,2.6
+704,Burton Dam,GA,GVL,GAINSVILLE,39.7,FFC,,1826,0.0,3.8,9.4
+54813,Shepherd Center,GA,PDK,ATLANTA/DEKALB,6.9,FFC,,1826,1.2,3.4,5.8
+54848,South Georgia Medical Center Inc,GA,VLD,VALDOSTA REGIONAL,5.6,TAE,,1826,26.3,4.3,2.6
+706,Flint River,GA,ABY,ALBANY MUNICIPAL,5.7,TAE,,1826,13.6,3.4,3.2
+54457,Hewlett Packard Enterprise,GA,PDK,ATLANTA/DEKALB,14.7,FFC,,1826,1.2,3.4,5.8
+718,Nacoochee,GA,GVL,GAINSVILLE,38.3,FFC,,1826,0.0,3.8,9.4
+55319,Athens Regional Medical Center,GA,AHN,ATHENS MUNICIPAL,4.2,FFC,,1826,4.0,3.0,3.4
+60930,Dublin Solar I,GA,MCN,MACON/LEWIS WILSON,42.8,FFC,,1826,12.4,2.8,6.0
+59335,MCLB Landfill Gas to Energy,GA,ABY,ALBANY MUNICIPAL,7.5,TAE,,1826,13.6,3.4,3.2
+54830,Emory Decatur Hospital,GA,PDK,ATLANTA/DEKALB,5.9,FFC,,1826,1.2,3.4,5.8
+62392,Guyton Community Solar,GA,SAV,Savannah - Hilton Head,24.0,CHS,,1826,14.8,3.0,6.4
+63535,Solar BESS Hybrid,GA,FTY,ATLANTA/FULTON CO.,13.9,FFC,,1826,1.2,3.2,5.8
+54839,Valdosta Water Treatment Plant,GA,VLD,VALDOSTA REGIONAL,9.2,TAE,,1826,26.3,4.3,2.6
+55152,Bank of America Plaza,GA,FTY,ATLANTA/FULTON CO.,7.7,FFC,,1826,1.2,3.2,5.8
+61740,Gratis Road Solar Facility,GA,AHN,ATHENS MUNICIPAL,22.5,FFC,,1826,4.0,3.0,3.4
+64276,Franklin Milliken,GA,AHN,ATHENS MUNICIPAL,36.5,FFC,,1826,4.0,3.0,3.4
+64277,Greene Durham,GA,AHN,ATHENS MUNICIPAL,25.7,FFC,,1826,4.0,3.0,3.4
+64280,Meriwether Jackson,GA,CSG,COLUMBUS METRO ARPT,30.4,FFC,,1826,7.9,4.6,6.8
+64281,Murray Treadwell Farms,GA,RMG,ROME/RUSSELL(RAMOS),35.2,FFC,,1826,4.2,3.2,3.6
+64285,Ware Avra I,GA,AMG,ALMA/BACON CO.,25.9,JAX,,1826,11.1,3.6,3.6
+65481,Wilkinson DeFore (Safari Energy),GA,MCN,MACON/LEWIS WILSON,24.0,FFC,,1826,12.4,2.8,6.0
+65727,Statesboro Solar LLC,GA,SAV,Savannah - Hilton Head,42.1,CHS,,1826,14.8,3.0,6.4
+65728,BE Solar LLC,GA,TLH,TALLAHASSEE RGNL,37.6,TAE,,1826,20.8,4.8,5.2
+65994,"Polk County GA S1, LLC",GA,RMG,ROME/RUSSELL(RAMOS),21.3,FFC,,1826,4.2,3.2,3.6
+65995,"Reidsville Renewables, Inc.",GA,AMG,ALMA/BACON CO.,42.6,JAX,,1826,11.1,3.6,3.6
+66205,"Turnipseed Solar, LLC",GA,FTY,ATLANTA/FULTON CO.,10.7,FFC,,1826,1.2,3.2,5.8
+66344,Bulloch County GA S4 LLC,GA,SAV,Savannah - Hilton Head,40.3,CHS,,1826,14.8,3.0,6.4
+66346,Bulloch County GA S3 LLC,GA,SAV,Savannah - Hilton Head,40.0,CHS,,1826,14.8,3.0,6.4
+66350,Richmond County GA S2 LLC,GA,AGS,AUGUSTA/BUSH FIELD,7.7,CAE,,1826,8.3,3.6,5.2
+66353,Upson County GA S1 LLC,GA,FFC,PEACHTREE CITY,33.7,FFC,,1826,1.4,3.2,3.4
+67240,Lowndes Cowart,GA,VLD,VALDOSTA REGIONAL,2.3,TAE,,1826,26.3,4.3,2.6
+67245,Tift Fletcher,GA,ABY,ALBANY MUNICIPAL,41.2,TAE,,1826,13.6,3.4,3.2
+68618,Gordon Thompson,GA,VPC,CARTERSVILLE AIRPORT,23.5,FFC,,1826,8.9,1.4,1.0
+61459,Georgia Power at Swainsboro,GA,AGS,AUGUSTA/BUSH FIELD,56.7,CAE,,1826,8.3,3.6,5.2
+65759,Putnam Erikson 2,GA,MCN,MACON/LEWIS WILSON,45.2,FFC,,1826,12.4,2.8,6.0
+68609,Tift Boyd,GA,ABY,ALBANY MUNICIPAL,40.3,TAE,,1826,13.6,3.4,3.2
+68622,Bulloch Rushing,GA,SAV,Savannah - Hilton Head,37.1,CHS,,1826,14.8,3.0,6.4
+60184,ADS Renewable Energy-Wolf Creek LLC,GA,MCN,MACON/LEWIS WILSON,13.7,FFC,,1826,12.4,2.8,6.0
+64275,Bulloch Neville Farms,GA,SAV,Savannah - Hilton Head,32.6,CHS,,1826,14.8,3.0,6.4
+64282,Putnam Erickson,GA,AHN,ATHENS MUNICIPAL,43.8,FFC,,1826,4.0,3.0,3.4
+64571,Coody Cochran,GA,MCN,MACON/LEWIS WILSON,27.6,FFC,,1826,12.4,2.8,6.0
+64583,Westberry Jesup,GA,AMG,ALMA/BACON CO.,34.1,JAX,,1826,11.1,3.6,3.6
+65730,Rockmart,GA,VPC,CARTERSVILLE AIRPORT,12.4,FFC,,1826,8.9,1.4,1.0
+66980,Bartow Davidson,GA,VPC,CARTERSVILLE AIRPORT,9.3,FFC,,1826,8.9,1.4,1.0
+60586,Pleasant Valley Solar,GA,AHN,ATHENS MUNICIPAL,25.8,FFC,,1826,4.0,3.0,3.4
+64565,Apalachicola,GA,AGS,AUGUSTA/BUSH FIELD,6.0,CAE,,1826,8.3,3.6,5.2
+54818,191 Peachtree Tower,GA,FTY,ATLANTA/FULTON CO.,7.8,FFC,,1826,1.2,3.2,5.8
+54845,Sun Trust Plaza,GA,FTY,ATLANTA/FULTON CO.,7.7,FFC,,1826,1.2,3.2,5.8
+58893,Camp Solar Plant,GA,FFC,PEACHTREE CITY,27.0,FFC,,1826,1.4,3.2,3.4
+62409,Waynesboro Community Solar,GA,AGS,AUGUSTA/BUSH FIELD,16.0,CAE,,1826,8.3,3.6,5.2
+68619,Polk Cedartown 2,GA,RMG,ROME/RUSSELL(RAMOS),21.0,FFC,,1826,4.2,3.2,3.6
+68626,Gordon Pine Hall,GA,VPC,CARTERSVILLE AIRPORT,23.4,FFC,,1826,8.9,1.4,1.0
+68627,Chattooga Gore,GA,RMG,ROME/RUSSELL(RAMOS),19.5,FFC,,1826,4.2,3.2,3.6
+7191,Tallassee Hydro Project,GA,AHN,ATHENS MUNICIPAL,10.2,FFC,,1826,4.0,3.0,3.4
+62884,Richmond Hayes Solar,GA,AGS,AUGUSTA/BUSH FIELD,3.3,CAE,,1826,8.3,3.6,5.2
+62885,Troup RC50,GA,CSG,COLUMBUS METRO ARPT,26.8,FFC,,1826,7.9,4.6,6.8
+62886,Wilkinson DeFore (Westbound),GA,MCN,MACON/LEWIS WILSON,23.0,FFC,,1826,12.4,2.8,6.0
+62960,Kimberly-Clark Solar,GA,CSG,COLUMBUS METRO ARPT,33.9,FFC,,1826,7.9,4.6,6.8
+64279,Lowndes Tycor Farms,GA,VLD,VALDOSTA REGIONAL,9.2,TAE,,1826,26.3,4.3,2.6
+67048,Bibb Williams,GA,MCN,MACON/LEWIS WILSON,12.7,FFC,,1826,12.4,2.8,6.0
+58011,IKEA Savannah 490,GA,SAV,Savannah - Hilton Head,3.6,CHS,,1826,14.8,3.0,6.4
+61000,King Mill,GA,DNL,Augusta,3.0,CAE,,1826,3.1,2.2,1.6
+64586,Polk Cedartown,GA,RMG,ROME/RUSSELL(RAMOS),23.7,FFC,,1826,4.2,3.2,3.6
+69436,Prologis Portside 2509 - SLSAV502,GA,SAV,Savannah - Hilton Head,1.6,CHS,,1826,14.8,3.0,6.4
+54322,Sibley Mill,GA,DNL,Augusta,3.0,CAE,,1826,3.1,2.2,1.6
+64584,Fountain Folkston,GA,JAX,Jacksonville Intl,33.4,JAX,,1826,22.2,4.6,11.4
+64585,Harris Shiloh,GA,CSG,COLUMBUS METRO ARPT,24.1,FFC,,1826,7.9,4.6,6.8
+61554,Comer Solar,GA,AHN,ATHENS MUNICIPAL,14.5,FFC,,1826,4.0,3.0,3.4
+64570,Columbia Substation,GA,DNL,Augusta,16.6,CAE,,1826,3.1,2.2,1.6
+64582,Shawnee - GA,GA,AGS,AUGUSTA/BUSH FIELD,18.1,CAE,,1826,8.3,3.6,5.2
+66199,"Cairo Solar Farm, LLC",GA,TLH,TALLAHASSEE RGNL,36.5,TAE,,1826,20.8,4.8,5.2
+66200,"Cedar Creek Solar, LLC",GA,GVL,GAINSVILLE,17.4,FFC,,1826,0.0,3.8,9.4
+62878,McCleskey Cotton,GA,ABY,ALBANY MUNICIPAL,22.9,TAE,,1826,13.6,3.4,3.2
+62883,Telfair Thompson,GA,AMG,ALMA/BACON CO.,42.0,JAX,,1826,11.1,3.6,3.6
+64286,Ware Avra II,GA,AMG,ALMA/BACON CO.,25.9,JAX,,1826,11.1,3.6,3.6
+66936,Bryan Floyd,GA,SAV,Savannah - Hilton Head,28.8,CHS,,1826,14.8,3.0,6.4
+67246,Tift Bowen,GA,ABY,ALBANY MUNICIPAL,37.8,TAE,,1826,13.6,3.4,3.2
+68621,Pierce Eunice,GA,AMG,ALMA/BACON CO.,23.0,JAX,,1826,11.1,3.6,3.6
+58572,Lakeland Solar Energy LLC,GA,VLD,VALDOSTA REGIONAL,21.4,TAE,,1826,26.3,4.3,2.6
+65729,Brady Solar LLC,GA,ABY,ALBANY MUNICIPAL,35.9,TAE,,1826,13.6,3.4,3.2
+66991,"CG PS Portfolio 1, LLC",GA,MCN,MACON/LEWIS WILSON,20.8,FFC,,1826,12.4,2.8,6.0
+64283,Terrell Riles Stovall,GA,ABY,ALBANY MUNICIPAL,22.8,TAE,,1826,13.6,3.4,3.2
+64569,Arnold Cochran,GA,MCN,MACON/LEWIS WILSON,27.0,FFC,,1826,12.4,2.8,6.0
+56231,Emory Hillandale Hospital,GA,PDK,ATLANTA/DEKALB,14.8,FFC,,1826,1.2,3.4,5.8
+59650,CII Methane Management III LFG Plant,GA,AHN,ATHENS MUNICIPAL,3.9,FFC,,1826,4.0,3.0,3.4
+60514,Seminole (GA),GA,MAI,MARIANA,21.8,TAE,,1826,16.0,3.6,3.8
+54566,YKK USA Chestney,GA,MCN,MACON/LEWIS WILSON,9.9,FFC,,1826,12.4,2.8,6.0
+61397,Georgia Power at Jakin GA PV,GA,MAI,MARIANA,22.8,TAE,,1826,16.0,3.6,3.8
+62881,Muscogee Public Works,GA,CSG,COLUMBUS METRO ARPT,5.0,FFC,,1826,7.9,4.6,6.8
+64278,Lowndes IDA,GA,VLD,VALDOSTA REGIONAL,4.7,TAE,,1826,26.3,4.3,2.6
+64284,Troup RC50 II,GA,CSG,COLUMBUS METRO ARPT,26.6,FFC,,1826,7.9,4.6,6.8
+10121,High Shoals Hydro (GA),GA,AHN,ATHENS MUNICIPAL,13.7,FFC,,1826,4.0,3.0,3.4
+54906,Georgia Pacific Center,GA,FTY,ATLANTA/FULTON CO.,7.8,FFC,,1826,1.2,3.2,5.8
+61441,Denver Braswell PV,GA,ABY,ALBANY MUNICIPAL,28.4,TAE,,1826,13.6,3.4,3.2
+62879,Columbia Bryson,GA,DNL,Augusta,9.4,CAE,,1826,3.1,2.2,1.6
+62882,Oil Dri 2 Solar,GA,ABY,ALBANY MUNICIPAL,38.4,TAE,,1826,13.6,3.4,3.2
+62887,Freeman Avenue,GA,ABY,ALBANY MUNICIPAL,44.8,TAE,,1826,13.6,3.4,3.2
+63775,Tech Square Microgrid,GA,FTY,ATLANTA/FULTON CO.,7.5,FFC,,1826,1.2,3.2,5.8
+54290,Inforum,GA,FTY,ATLANTA/FULTON CO.,7.8,FFC,,1826,1.2,3.2,5.8
+54462,Graniteville Enterprise Division,GA,DNL,Augusta,3.3,CAE,,1826,3.1,2.2,1.6
+54877,Atlanta Gift Mart LP,GA,FTY,ATLANTA/FULTON CO.,7.6,FFC,,1826,1.2,3.2,5.8
+54816,Riverwood 100 Building,GA,FTY,ATLANTA/FULTON CO.,7.6,FFC,,1826,1.2,3.2,5.8
+64226,Curry Solar,GA,AMG,ALMA/BACON CO.,40.9,JAX,,1826,11.1,3.6,3.6
+68610,Whitfield Cooper,GA,RMG,ROME/RUSSELL(RAMOS),43.6,FFC,,1826,4.2,3.2,3.6
+58064,Laredo Bus Facility Solar Canopies,GA,PDK,ATLANTA/DEKALB,6.7,FFC,,1826,1.2,3.4,5.8
+59843,Georgia Power at Wadley GA,GA,AGS,AUGUSTA/BUSH FIELD,42.4,CAE,,1826,8.3,3.6,5.2
+60448,Valdosta (Terraform),GA,VLD,VALDOSTA REGIONAL,3.6,TAE,,1826,26.3,4.3,2.6
+60512,Greenville,GA,FFC,PEACHTREE CITY,23.0,FFC,,1826,1.4,3.2,3.4
+60513,Richland (GA),GA,EUF,Eufaula,28.9,BMX,,1826,14.1,3.5,1.2
+60544,Tri-County Solar Facility,GA,AHN,ATHENS MUNICIPAL,44.4,FFC,,1826,4.0,3.0,3.4
+60585,Mount Vernon Solar,GA,AHN,ATHENS MUNICIPAL,19.4,FFC,,1826,4.0,3.0,3.4
+61468,Valdosta Prison,GA,VLD,VALDOSTA REGIONAL,8.2,TAE,,1826,26.3,4.3,2.6
+62393,Atlanta Falcons Solar,GA,FTY,ATLANTA/FULTON CO.,7.0,FFC,,1826,1.2,3.2,5.8
+64011,Bainbridge Solar,GA,MAI,MARIANA,34.3,TAE,,1826,16.0,3.6,3.8
+58485,Upson Rocky Creek Solar Plant,GA,FFC,PEACHTREE CITY,32.7,FFC,,1826,1.4,3.2,3.4
+59459,Hickory Ridge Landfill Solar Project,GA,ATL,ATLANTA INTL ARPT,6.5,FFC,,1826,2.0,3.0,13.4
+46,Browns Ferry,AL,DCU,DECATUR/PRYOR FIELD,10.5,HUN,,1826,10.2,1.8,10.4
+3,Barry,AL,MOB,MOBILE/BATES FIELD,26.1,MOB,,1826,17.6,6.0,6.0
+6002,James H Miller Jr,AL,BHM,BIRMINGHAM MUNI,18.7,BMX,,1826,8.6,2.8,8.8
+26,E C Gaston,AL,EET,Alabaster,19.3,BMX,,1826,10.0,4.2,1.6
+7710,H Allen Franklin Combined Cycle,AL,CSG,COLUMBUS METRO ARPT,11.0,FFC,,1826,7.9,4.6,6.8
+6001,Joseph M Farley,AL,DHN,DOTHAN MUNICIPAL,21.1,TAE,,1826,15.8,3.4,3.8
+7897,E B Harris Electric Generating Plant,AL,MGM,MONTGOMERY/DANNELLY,11.9,BMX,,1826,19.4,3.8,5.8
+10,Greene County,AL,TCL,TUSCALOOSA MUNI,43.2,BMX,,1826,17.0,3.6,3.6
+47,Colbert,AL,MSL,MUSCLE SHOALS RGNL,14.1,HUN,,1826,12.8,3.2,8.0
+55271,Tenaska Lindsay Hill Generating Station,AL,MGM,MONTGOMERY/DANNELLY,31.5,BMX,,1826,19.4,3.8,5.8
+55440,Central Alabama Generating Station,AL,MGM,MONTGOMERY/DANNELLY,31.4,BMX,,1826,19.4,3.8,5.8
+55292,Decatur Energy Center,AL,DCU,DECATUR/PRYOR FIELD,4.6,HUN,,1826,10.2,1.8,10.4
+55293,Morgan Energy Center,AL,DCU,DECATUR/PRYOR FIELD,6.8,HUN,,1826,10.2,1.8,10.4
+55411,Hillabee Energy Center,AL,ANB,Anniston,40.9,BMX,,1826,5.9,2.6,4.2
+55409,Calhoun Energy Center,AL,ANB,Anniston,7.2,BMX,,1826,5.9,2.6,4.2
+56,Lowman Energy Center,AL,GZH,EVERGREEN,51.3,MOB,,1826,18.5,4.4,2.8
+7063,McIntosh (AL),AL,MOB,MOBILE/BATES FIELD,41.2,MOB,,1826,17.6,6.0,6.0
+6440,Wilson Dam,AL,MSL,MUSCLE SHOALS RGNL,4.0,HUN,,1826,12.8,3.2,8.0
+533,McWilliams,AL,79J,Andalusia,8.3,MOB,,1826,18.3,3.8,4.8
+49,Wheeler Dam,AL,MSL,MUSCLE SHOALS RGNL,13.1,HUN,,1826,12.8,3.2,8.0
+7721,Theodore Cogen Facility,AL,BFM,MOBILE DOWNTOWN,7.9,MOB,,1826,23.2,5.4,6.8
+55241,Hog Bayou Energy Center,AL,BFM,MOBILE DOWNTOWN,8.4,MOB,,1826,23.2,5.4,6.8
+62462,Muscle Shoals,AL,MSL,MUSCLE SHOALS RGNL,17.4,HUN,,1826,12.8,3.2,8.0
+4,Walter Bouldin Dam,AL,MGM,MONTGOMERY/DANNELLY,20.6,BMX,,1826,19.4,3.8,5.8
+16,Martin Dam,AL,MGM,MONTGOMERY/DANNELLY,38.5,BMX,,1826,19.4,3.8,5.8
+18,Lewis Smith Dam,AL,BHM,BIRMINGHAM MUNI,33.3,BMX,,1826,8.6,2.8,8.8
+15,Lay Dam,AL,EET,Alabaster,21.3,BMX,,1826,10.0,4.2,1.6
+702,Bartletts Ferry,AL,CSG,COLUMBUS METRO ARPT,13.3,FFC,,1826,7.9,4.6,6.8
+17,Mitchell Dam,AL,EET,Alabaster,32.3,BMX,,1826,10.0,4.2,1.6
+6188,Harris Dam,AL,ANB,Anniston,26.6,BMX,,1826,5.9,2.6,4.2
+14,Logan Martin Dam,AL,BHM,BIRMINGHAM MUNI,25.4,BMX,,1826,8.6,2.8,8.8
+7697,Washington County Cogeneration Facility,AL,MOB,MOBILE/BATES FIELD,42.3,MOB,,1826,17.6,6.0,6.0
+54802,Mead Coated Board,AL,EUF,Eufaula,16.6,BMX,,1826,14.1,3.5,1.2
+48,Guntersville,AL,HSV,HUNTSVILLE/MADISON,27.1,HUN,,1826,10.0,3.6,17.4
+54096,International Paper Riverdale Mill,AL,MGM,MONTGOMERY/DANNELLY,29.2,BMX,,1826,19.4,3.8,5.8
+54789,Georgia-Pacific Brewton Mill,AL,GZH,EVERGREEN,23.7,MOB,,1826,18.5,4.4,2.8
+55138,Walton Discover Power Facility,AL,CSG,COLUMBUS METRO ARPT,5.9,FFC,,1826,7.9,4.6,6.8
+38,Millers Ferry,AL,PRN,Greenville,49.5,MOB,,1826,5.4,3.1,4.4
+13,Jordan Dam,AL,MGM,MONTGOMERY/DANNELLY,23.4,BMX,,1826,19.4,3.8,5.8
+63765,Black Bear Solar 1,AL,MGM,MONTGOMERY/DANNELLY,8.2,BMX,,1826,19.4,3.8,5.8
+56018,AMEA Peaking,AL,EET,Alabaster,28.9,BMX,,1826,10.0,4.2,1.6
+7698,General Electric Plastic,AL,MGM,MONTGOMERY/DANNELLY,7.7,BMX,,1826,19.4,3.8,5.8
+19,Thurlow Dam,AL,MGM,MONTGOMERY/DANNELLY,33.7,BMX,,1826,19.4,3.8,5.8
+52140,International Paper Prattville Mill,AL,MGM,MONTGOMERY/DANNELLY,9.3,BMX,,1826,19.4,3.8,5.8
+20,Weiss Dam,AL,RMG,ROME/RUSSELL(RAMOS),36.0,FFC,,1826,4.2,3.2,3.6
+10699,Georgia-Pacific Consr Prods LP-Naheola,AL,TCL,TUSCALOOSA MUNI,72.1,BMX,,1826,17.0,3.6,3.6
+6131,Jones Bluff,AL,MGM,MONTGOMERY/DANNELLY,22.9,BMX,,1826,19.4,3.8,5.8
+64469,Wing,AL,CEW,CRESTVIEW/BOB SIKES,16.3,MOB,,1826,26.4,3.4,4.6
+67957,East Atmore Solar,AL,NSE,WHITING FLD NAS-N.,28.6,MOB,,1826,14.6,4.4,4.2
+68001,"Old Hayneville Solar, LLC",AL,MGM,MONTGOMERY/DANNELLY,1.5,BMX,,1826,19.4,3.8,5.8
+68669,Walker Springs II,AL,GZH,EVERGREEN,39.0,MOB,,1826,18.5,4.4,2.8
+68670,Walker Springs I,AL,GZH,EVERGREEN,39.0,MOB,,1826,18.5,4.4,2.8
+60583,LaFayette Solar Farm,AL,CSG,COLUMBUS METRO ARPT,35.9,FFC,,1826,7.9,4.6,6.8
+54752,International Paper Pine Hill Mill,AL,GZH,EVERGREEN,46.1,MOB,,1826,18.5,4.4,2.8
+60058,"River Bend Solar, LLC (AL)",AL,MSL,MUSCLE SHOALS RGNL,15.0,HUN,,1826,12.8,3.2,8.0
+11,H Neely Henry Dam,AL,ANB,Anniston,17.8,BMX,,1826,5.9,2.6,4.2
+54429,Alabama Pine Pulp,AL,GZH,EVERGREEN,28.6,MOB,,1826,18.5,4.4,2.8
+2,Bankhead Dam,AL,TCL,TUSCALOOSA MUNI,22.7,BMX,,1826,17.0,3.6,3.6
+21,Yates Dam,AL,MGM,MONTGOMERY/DANNELLY,34.9,BMX,,1826,19.4,3.8,5.8
+62449,Kimberly Clark Mobile - CHP Plant,AL,BFM,MOBILE DOWNTOWN,7.7,MOB,,1826,23.2,5.4,6.8
+10216,Alabama River Pulp,AL,GZH,EVERGREEN,28.6,MOB,,1826,18.5,4.4,2.8
+54763,WestRock Demopolis Mill,AL,TCL,TUSCALOOSA MUNI,56.4,BMX,,1826,17.0,3.6,3.6
+12,Holt Dam,AL,TCL,TUSCALOOSA MUNI,10.1,BMX,,1826,17.0,3.6,3.6
+55044,Packaging Corp. of America Jackson Mill,AL,GZH,EVERGREEN,50.6,MOB,,1826,18.5,4.4,2.8
+707,Goat Rock,AL,CSG,COLUMBUS METRO ARPT,10.3,FFC,,1826,7.9,4.6,6.8
+67488,TAI Huntsville Solar Hybrid,AL,HSV,HUNTSVILLE/MADISON,15.6,HUN,,1826,10.0,3.6,17.4
+59862,Fort Benning Solar Facility,AL,CSG,COLUMBUS METRO ARPT,14.9,FFC,,1826,7.9,4.6,6.8
+54216,U S Alliance Coosa Pines,AL,EET,Alabaster,26.6,BMX,,1826,10.0,4.2,1.6
+61924,"Cumblerland Land Holdings, LLC",AL,DCU,DECATUR/PRYOR FIELD,21.0,HUN,,1826,10.2,1.8,10.4
+6150,Bellefonte,AL,HSV,HUNTSVILLE/MADISON,49.0,HUN,,1826,10.0,3.6,17.4
+54550,W&T Onshore Treating Facility (OTF),AL,BFM,MOBILE DOWNTOWN,15.1,MOB,,1826,23.2,5.4,6.8
+61901,Redstone Arsenal Hybrid,AL,HSV,HUNTSVILLE/MADISON,10.2,HUN,,1826,10.0,3.6,17.4
+60679,Fort Rucker Solar Array,AL,DHN,DOTHAN MUNICIPAL,16.6,TAE,,1826,15.8,3.4,3.8
+54985,Crestwood Dothan,AL,DHN,DOTHAN MUNICIPAL,4.9,TAE,,1826,15.8,3.4,3.8
+60680,ANAD Solar Array,AL,ANB,Anniston,7.4,BMX,,1826,5.9,2.6,4.2
+55,Point A,AL,79J,Andalusia,8.5,MOB,,1826,18.3,3.8,4.8
+59710,Sand Valley Power Station,AL,RMG,ROME/RUSSELL(RAMOS),40.2,FFC,,1826,4.2,3.2,3.6
+7924,Albertville,AL,HSV,HUNTSVILLE/MADISON,37.4,HUN,,1826,10.0,3.6,17.4
+56076,ABC Coke,AL,BHM,BIRMINGHAM MUNI,2.3,BMX,,1826,8.6,2.8,8.8
+53,Gantt,AL,79J,Andalusia,8.5,MOB,,1826,18.3,3.8,4.8
+58061,Decatur-Morgan Co LFG Recovery Project,AL,DCU,DECATUR/PRYOR FIELD,9.1,HUN,,1826,10.2,1.8,10.4
