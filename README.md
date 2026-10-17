@@ -1,6 +1,58 @@
 # SwampHacksProject2026
 Our SwampHacks
 
+## Setup (virtual environment)
+
+Use one Python virtual environment (`.venv`) for the whole project, so everyone runs the same Python with the same packages. Without it, `python` can point at different installs: this project hit a `No module named 'psycopg'` error because `python` was 3.14 while the packages were installed for 3.13.
+
+### One-time setup
+
+From the project root:
+
+**Windows (PowerShell)**
+```powershell
+py -3.13 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r backend/requirements.txt -r scraper/requirements.txt
+```
+
+If PowerShell refuses to run `Activate.ps1` ("running scripts is disabled on this system"), allow scripts for your user once, then activate again:
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+**macOS / Linux**
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r backend/requirements.txt -r scraper/requirements.txt
+```
+
+Python 3.13 is what the project is tested with. Any 3.12 or newer should work.
+
+### Every new terminal
+
+Activate the environment first. Your prompt then starts with `(.venv)`, and plain `python` uses the project's packages:
+
+```powershell
+.venv\Scripts\Activate.ps1        # Windows
+source .venv/bin/activate         # macOS / Linux
+```
+
+Check that it worked: `python -c "import sys; print(sys.executable)"` should print a path inside `.venv`.
+
+### VS Code
+
+Open the Command Palette (Ctrl+Shift+P), choose **Python: Select Interpreter**, and pick the one in `.venv`. New VS Code terminals will then activate it automatically.
+
+### Other setup
+
+- **Database:** the connection string goes in `.env` in the project root, as `DATABASE_URL=...`. Get it from a teammate privately, or see [Database (Tiger Data)](#database-tiger-data).
+- **Git:** `.venv/` and `.env` are git-ignored. Never commit either one.
+- **New packages:** after installing a package, add it to the matching `requirements.txt` (`backend/` or `scraper/`) so teammates get it too.
+
 ## Power plant scraper
 
 [scraper/scrape_power_plants.py](scraper/scrape_power_plants.py) collects operating power plants for the states you choose (default: Florida, Georgia, Alabama). It writes one row per plant to [data/power_plants.csv](data/power_plants.csv) with location, county and time zone.
@@ -317,3 +369,61 @@ UPDATE hazard_categories SET stop_radius_mi = 15 WHERE category = 'lightning';
 - **Time-series:** the time-based tables are TimescaleDB hypertables. Lightning strikes, live observations and gauge readings are compressed after a few days, and lightning strikes are deleted after 90 days.
 - **Alerts:** `raise_site_alert(site_id, category, level, at, value)` opens an alert, or extends an open alert for the same site and category, restarting its all-clear countdown if the category says to. `active_site_alerts` lists open alerts with the time remaining.
 - **Risk profile:** `site_risk_profile` is a materialized view with one row per site and a set of columns per category. Examples are `lightning_events`, `lightning_deaths`, `heat_warn_days_per_year`, `flood_events`, `heavy_rain_days_per_year`, `severe_storm_injuries`, `tropical_deaths`, `storm_fatalities_crew_relevant`, `cdc_county_weather_deaths`, `ppe_osha_reports` and `machinery_osha_reports`. It's built from `site_hazard_events` and the station weather. Run `REFRESH MATERIALIZED VIEW site_risk_profile` after loading data or changing a range.
+
+## Backend (FastAPI + live data worker)
+
+The [backend/](backend/) folder has two processes that share the Tiger database:
+
+| Process | Command (from the project root) | What it does |
+|---|---|---|
+| API | `python -m uvicorn backend.app:app --reload` | Serves the endpoints below. Interactive docs are at http://127.0.0.1:8000/docs. |
+| Worker | `python -m backend.worker` | Pulls live NWS and lightning data on a schedule and writes the 6 PM briefings. Run **one** copy. |
+
+```powershell
+python -m pip install -r backend/requirements.txt
+$env:NWS_USER_AGENT = "PlanIT-Control (your-team-email@example.com)"   # NWS asks every client for a contact
+python -m backend.worker points        # one-time: looks up each site's NWS forecast grid and alert zones
+python -m backend.worker               # then leave this running
+python -m backend.test_backend         # parsing and threshold checks (no network needed)
+```
+
+### Worker schedule
+
+| Job | How often | Source → table |
+|---|---|---|
+| `lightning` | every minute | GOES-19 GLM satellite flashes (AWS bucket `noaa-goes19`) → `lightning_strikes`. Flashes within a site's warn/stop radius call `raise_site_alert()`, which restarts the 30-minute all-clear on each new strike. |
+| `alerts` | every 2 min | NWS active alerts for the sites' states → `nws_alerts`. Alerts in effect now raise site alerts that last until the NWS warning expires. Storm-based warnings use their polygon; zone and county alerts use the site's NWS zone. |
+| `forecasts` | hourly (at :05) | NWS hourly gridpoint forecast for the next 48 h → `weather_forecasts`: temperature, heat index, wind chill, gusts, rain, chance of rain and thunder, visibility. One request per NWS grid cell. |
+| `briefings` | every 15 min | Writes tomorrow's briefing for each site where it's 6:00–6:15 PM local time → `daily_briefings` |
+| `points` | daily | Looks up the NWS grid and zones for any new site |
+
+Which NWS alert names map to which hazard category, and whether they mean `warning` or `stop_work`, is stored as data in `hazard_categories.nws_warn_events` and `nws_stop_events`.
+
+### Endpoints
+
+| Method and path | Returns |
+|---|---|
+| `GET /health` | database time and site count |
+| `GET /hazard-categories` | thresholds, radii and countdowns (for the frontend legend) |
+| `GET /sites?state=FL&limit=100` | **Dashboard ranking**, sorted by latest hazard score, then active stop-work and warning alerts |
+| `GET /sites/{id}` | site details, historical `risk_profile`, `active_alerts`, `latest_score` |
+| `GET /sites/{id}/forecast?hours=48` | hourly forecast |
+| `GET /sites/{id}/hazard-events?category=lightning` | historical events tied to the site |
+| `GET /alerts/active?state=FL` | **Instant alerts** with `all_clear_seconds` for the countdown. Poll every 15–30 s. |
+| `GET /briefings/{id}?date=2026-10-18` | the 6 PM next-day briefing: `summary` text plus structured `content` (flags, forecast, NWS alerts, score) for the AI API to rewrite |
+| `POST /crew-reports` | `{category, lat, lon, description, photo_url, reported_by, severity, site_id?}`. Upload the photo to storage first and send its URL. The nearest site within 10 mi is filled in when `site_id` is omitted. |
+| `GET /crew-reports?site_id=&category=&status=open` | crew hazard reports |
+
+**Demo endpoints** (start the API with `$env:PLANIT_DEV = "1"`):
+
+| Method and path | What it does |
+|---|---|
+| `POST /dev/lightning/{site_id}?miles_away=3` | fakes a strike to show the stop-work countdown |
+| `POST /dev/briefings/{site_id}` | writes tomorrow's briefing now, without waiting for 6 PM |
+| `POST /dev/jobs/{name}` | runs one worker job |
+
+### Notes
+
+- `hazard_scores` stays empty until the ML model writes to it. Until then, the dashboard ranks sites by active alerts, then capacity.
+- GLM locates lightning to roughly 8 km (about 5 mi). That's coarse for a 10-mile rule, but it's the best free real-time source.
+- Forecasts keep 30 days, NWS alerts keep 180 days, and lightning keeps 90 days (compressed after 2), to stay within the free tier.
