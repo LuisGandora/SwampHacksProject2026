@@ -86,12 +86,15 @@ def stop(conn, site_id):
     started = conn.execute("SELECT min(observed_at) AS t FROM weather_observations WHERE site_id = %s AND source = 'demo'",
                            (site_id,)).fetchone()["t"]
     conn.execute("DELETE FROM weather_observations WHERE site_id = %s AND source = 'demo'", (site_id,))
-    conn.execute("DELETE FROM lightning_strikes WHERE source = 'demo'")
+    conn.execute("DELETE FROM lightning_strikes WHERE source IN ('demo', 'dev')")  # dev = fake strikes from the demo
     conn.execute("DELETE FROM weather_forecasts WHERE site_id = %s AND short_forecast LIKE 'demo:%%'", (site_id,))
     conn.execute("DELETE FROM crew_reports WHERE site_id = %s AND reported_by = 'demo'", (site_id,))
     conn.execute("DELETE FROM daily_briefings WHERE site_id = %s AND content ->> 'demo' = 'true'", (site_id,))
-    if started:  # alerts the demo raised for this site
+    if started:  # alerts the demo raised for this site, and the lightning alerts its strikes raised at neighbors
         conn.execute("DELETE FROM site_alerts WHERE site_id = %s AND started_at >= %s", (site_id, started))
+        conn.execute("DELETE FROM site_alerts a USING sites n, sites d WHERE a.site_id = n.site_id AND d.site_id = %s "
+                     "AND a.category = 'lightning' AND a.started_at >= %s AND ST_DWithin(n.geog, d.geog, 25 * %s)",
+                     (site_id, started, MILE))  # real strikes re-raise theirs on the next lightning run
     # real alerts the demo extended now carry demo text; drop them and the live jobs re-raise the real ones
     conn.execute("DELETE FROM site_alerts WHERE site_id = %s AND message LIKE '[demo]%%'", (site_id,))
     return {"removed": True}

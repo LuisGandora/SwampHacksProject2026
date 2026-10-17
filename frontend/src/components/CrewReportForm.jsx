@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api.js";
+import { enqueue, newId } from "../offlineQueue.js";
 
 const CREW_FIRST = ["wildlife", "slip_trip", "ppe", "heavy_machinery", "osha_inspection", "flooding",
                     "soil_saturation", "extreme_heat", "lightning", "high_wind", "severe_storm"];
@@ -23,7 +24,7 @@ async function shrink(file, max = 1600) {
   }
 }
 
-export default function CrewReportForm({ site, categories, pin, pinMode, setPinMode, me, onDone, onCancel }) {
+export default function CrewReportForm({ site, categories, pin, pinMode, setPinMode, me, onDone, onCancel, signedIn, onSignIn }) {
   const [category, setCategory] = useState("wildlife");
   const [description, setDescription] = useState("");
   const [severity, setSeverity] = useState(3);
@@ -59,25 +60,41 @@ export default function CrewReportForm({ site, categories, pin, pinMode, setPinM
     e.preventDefault();
     if (!location) return setError(where === "pin" ? "Tap the map to drop the pin." : "Location isn't available yet.");
     setError("");
+    try { localStorage.setItem(NAME_KEY, name); } catch { /* private mode: fine */ }
+    const report = {
+      report_id: newId(), reported_at: new Date().toISOString(),
+      category, description: description.trim() || null, severity, photo_url: null, reported_by: name.trim() || null,
+      lat: location.lat, lon: location.lon, site_id: where === "site" ? site?.site_id : null,
+    };
+    const queue = async () => { await enqueue(report, photo); onDone({ ...report, queued: true }); };
     try {
-      let photo_url = null;
+      if (!navigator.onLine) return await queue();
       if (photo) {
         setBusy("Uploading photo…");
-        photo_url = (await api.upload(photo)).url;
+        report.photo_url = (await api.upload(photo)).url;
       }
       setBusy("Sending report…");
-      try { localStorage.setItem(NAME_KEY, name); } catch { /* private mode: fine */ }
-      const report = await api.createCrewReport({
-        category, description: description.trim() || null, severity, photo_url, reported_by: name.trim() || null,
-        lat: location.lat, lon: location.lon, site_id: where === "site" ? site?.site_id : null,
-      });
-      onDone(report);
+      onDone(await api.createCrewReport(report));
     } catch (err) {
-      setError(err.message);
+      // No signal (or it dropped mid-send): keep the report on the phone and send it when back online.
+      if (err.status === 0) {
+        try { await queue(); } catch { setError(`${err.message} Couldn't save it on this device either.`); }
+      } else setError(err.message);
     } finally {
       setBusy("");
     }
   };
+
+  if (!signedIn) return (
+    <div className="crew-form">
+      <h3>Report a hazard</h3>
+      <p className="muted small">Sign in so your report is tied to you and your team gets notified.</p>
+      <div className="form-actions">
+        <button type="button" className="ghost" onClick={onCancel}>Cancel</button>
+        <button type="button" className="primary" onClick={onSignIn}>Sign in</button>
+      </div>
+    </div>
+  );
 
   return (
     <form className="crew-form" onSubmit={submit} aria-label="Report a hazard">

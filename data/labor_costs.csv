@@ -1,0 +1,5 @@
+key,value,unit,note
+loaded_cost_per_hour,63.19,USD per person-hour,"BLS: OEWS 49-9051 mean wage $44.22 (2025 Annual, US) x ECEC benefits multiplier 1.429 (2026 2nd Quarter, private industry; series OEUN000000000000049905103)"
+loaded_cost_per_hour_FL,58.33,USD per person-hour,"BLS: OEWS 49-9051 mean wage $40.82 (2025 Annual, FL) x ECEC benefits multiplier 1.429 (2026 2nd Quarter, private industry; series OEUS120000000000049905103)"
+loaded_cost_per_hour_GA,56.26,USD per person-hour,"BLS: OEWS 49-9051 mean wage $39.37 (2025 Annual, GA) x ECEC benefits multiplier 1.429 (2026 2nd Quarter, private industry; series OEUS130000000000049905103)"
+loaded_cost_per_hour_AL,56.65,USD per person-hour,"BLS: OEWS 49-9051 mean wage $39.64 (2025 Annual, AL) x ECEC benefits multiplier 1.429 (2026 2nd Quarter, private industry; series OEUS010000000000049905103)"

@@ -52,6 +52,26 @@ def load_inputs(conn):
     with conn.cursor().copy("COPY ba_daily_demand FROM STDIN") as cp:
         for r in demand.groupby(["balancing_authority", "date"], as_index=False).sum().itertuples():
             cp.write_row((r.balancing_authority, r.date, r.demand_mwh))
+    outages = DATA / "eaglei_county_daily.csv"  # EAGLE-I stand-in for crew workload (scraper/outages.py)
+    if outages.exists():
+        conn.execute("TRUNCATE county_outages_daily")
+        o = pd.read_csv(outages, dtype={"county_fips": str})
+        o["county_fips"] = o["county_fips"].str.zfill(5)
+        # Dec 31 evening (Eastern) arrives in the next year's file too: merge those county-days
+        o = o.groupby(["county_fips", "date"], as_index=False).agg(
+            customer_hours_out=("customer_hours_out", "sum"), peak_customers_out=("peak_customers_out", "max"),
+            customers=("customers", "max"))
+        with conn.cursor().copy("COPY county_outages_daily FROM STDIN") as cp:
+            for r in o.itertuples():
+                cp.write_row((r.county_fips.zfill(5), r.date, r.customer_hours_out, int(r.peak_customers_out),
+                              int(r.customers) if r.customers else None))
+    labor = DATA / "labor_costs.csv"  # BLS wages x benefits (scraper/labor_costs.py): only over assumptions/BLS values
+    if labor.exists():
+        conn.cursor().executemany(
+            "INSERT INTO economic_assumptions AS a VALUES (%s, %s, %s, %s) ON CONFLICT (key) DO UPDATE "
+            "SET value = EXCLUDED.value, unit = EXCLUDED.unit, note = EXCLUDED.note "
+            "WHERE a.note LIKE 'ASSUMPTION%%' OR a.note LIKE 'BLS:%%'",
+            [(r.key, r.value, r.unit, r.note) for r in pd.read_csv(labor).itertuples()])
     trips = DATA / "crew_trips.csv"
     if trips.exists():
         t = pd.read_csv(trips)
@@ -70,6 +90,10 @@ def crew_hours(conn):
     stops["hours"] = stops["category"].map(lambda c: a.get(f"hours_lost_{c}", 0.0))
     per_day = stops.groupby(["site_id", "day"], as_index=False)["hours"].sum()
     per_day["hours"] = per_day["hours"].clip(upper=a.get("shift_hours", 10.0)) * a["crew_size"]
+    state = frame(conn, "SELECT site_id, state FROM sites")
+    per_day = per_day.merge(state, on="site_id")
+    per_day["cost"] = per_day["hours"] * per_day["state"].map(  # state labor rate (BLS) where loaded
+        lambda st: a.get(f"loaded_cost_per_hour_{st}", a["loaded_cost_per_hour"]))
     return per_day, a
 
 
@@ -92,6 +116,21 @@ def weekly(conn):
     demand = demand[demand["n"] == 7].drop(columns="n")  # full weeks only
     trips = frame(conn, """SELECT s.balancing_authority AS ba, date_trunc('week', t.started_at)::date AS week,
                                   count(*) AS crew_trips FROM crew_trips t JOIN sites s USING (site_id) GROUP BY 1, 2""")
+    # crew-workload stand-in: customer-hours without power in the counties that hold the operator's sites
+    outages = frame(conn, """SELECT s.ba, date_trunc('week', o.day)::date AS week,
+                                    sum(o.customer_hours_out) AS outage_customer_hours
+                               FROM county_outages_daily o
+                               JOIN (SELECT DISTINCT balancing_authority AS ba, county_fips FROM sites
+                                      WHERE balancing_authority IS NOT NULL) s USING (county_fips)
+                              GROUP BY 1, 2""")
+    outage_end = conn.execute("SELECT max(day) AS d FROM county_outages_daily").fetchone()["d"]
+    # average retail price that month across the operator's utilities (EIA-861M revenue / MWh)
+    price = frame(conn, """SELECT s.ba, u.month,
+                                  sum(u.revenue_thousand_usd) * 1000 / nullif(sum(u.sales_mwh), 0) AS avg_price_usd_per_mwh
+                             FROM utility_monthly_sales u
+                             JOIN (SELECT DISTINCT balancing_authority AS ba, utility_id FROM sites
+                                    WHERE balancing_authority IS NOT NULL) s USING (utility_id)
+                            GROUP BY 1, 2""")
 
     g = days.groupby(["ba", "week"])
     w = pd.DataFrame({
@@ -107,11 +146,31 @@ def weekly(conn):
     else:
         w["crew_trips"] = np.nan
     w["sites"] = w["ba"].map(sites.groupby("ba").size())
-    w = w.fillna({"crew_hours_lost": 0, "storm_events": 0})
-    w["est_cost_usd"] = w["crew_hours_lost"] * a["loaded_cost_per_hour"]
+    w = w.merge(lost.groupby(["ba", "week"])["cost"].sum().rename("est_cost_usd").reset_index(), how="left")
+    w = w.fillna({"crew_hours_lost": 0, "storm_events": 0, "est_cost_usd": 0})
+    if not outages.empty:
+        outages["week"] = pd.to_datetime(outages["week"])
+        outages["outage_customer_hours"] = outages["outage_customer_hours"].astype(float)
+        w = w.merge(outages, how="left")
+        covered = w["week"] <= pd.Timestamp(outage_end)  # weeks after the last EAGLE-I file stay unknown, not zero
+        w.loc[covered, "outage_customer_hours"] = w.loc[covered, "outage_customer_hours"].fillna(0)
+    else:
+        w["outage_customer_hours"] = np.nan
+    if not price.empty:
+        price["month"] = pd.to_datetime(price["month"])
+        price["avg_price_usd_per_mwh"] = price["avg_price_usd_per_mwh"].astype(float)
+        w["month"] = w["week"].dt.to_period("M").dt.start_time
+        w = w.merge(price, on=["ba", "month"], how="left").drop(columns="month")
+        w["est_revenue_usd"] = w["demand_mwh"].astype(float) * w["avg_price_usd_per_mwh"]
+    else:
+        w["avg_price_usd_per_mwh"] = w["est_revenue_usd"] = np.nan
     for c in ("heat_site_days", "stop_work_site_days", "storm_events"):
         w[f"{c}_per_site"] = w[c] / w["sites"]
     return w, sites, lost, days
+
+
+def opt(v):
+    return None if v is None or pd.isna(v) else float(v)
 
 
 def correlate(df, xs, y, scope, entity, rows):
@@ -138,15 +197,24 @@ def run(conn):
     conn.execute("TRUNCATE economic_weekly")
     keep = w.dropna(subset=["ba"])
     conn.cursor().executemany(
-        "INSERT INTO economic_weekly VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-        [(r.ba, r.week.date(), int(r.sites), None if pd.isna(r.demand_mwh) else float(r.demand_mwh),
-          int(r.stop_work_site_days), int(r.warning_site_days), int(r.storm_events), float(r.crew_hours_lost),
-          float(r.est_cost_usd), None if pd.isna(r.crew_trips) else int(r.crew_trips)) for r in keep.itertuples()])
+        "INSERT INTO economic_weekly (balancing_authority, week, sites, demand_mwh, stop_work_site_days, "
+        "warning_site_days, storm_events, crew_hours_lost, est_cost_usd, crew_trips, outage_customer_hours, "
+        "avg_price_usd_per_mwh, est_revenue_usd) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        [(r.ba, r.week.date(), int(r.sites), opt(r.demand_mwh), int(r.stop_work_site_days), int(r.warning_site_days),
+          int(r.storm_events), float(r.crew_hours_lost), float(r.est_cost_usd),
+          None if pd.isna(r.crew_trips) else int(r.crew_trips), opt(r.outage_customer_hours),
+          opt(r.avg_price_usd_per_mwh), opt(r.est_revenue_usd)) for r in keep.itertuples()])
 
     rows = []
+    weather = ["heat_site_days_per_site", "stop_work_site_days_per_site", "storm_events_per_site"]
     for ba, df in keep.groupby("ba"):
-        correlate(df.sort_values("week"), X_METRICS + (["crew_trips"] if df["crew_trips"].notna().any() else []),
-                  "demand_mwh", "weekly_ba", ba, rows)
+        df = df.sort_values("week")
+        has_trips = df["crew_trips"].notna().any()
+        correlate(df, X_METRICS + (["crew_trips"] if has_trips else []), "demand_mwh", "weekly_ba", ba, rows)
+        correlate(df, weather, "outage_customer_hours", "weekly_ba", ba, rows)   # does weather drive crew workload?
+        correlate(df, weather + ["outage_customer_hours"], "est_revenue_usd", "weekly_ba", ba, rows)
+        if has_trips:  # once real trip logs exist: trips vs weather and vs the outage stand-in
+            correlate(df, weather + ["outage_customer_hours"], "crew_trips", "weekly_ba", ba, rows)
 
     sales = frame(conn, "SELECT utility_id, utility_name, month, sum(revenue_thousand_usd) AS revenue_thousand_usd, "
                         "sum(sales_mwh) AS sales_mwh FROM utility_monthly_sales GROUP BY 1, 2, 3")
