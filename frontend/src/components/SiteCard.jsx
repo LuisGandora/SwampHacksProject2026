@@ -9,7 +9,8 @@ const COORD = {
   no_osm: ["Location: EIA only (no OSM match)", "muted"],
 };
 
-export default function SiteCard({ summary, horizon, categories, alerts, now, dev, onReport, onAiReport,
+export default function SiteCard({ summary, horizon, categories, alerts, now, dev, onReport, onAiReport, onCompliance,
+                                   onChanged,
                                    onScenario, onStrike, onClearScenario, refreshKey, onClose }) {
   const [detail, setDetail] = useState(null);
   const [forecast, setForecast] = useState([]);
@@ -60,13 +61,16 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
       </header>
 
       <div className="score-tiles">
-        {[["Today", summary.score_now], ["Tomorrow", summary.score_next_day]].map(([label, s]) => {
+        {[["Today", summary.score_now, summary.live_floor], ["Tomorrow", summary.score_next_day, null]].map(([label, s, floor]) => {
           const b = band(s);
           return (
             <div key={label} className="score-tile" style={{ borderColor: b.color }}>
               <span className="muted small">{label}</span>
               <strong className="big">{fmtScore(s)}<small>/10</small></strong>
               <span className="band-label"><i className="dot" style={{ background: b.color }} />{b.label}</span>
+              {floor != null && floor >= s && (
+                <span className="small live-reason" title={summary.live_floor_reason}>⚡ Live: {summary.live_floor_reason}</span>
+              )}
             </div>
           );
         })}
@@ -82,6 +86,7 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
       <div className="actions">
         <button className="primary" onClick={onAiReport}>🛰 AI safety report</button>
         <button onClick={onReport}>📍 Report hazard here</button>
+        <button onClick={onCompliance}>📋 Compliance</button>
       </div>
 
       {mine.length > 0 && (
@@ -107,6 +112,16 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
 
       <section>
         <h4>{horizon === "now" ? "Today" : "Tomorrow"}: what drives the score</h4>
+        {meta.p_severe != null && (
+          <p className="small">
+            Severe-outcome chance (death, injury, $1M+ damage or a worker injury): <strong>{(meta.p_severe * 100).toFixed(1)}%</strong>
+            {" · "}
+            {meta.percentile_for_site_month == null ? "" : meta.percentile_for_site_month >= 90
+              ? <span className="warn">Unusual: higher than {Math.round(meta.percentile_for_site_month)}% of this site's days this month</span>
+              : <span className="muted">Typical for this site this month ({Math.round(meta.percentile_for_site_month)}th percentile)</span>}
+          </p>
+        )}
+        {meta.nws_alerts?.length > 0 && <p className="small">NWS alerts in the forecast: {meta.nws_alerts.join(", ")}</p>}
         {cats.length === 0 ? <p className="muted small">No hazard above 0.1/10.</p> : (
           <ul className="cat-bars">
             {cats.slice(0, 6).map(([k, v]) => {
@@ -168,9 +183,12 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
             {econ.weekly.length > 0 && (
               <div className="table-wrap">
                 <table className="data-table">
-                  <thead><tr><th>Week</th><th>Demand MWh</th><th>Stop-work site-days</th><th>Crew-h lost*</th><th>Cost*</th></tr></thead>
+                  <thead><tr><th>Week</th><th>Demand MWh</th><th>Est. revenue†</th><th>Outage cust-h‡</th>
+                    <th>Stop-work site-days</th><th>Crew-h lost*</th><th>Cost*</th></tr></thead>
                   <tbody>{econ.weekly.map((w) => (
                     <tr key={w.week}><td>{w.week}</td><td>{w.demand_mwh ? Math.round(w.demand_mwh).toLocaleString() : "–"}</td>
+                      <td>{w.est_revenue_usd ? usd(w.est_revenue_usd) : "–"}</td>
+                      <td>{w.outage_customer_hours != null ? Math.round(w.outage_customer_hours).toLocaleString() : "–"}</td>
                       <td>{w.stop_work_site_days}</td><td>{Math.round(w.crew_hours_lost)}</td><td>{usd(w.est_cost_usd)}</td></tr>
                   ))}</tbody>
                 </table>
@@ -182,7 +200,10 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
                 {c.p_value < 0.001 ? ", p < 0.001" : `, p = ${Number(c.p_value).toFixed(3)}`} · n = {c.n}, deseasonalized
               </p>
             ))}
-            <p className="small muted">*Estimates from labeled assumptions (crew size, cost/hour, hours lost per hazard). Correlation is not causation.</p>
+            <p className="small muted">*Estimate: stop-work days × hours lost per hazard × crew size × BLS state labor rate.
+              †Estimate: EIA-930 demand × that month's EIA-861M average retail price. ‡EAGLE-I customer-hours without power in
+              the operator's site counties: the public stand-in for crew workload until real trip logs are loaded.
+              Correlation is not causation.</p>
           </div>
         )}
       </details>
@@ -199,6 +220,17 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
                   {c.severity && <span className="muted small"> · severity {c.severity}/5</span>}
                   <p className="small">{c.description || "No description"}</p>
                   <p className="small muted">{c.reported_by || "Crew"} · {new Date(c.reported_at).toLocaleString()}</p>
+                  <div className="row-actions">
+                    {["resolved", "dismissed"].map((status) => (
+                      <button key={status} className="link small" onClick={async () => {
+                        try {
+                          await api.setCrewReportStatus(c.report_id, status);
+                          setCrew((list) => list.filter((x) => x.report_id !== c.report_id));
+                          onChanged?.();
+                        } catch (e) { setError(e.message); }
+                      }}>{status === "resolved" ? "Mark resolved" : "Dismiss"}</button>
+                    ))}
+                  </div>
                 </div>
               </li>
             ))}

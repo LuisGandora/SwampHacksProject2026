@@ -397,6 +397,44 @@ CREATE TABLE IF NOT EXISTS crew_reports (
 CREATE INDEX IF NOT EXISTS crew_reports_geog_idx ON crew_reports USING gist (geog);
 CREATE INDEX IF NOT EXISTS crew_reports_site_idx ON crew_reports (site_id, reported_at DESC);
 
+-- Users (Auth0 sign-in) and where each wants alerts sent. A user row is created the first time a verified Auth0
+-- token reaches the API; no passwords are stored here. Webhook URLs are secrets, so they're stored encrypted with a
+-- key that lives only in the app's environment (backend/notify.py), and the API shows just the last 4 characters.
+CREATE TABLE IF NOT EXISTS app_users (
+    user_id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    auth0_sub       text NOT NULL UNIQUE,                -- the token's "sub", e.g. google-oauth2|1234
+    email           text,
+    name            text,
+    role            text NOT NULL DEFAULT 'crew' CHECK (role IN ('crew', 'supervisor')),  -- not enforced yet
+    created_at      timestamptz NOT NULL DEFAULT now(),
+    last_seen_at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS notification_channels (
+    channel_id        bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id           uuid NOT NULL REFERENCES app_users ON DELETE CASCADE,
+    kind              text NOT NULL CHECK (kind IN ('discord', 'slack')),
+    label             text CHECK (length(label) <= 80),
+    webhook_encrypted text NOT NULL,                     -- Fernet token, never the plain URL
+    webhook_hint      text NOT NULL,                     -- last 4 characters, to tell channels apart
+    levels            text[] NOT NULL DEFAULT '{stop_work}' CHECK (levels <@ '{warning,stop_work}'),
+    site_ids          bigint[],                          -- NULL = every site
+    briefings         boolean NOT NULL DEFAULT true,
+    crew_reports      boolean NOT NULL DEFAULT true,
+    created_at        timestamptz NOT NULL DEFAULT now(),
+    last_sent_at      timestamptz,
+    last_error        text
+);
+CREATE INDEX IF NOT EXISTS notification_channels_user_idx ON notification_channels (user_id);
+CREATE TABLE IF NOT EXISTS notification_log (            -- what each channel has been sent, so nothing repeats
+    channel_id      bigint NOT NULL REFERENCES notification_channels ON DELETE CASCADE,
+    item            text NOT NULL,                       -- alert:<id> / report:<uuid> / briefing:<site>:<date>
+    sent_at         timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (channel_id, item)
+);
+ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS user_id     uuid REFERENCES app_users;
+ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS resolved_by uuid REFERENCES app_users;
+ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS received_at timestamptz DEFAULT now();  -- reported_at can be earlier (sent from an offline queue)
+
 CREATE TABLE IF NOT EXISTS site_alerts (
     alert_id        bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     site_id         bigint NOT NULL REFERENCES sites,
@@ -453,6 +491,7 @@ BEGIN
     RETURN a;
 END $$;
 
+DROP VIEW IF EXISTS site_live_floor;
 DROP VIEW IF EXISTS active_site_alerts;
 CREATE VIEW active_site_alerts AS
 SELECT a.*, s.name AS site_name, s.timezone,
@@ -460,6 +499,21 @@ SELECT a.*, s.name AS site_name, s.timezone,
        greatest(a.all_clear_at - now(), interval '0') AS all_clear_remaining
   FROM site_alerts a JOIN sites s USING (site_id) JOIN hazard_categories c USING (category)
  WHERE a.cleared_at IS NULL AND (a.all_clear_at IS NULL OR a.all_clear_at > now());
+
+-- Live adjustment of today's Hazard Index: what's happening now sets a floor under the model's forecast score.
+-- Stop-work alert -> 8, any other active warning -> 5, open crew report (last 12 h) -> 4; the highest wins, with
+-- its reason. Applied at read time (GET /sites), so it moves the moment an alert opens or clears.
+CREATE VIEW site_live_floor AS
+SELECT DISTINCT ON (site_id) site_id, floor, reason
+  FROM (SELECT site_id,
+               CASE WHEN level = 'stop_work' THEN 8 WHEN message LIKE 'Crew report:%' THEN 4 ELSE 5 END AS floor,
+               title || coalesce(': ' || message, '') AS reason
+          FROM active_site_alerts
+        UNION ALL
+        SELECT site_id, 4, 'Open crew report: ' || replace(category, '_', ' ')
+          FROM crew_reports
+         WHERE status = 'open' AND site_id IS NOT NULL AND reported_at > now() - interval '12 hours') f
+ ORDER BY site_id, floor DESC;
 
 CREATE TABLE IF NOT EXISTS hazard_scores (               -- ML hazard index output
     site_id         bigint NOT NULL REFERENCES sites,
@@ -497,6 +551,14 @@ CREATE TABLE IF NOT EXISTS site_reports (                -- on-tap AI report (ba
     errors              text[]                           -- Gemini failures before falling back
 );
 CREATE INDEX IF NOT EXISTS site_reports_site_idx ON site_reports (site_id, created_at DESC);
+ALTER TABLE site_reports ADD COLUMN IF NOT EXISTS kind text NOT NULL DEFAULT 'safety';  -- safety / compliance
+
+CREATE TABLE IF NOT EXISTS site_score_climatology (      -- each site's normal Hazard Index range by month
+    site_id     bigint NOT NULL REFERENCES sites,
+    month       int NOT NULL CHECK (month BETWEEN 1 AND 12),
+    q           numeric[] NOT NULL,                       -- percentiles 0..100 of the daily index (101 values)
+    PRIMARY KEY (site_id, month)
+);
 
 -- ===========================================================================================================
 -- Site <-> hazard ties: every historical event within its category's history_radius_mi of a site.
@@ -619,6 +681,15 @@ INSERT INTO economic_assumptions VALUES
     ('hours_lost_dense_fog', 2, 'hours per stop-work day', 'ASSUMPTION')
 ON CONFLICT (key) DO NOTHING;  -- keep the team's edits
 
+CREATE TABLE IF NOT EXISTS county_outages_daily (       -- EAGLE-I (ORNL): stand-in for restoration crew workload
+    county_fips         char(5) NOT NULL,
+    day                 date NOT NULL,                   -- Eastern date
+    customer_hours_out  numeric NOT NULL,                -- sum over 15-min snapshots of customers out x 0.25 h
+    peak_customers_out  int,
+    customers           int,                             -- customers tracked in the county
+    PRIMARY KEY (county_fips, day)
+);
+
 CREATE TABLE IF NOT EXISTS economic_weekly (             -- per grid operator per week (Monday start)
     balancing_authority     text NOT NULL,
     week                    date NOT NULL,
@@ -632,6 +703,9 @@ CREATE TABLE IF NOT EXISTS economic_weekly (             -- per grid operator pe
     crew_trips              int,                         -- from crew_trips, when real trip logs are loaded
     PRIMARY KEY (balancing_authority, week)
 );
+ALTER TABLE economic_weekly ADD COLUMN IF NOT EXISTS outage_customer_hours numeric;  -- EAGLE-I, the operator's site counties
+ALTER TABLE economic_weekly ADD COLUMN IF NOT EXISTS avg_price_usd_per_mwh numeric;  -- EIA-861M revenue / MWh that month
+ALTER TABLE economic_weekly ADD COLUMN IF NOT EXISTS est_revenue_usd       numeric;  -- demand x average price (estimate)
 
 CREATE TABLE IF NOT EXISTS economic_correlations (
     scope           text NOT NULL,                       -- weekly_ba / monthly_utility
