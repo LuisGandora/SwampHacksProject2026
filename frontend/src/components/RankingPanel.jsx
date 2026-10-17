@@ -83,6 +83,12 @@ export default function RankingPanel({ sites, horizon, setHorizon, selectedId, o
                 <span className="rank-score">
                   <strong>{fmtScore(s.score)}</strong>
                   <span className="band-label"><i className="dot" style={{ background: b.color }} />{b.label}</span>
+                  {s.live_floor != null && horizon === "now" && s.live_floor > (s.model_score ?? 0) && (
+                    <span className="badge badge--live" title={`Raised by what's happening now: ${s.live_floor_reason}`}>LIVE</span>
+                  )}
+                  {s.percentile >= 90 && (
+                    <span className="badge badge--unusual" title={`Higher than ${Math.round(s.percentile)}% of this site's days in this month`}>UNUSUAL</span>
+                  )}
                   {s.stop_work_alerts > 0 && <span className="badge badge--stop">STOP ×{s.stop_work_alerts}</span>}
                   {s.warning_alerts > 0 && <span className="badge badge--warn">WARN ×{s.warning_alerts}</span>}
                 </span>

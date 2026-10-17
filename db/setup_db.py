@@ -35,11 +35,9 @@ def load_env(path=None):
 
 
 def database_url():
+    load_env()
     if os.environ.get("DATABASE_URL"):
         return os.environ["DATABASE_URL"]
-    for line in (ROOT / ".env").read_text(encoding="utf-8-sig").splitlines():
-        if line.startswith("DATABASE_URL="):
-            return line.split("=", 1)[1].strip()
     raise SystemExit("DATABASE_URL not found in the environment or .env")
 
 

@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API, api } from "./api.js";
+import { API, api, setTokenGetter } from "./api.js";
+import { useAuth } from "./auth.js";
+import { flush, queued } from "./offlineQueue.js";
 import AlertsPanel from "./components/AlertsPanel.jsx";
+import ComplianceModal from "./components/ComplianceModal.jsx";
+import ModelModal from "./components/ModelModal.jsx";
+import NotifyModal from "./components/NotifyModal.jsx";
+import StopWorkBanner from "./components/StopWorkBanner.jsx";
+import { PIN_COLORS } from "./components/GlobeMap.jsx";
 import CrewReportForm from "./components/CrewReportForm.jsx";
 import GlobeMap from "./components/GlobeMap.jsx";
 import RankingPanel from "./components/RankingPanel.jsx";
@@ -9,7 +16,8 @@ import SiteCard from "./components/SiteCard.jsx";
 import { categoryLabel } from "./hazard.js";
 
 const SENSORS = [["normal", "STD"], ["nvg", "NVG"], ["flir", "FLIR"], ["crt", "CRT"]];
-const POLL = { sites: 60000, alerts: 20000, lightning: 60000 };
+const POLL = { sites: 60000, alerts: 20000, alertsDuringStop: 8000, lightning: 60000 };
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function usePoll(fn, ms, deps = []) {
   useEffect(() => {
@@ -22,6 +30,7 @@ function usePoll(fn, ms, deps = []) {
 }
 
 export default function App() {
+  const auth = useAuth();
   const [now, setNow] = useState(new Date());
   const [health, setHealth] = useState(null);
   const [apiError, setApiError] = useState("");
@@ -38,10 +47,18 @@ export default function App() {
   const [me, setMe] = useState(null);
   const [sensor, setSensor] = useState("normal");
   const [aiSite, setAiSite] = useState(null);
+  const [complianceSite, setComplianceSite] = useState(null);
+  const [modelOpen, setModelOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [tab, setTab] = useState("rank");
   const [notifyOn, setNotifyOn] = useState(() => "Notification" in window && Notification.permission === "granted");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [notifyOpen, setNotifyOpen] = useState(false);
+  const [showPins, setShowPins] = useState(false);
+  const [pins, setPins] = useState([]);
+  const [queuedCount, setQueuedCount] = useState(0);
+  const [demo, setDemo] = useState(null);  // { step, total, text, site_id, done }
+  const demoRun = useRef(0);
   const seenAlerts = useRef(null);
   const globe = useRef(null);
 
@@ -52,6 +69,8 @@ export default function App() {
   }, []);
 
   useEffect(() => { const id = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(id); }, []);
+  useEffect(() => { setTokenGetter(auth.enabled && auth.isAuthenticated ? auth.getToken : null); },
+            [auth.enabled, auth.isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     api.health().then((h) => { setHealth(h); setApiError(""); }).catch((e) => setApiError(e.message));
     api.categories().then(setCategories).catch(() => {});
@@ -81,7 +100,25 @@ export default function App() {
     }
     seenAlerts.current = ids;
   }).catch(() => {});
-  usePoll(loadAlerts, POLL.alerts, [notifyOn, refreshKey]);
+  const anyStop = alerts.some((a) => a.level === "stop_work");
+  usePoll(loadAlerts, anyStop ? POLL.alertsDuringStop : POLL.alerts, [notifyOn, refreshKey, anyStop]);
+  useEffect(() => { if (showPins) api.hazardPins().then(setPins).catch((e) => toast(e.message, "error")); },
+            [showPins, refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reports saved on the phone without signal go out as soon as it's back online (and every minute while waiting).
+  const sendQueued = useCallback(async () => {
+    if (!navigator.onLine) return;
+    const r = await flush();
+    setQueuedCount(r.left);
+    if (r.sent) { toast(`${r.sent} saved report${r.sent > 1 ? "s" : ""} sent.`); setRefreshKey((k) => k + 1); }
+    if (r.rejected) toast(`${r.rejected} saved report${r.rejected > 1 ? "s were" : " was"} rejected by the server.`, "error");
+  }, [toast]);
+  useEffect(() => {
+    queued().then((q) => { setQueuedCount(q.length); if (q.length && auth.isAuthenticated) sendQueued(); });
+    window.addEventListener("online", sendQueued);
+    return () => window.removeEventListener("online", sendQueued);
+  }, [sendQueued, auth.isAuthenticated]);
+  usePoll(() => queuedCount && auth.isAuthenticated && sendQueued(), 60000, [queuedCount, auth.isAuthenticated]);
   usePoll(() => api.lightning().then(setLightning).catch(() => {}), POLL.lightning, [refreshKey]);
 
   const selected = sites.find((s) => s.site_id === selectedId) || null;
@@ -103,6 +140,43 @@ export default function App() {
     try { await fn(selectedId); toast(msg); refreshAll(); } catch (e) { toast(e.message, "error"); }
   };
 
+  // One-click demo of the brief's story on the selected (or top Florida) site, narrated step by step.
+  const runDemo = async () => {
+    const site = selected || sites.find((s) => s.state === "FL") || sites[0];
+    if (!site) return;
+    const run = ++demoRun.current;
+    const step = async (n, text, ms, action) => {
+      if (demoRun.current !== run) throw new Error("stopped");
+      setDemo({ step: n, total: 6, text, site_id: site.site_id });
+      const out = action ? await action() : null;
+      refreshAll();
+      await sleep(ms);
+      return out;
+    };
+    try {
+      await step(1, `6:00 AM. A crew heads out to ${site.name} (${site.county}, ${site.state}).`, 4000,
+                 async () => select(site.site_id));
+      const s = await step(2, "Heat index 108°F, a week of rain has softened the ground, and a crew member reports an " +
+                              "alligator by the jobsite, with a photo.", 7000, () => api.startScenario(site.site_id));
+      await step(3, "Lightning 4 miles away: STOP WORK within 10 miles. The 30-minute all-clear countdown starts.", 7000);
+      await step(4, "Another strike, 3 miles out: the countdown restarts at 30:00. Nobody goes back out early.", 8000,
+                 () => api.fakeStrike(site.site_id));
+      await step(5, "The supervisor's ranking puts this site on top (live floor 8/10), and each user's Discord or " +
+                    "Slack channel gets the alert.", 7000, async () => setTab("rank"));
+      await step(6, `6 PM: tomorrow's briefing goes out. "${s?.summary || "Tomorrow: heat and afternoon storms."}"`, 9000);
+      if (demoRun.current === run) setDemo((d) => d && { ...d, done: true, text: "That's the brief's day. Reset clears the demo data." });
+    } catch (e) {
+      if (e.message !== "stopped") { toast(e.message, "error"); setDemo(null); }
+    }
+  };
+  const resetDemo = async () => {
+    const id = demo?.site_id;
+    demoRun.current++;
+    setDemo(null);
+    if (id) { try { await api.stopScenario(id); toast("Demo cleared."); } catch (e) { toast(e.message, "error"); } }
+    refreshAll();
+  };
+
   const counts = { stop: alerts.filter((a) => a.level === "stop_work").length, warn: alerts.filter((a) => a.level === "warning").length };
   const online = health && !apiError;
 
@@ -110,7 +184,7 @@ export default function App() {
     <div className="app">
       <GlobeMap ref={globe} sites={sites} lightning={lightning} selectedId={selectedId} onSelect={select}
                 pinMode={pinMode} pin={pin} onPin={(p) => { setPin(p); setPinMode(false); setTab("site"); }}
-                me={me} sensor={sensor} />
+                pins={showPins ? pins : null} me={me} sensor={sensor} />
       {sensor === "crt" && <div className="scanlines" aria-hidden="true" />}
 
       <header className="hud">
@@ -128,6 +202,11 @@ export default function App() {
           <span className="warn">{counts.warn} WARN</span>
           <span className="hide-sm">⚡ {lightning.length}/30m</span>
           <span className="hide-sm">UTC {now.toISOString().slice(11, 19)}</span>
+          {queuedCount > 0 && (
+            <button className="link small warn" onClick={sendQueued} title="Saved on this device; sent when back online">
+              ⏳ {queuedCount} QUEUED
+            </button>
+          )}
         </div>
         <div className="hud-controls">
           <div className="seg" role="group" aria-label="Sensor mode">
@@ -135,6 +214,25 @@ export default function App() {
               <button key={k} className={sensor === k ? "on" : ""} onClick={() => setSensor(k)}>{label}</button>
             ))}
           </div>
+          <button className={showPins ? "on" : ""} onClick={() => setShowPins((v) => !v)} aria-pressed={showPins}
+                  title="Past hazards: crew reports and OSHA injuries">📍<span className="hide-sm"> Pins</span></button>
+          {health?.dev && (
+            <button onClick={demo ? resetDemo : runDemo} title="Play the brief's story">{demo ? "■ Reset" : "▶ Demo"}</button>
+          )}
+          {auth.enabled && !auth.isAuthenticated ? (
+            <button className="primary" onClick={auth.login} disabled={auth.isLoading}>Sign in</button>
+          ) : (
+            <>
+              <button onClick={() => setNotifyOpen(true)} title="Discord / Slack notifications" aria-label="Notifications">🔔</button>
+              {auth.enabled && (
+                <button onClick={auth.logout} title={`Signed in as ${auth.user?.name || auth.user?.email}. Sign out`}
+                        aria-label="Sign out" className="user-btn">
+                  {auth.user?.picture ? <img src={auth.user.picture} alt="" /> : "⎋"}
+                </button>
+              )}
+            </>
+          )}
+          <button onClick={() => setModelOpen(true)} title="Model accuracy (backtest)" aria-label="Model accuracy">📈<span className="hide-sm"> Model</span></button>
           <button onClick={() => globe.current?.flyHome()} title="North America" aria-label="Show North America">🌎</button>
           <button onClick={() => globe.current?.flySites()} title="All sites" aria-label="Show all sites">◎<span className="hide-sm"> Sites</span></button>
         </div>
@@ -143,6 +241,21 @@ export default function App() {
       {apiError && (
         <div className="banner" role="alert">
           {apiError} Start it with <code>python -m uvicorn backend.app:app</code>, or set <code>VITE_API_URL</code> (now {API}).
+        </div>
+      )}
+      <StopWorkBanner alerts={alerts} selectedId={selectedId} now={now} categories={categories} onSelect={select} />
+      {showPins && (
+        <div className="pin-legend small" aria-label="Pin legend">
+          <span><i className="dot" style={{ background: PIN_COLORS.crew }} /> Crew reports (faded = closed)</span>
+          <span><i className="dot" style={{ background: PIN_COLORS.osha }} /> OSHA severe injuries ≤50 mi of a site, 3 yrs</span>
+          <span className="muted">{pins.length.toLocaleString()} pins · tap one for details</span>
+        </div>
+      )}
+      {demo && (
+        <div className="demo-caption" role="status">
+          <span className="mono small">{demo.done ? "DEMO" : `STEP ${demo.step}/${demo.total}`}</span>
+          <p>{demo.text}</p>
+          <button onClick={resetDemo}>■ Reset demo</button>
         </div>
       )}
       {pinMode && <div className="banner banner--pin">Tap the map where the hazard is · <button className="link" onClick={() => setPinMode(false)}>Cancel</button></div>}
@@ -164,9 +277,13 @@ export default function App() {
             <section className="panel">
               <CrewReportForm site={selected} categories={categories} pin={pin} pinMode={pinMode} setPinMode={setPinMode}
                               me={me} onCancel={() => { setCrewOpen(false); setPinMode(false); setPin(null); }}
+                              signedIn={auth.isAuthenticated} onSignIn={auth.login}
                               onDone={(r) => {
                                 setCrewOpen(false); setPin(null);
-                                toast(`Report sent${r.site_id ? "; site alerted" : ""}. Thanks for keeping the crew safe.`);
+                                if (r.queued) {
+                                  setQueuedCount((n) => n + 1);
+                                  toast("No signal: report saved on this phone. It sends automatically when you're back online.");
+                                } else toast(`Report sent${r.site_id ? "; site alerted" : ""}. Thanks for keeping the crew safe.`);
                                 refreshAll();
                               }} />
             </section>
@@ -174,6 +291,7 @@ export default function App() {
             <SiteCard summary={selected} horizon={horizon} categories={categories} alerts={alerts} now={now}
                       dev={health?.dev} refreshKey={refreshKey} onClose={() => setSelectedId(null)}
                       onReport={() => setCrewOpen(true)} onAiReport={() => setAiSite(selected)}
+                      onCompliance={() => setComplianceSite(selected)} onChanged={refreshAll}
                       onScenario={dev(api.startScenario, "Demo scenario running on this site.")}
                       onStrike={dev(api.fakeStrike, "Strike recorded 3 mi away: all-clear countdown restarted.")}
                       onClearScenario={dev(api.stopScenario, "Demo cleared.")} />
@@ -194,6 +312,9 @@ export default function App() {
       </div>
 
       {aiSite && <ReportModal site={aiSite} categories={categories} onClose={() => setAiSite(null)} />}
+      {complianceSite && <ComplianceModal site={complianceSite} categories={categories} onClose={() => setComplianceSite(null)} />}
+      {modelOpen && <ModelModal onClose={() => setModelOpen(false)} />}
+      {notifyOpen && <NotifyModal sites={sites} selected={selected} onClose={() => setNotifyOpen(false)} />}
 
       <div className="toasts" aria-live="polite">
         {toasts.map((t) => <div key={t.id} className={`toast toast--${t.kind}`}>{t.text}</div>)}
