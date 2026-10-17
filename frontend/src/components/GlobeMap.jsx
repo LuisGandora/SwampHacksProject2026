@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { BAND_COLOR_EXPRESSION, band, fmtScore } from "../hazard.js";
+import { BAND_COLOR_EXPRESSION, NWS_COLOR_EXPRESSION, band, fmtScore } from "../hazard.js";
 
 const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services";
 const NORTH_AMERICA = { center: [-97, 39.5], zoom: 3.1 };
@@ -36,12 +36,14 @@ const STYLE = {
 };
 
 const empty = { type: "FeatureCollection", features: [] };
+// Live NEXRAD radar mosaic (Iowa Environmental Mesonet, keyless, updated every 5 min).
+export const RADAR_TILES = "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png";
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);  // popups take HTML
 export const PIN_COLORS = { crew: "#5fd3ff", osha: "#c08cff" };
 const point = (lon, lat, properties = {}) => ({ type: "Feature", geometry: { type: "Point", coordinates: [lon, lat] }, properties });
 
 const GlobeMap = forwardRef(function GlobeMap(
-  { sites, lightning, pins, selectedId, onSelect, pinMode, pin, onPin, me, sensor }, ref) {
+  { sites, lightning, pins, warnings, radar, selectedId, onSelect, pinMode, pin, onPin, me, sensor }, ref) {
   const container = useRef(null);
   const map = useRef(null);
   const ready = useRef(false);
@@ -84,6 +86,19 @@ const GlobeMap = forwardRef(function GlobeMap(
       m.addSource("lightning", { type: "geojson", data: empty });
       m.addSource("selected", { type: "geojson", data: empty });
       m.addSource("pins", { type: "geojson", data: empty });
+      m.addSource("warnings", { type: "geojson", data: empty });
+      m.addSource("radar", { type: "raster", tiles: [RADAR_TILES], tileSize: 256, attribution: "Radar © Iowa Environmental Mesonet" });
+      // Weather layers under everything else, hidden until switched on in Layers.
+      m.addLayer({ id: "radar", type: "raster", source: "radar", layout: { visibility: "none" },
+        paint: { "raster-opacity": 0.65, "raster-fade-duration": 0 } });
+      m.addLayer({ id: "warn-fill", type: "fill", source: "warnings", layout: { visibility: "none" },
+        filter: ["==", ["geometry-type"], "Polygon"], paint: { "fill-color": NWS_COLOR_EXPRESSION, "fill-opacity": 0.18 } });
+      m.addLayer({ id: "warn-line", type: "line", source: "warnings", layout: { visibility: "none" },
+        filter: ["==", ["geometry-type"], "Polygon"], paint: { "line-color": NWS_COLOR_EXPRESSION, "line-width": 2 } });
+      m.addLayer({ id: "warn-site", type: "circle", source: "warnings", layout: { visibility: "none" },
+        filter: ["==", ["geometry-type"], "Point"],
+        paint: { "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": NWS_COLOR_EXPRESSION, "circle-stroke-width": 2.5,
+                 "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 6, 9, 14] } });
       m.addLayer({ id: "alert-pulse", type: "circle", source: "sites", filter: [">", ["get", "stop_work_alerts"], 0],
         paint: { "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#d03b3b", "circle-stroke-width": 2,
                  "circle-radius": 10, "circle-stroke-opacity": 0.9 } });
@@ -142,7 +157,13 @@ const GlobeMap = forwardRef(function GlobeMap(
         const hit = m.queryRenderedFeatures(e.point, { layers: ["sites"] })[0];
         if (hit) return handlers.current.onSelect(Number(hit.properties.site_id));
         const pinHit = m.queryRenderedFeatures(e.point, { layers: ["pins"] })[0];
-        if (pinHit) showPin(pinHit);
+        if (pinHit) return showPin(pinHit);
+        const warn = m.queryRenderedFeatures(e.point, { layers: ["warn-fill", "warn-site"] })[0];
+        if (warn) {
+          const p = warn.properties;
+          pinPopup.setLngLat(e.lngLat).setHTML(`<strong>${esc(p.event)}</strong> · NWS<br/>${esc(p.headline || "")}<br/>` +
+            `<span class="muted">Until ${new Date(p.expires_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}</span>`).addTo(m);
+        }
       });
 
       // Pulse the stop-work rings at 20 fps, and only while a stop-work alert exists: every frame redraws the
@@ -180,6 +201,21 @@ const GlobeMap = forwardRef(function GlobeMap(
     };
     if (ready.current) apply(); else m.once("planit:ready", apply);
   }, [sites, lightning, pins, selectedId]);
+
+  // Weather layers: show or hide, and keep the radar fresh (the tile cache updates every 5 minutes).
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    let timer = null;
+    const apply = () => {
+      m.setLayoutProperty("radar", "visibility", radar ? "visible" : "none");
+      ["warn-fill", "warn-line", "warn-site"].forEach((id) => m.setLayoutProperty(id, "visibility", warnings ? "visible" : "none"));
+      m.getSource("warnings")?.setData(warnings || empty);
+      if (radar) timer = setInterval(() => m.getSource("radar")?.setTiles([`${RADAR_TILES}?t=${Date.now()}`]), 300000);
+    };
+    if (ready.current) apply(); else m.once("planit:ready", apply);
+    return () => clearInterval(timer);
+  }, [radar, warnings]);
 
   // Draft report pin and the viewer's own location, as DOM markers.
   useMarker(map, pin, "marker marker--pin", "Report location");

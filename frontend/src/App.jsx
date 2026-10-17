@@ -7,7 +7,7 @@ import ComplianceModal from "./components/ComplianceModal.jsx";
 import ModelModal from "./components/ModelModal.jsx";
 import NotifyModal from "./components/NotifyModal.jsx";
 import StopWorkBanner from "./components/StopWorkBanner.jsx";
-import { PIN_COLORS } from "./components/GlobeMap.jsx";
+import MapLayers from "./components/MapLayers.jsx";
 import CrewReportForm from "./components/CrewReportForm.jsx";
 import GlobeMap from "./components/GlobeMap.jsx";
 import RankingPanel from "./components/RankingPanel.jsx";
@@ -57,6 +57,10 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [notifyOpen, setNotifyOpen] = useState(false);
   const [showPins, setShowPins] = useState(false);
+  const [radar, setRadar] = useState(false);
+  const [warnOn, setWarnOn] = useState(false);
+  const [warnings, setWarnings] = useState(null);
+  const [layersOpen, setLayersOpen] = useState(false);
   const [pins, setPins] = useState([]);
   const [queuedCount, setQueuedCount] = useState(0);
   const [demo, setDemo] = useState(null);  // { step, total, text, site_id, done }
@@ -107,6 +111,9 @@ export default function App() {
   usePoll(loadAlerts, anyStop ? POLL.alertsDuringStop : POLL.alerts, [notifyOn, refreshKey, anyStop]);
   useEffect(() => { if (showPins) api.hazardPins().then(setPins).catch((e) => toast(e.message, "error")); },
             [showPins, refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  usePoll(() => warnOn && api.nwsAlertMap().then(setWarnings).catch((e) => toast(e.message, "error")),
+          120000, [warnOn, refreshKey]);
+  const setLayer = (key, on) => ({ radar: setRadar, warnings: setWarnOn, pins: setShowPins })[key](on);
 
   // Reports saved on the phone without signal go out as soon as it's back online (and every minute while waiting).
   const sendQueued = useCallback(async () => {
@@ -200,7 +207,7 @@ export default function App() {
     <div className="app">
       <GlobeMap ref={globe} sites={visibleSites} lightning={lightning} selectedId={selectedId} onSelect={select}
                 pinMode={pinMode} pin={pin} onPin={(p) => { setPin(p); setPinMode(false); setTab("site"); }}
-                pins={showPins ? pins : null} me={me} sensor={sensor} />
+                pins={showPins ? pins : null} warnings={warnOn ? warnings : null} radar={radar} me={me} sensor={sensor} />
       {sensor === "crt" && <div className="scanlines" aria-hidden="true" />}
 
       <header className="hud">
@@ -230,8 +237,9 @@ export default function App() {
               <button key={k} className={sensor === k ? "on" : ""} onClick={() => setSensor(k)}>{label}</button>
             ))}
           </div>
-          <button className={showPins ? "on" : ""} onClick={() => setShowPins((v) => !v)} aria-pressed={showPins}
-                  title="Past hazards: crew reports, and historical OSHA injury reports">📍<span className="hide-sm"> Pins</span></button>
+          <button className={radar || warnOn || showPins ? "on" : ""} onClick={() => setLayersOpen((v) => !v)}
+                  aria-pressed={layersOpen} title="Map layers (radar, NWS warnings, hazard pins) and legend">
+            🗺<span className="hide-sm"> Layers</span></button>
           {health?.dev && (
             <button onClick={demo ? resetDemo : runDemo} title="Play the brief's story">{demo ? "■ Reset" : "▶ Demo"}</button>
           )}
@@ -261,12 +269,9 @@ export default function App() {
         </div>
       )}
       <StopWorkBanner alerts={alerts} selectedId={selectedId} now={now} categories={categories} onSelect={select} />
-      {showPins && (
-        <div className="pin-legend small" aria-label="Pin legend">
-          <span><i className="dot" style={{ background: PIN_COLORS.crew }} /> Crew reports (faded = closed)</span>
-          <span><i className="dot dot--ring" style={{ borderColor: PIN_COLORS.osha }} /> Historical OSHA injury reports (not live)</span>
-          <span className="muted">{pins.length.toLocaleString()} pins · tap one for details</span>
-        </div>
+      {layersOpen && (
+        <MapLayers layers={{ radar, warnings: warnOn, pins: showPins }} setLayer={setLayer} pinCount={pins.length}
+                   warnings={warnings} onClose={() => setLayersOpen(false)} />
       )}
       {demo && (
         <div className="demo-caption" role="status">

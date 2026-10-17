@@ -121,6 +121,23 @@ def sites(state: str | None = None, horizon: Literal["now", "next_day"] = "next_
          LIMIT %(limit)s""", {"state": state, "horizon": horizon, "limit": limit})
 
 
+@app.get("/nws-alerts/map")
+def nws_alert_map():
+    """Active NWS alerts as GeoJSON for the map layer. Storm-based warnings come with their polygon; zone and county
+    alerts (heat, wind, flood watches) have no shape from NWS, so they're a point on each site they cover."""
+    rows = many("""
+        WITH a AS (SELECT DISTINCT ON (alert_id) * FROM nws_alerts ORDER BY alert_id, sent_at DESC)
+        SELECT alert_id, event, severity, headline, expires_at, 'area' AS shape,
+               ST_AsGeoJSON(geog::geometry)::json AS geometry
+          FROM a WHERE expires_at > now() AND geog IS NOT NULL
+        UNION ALL
+        SELECT a.alert_id, a.event, a.severity, a.headline, a.expires_at, 'site', ST_AsGeoJSON(s.geog::geometry)::json
+          FROM a JOIN sites s ON s.forecast_zone = ANY (a.ugc_codes) OR s.county_ugc = ANY (a.ugc_codes)
+         WHERE a.expires_at > now() AND a.geog IS NULL""")
+    return {"type": "FeatureCollection",
+            "features": [{"type": "Feature", "geometry": r.pop("geometry"), "properties": r} for r in rows]}
+
+
 @app.get("/lightning/recent")
 def recent_lightning(minutes: int = Query(30, le=240)):
     """Lightning strikes near the sites in the last `minutes` (GOES-19 GLM and demo strikes), newest first."""
