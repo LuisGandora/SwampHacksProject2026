@@ -707,6 +707,97 @@ ALTER TABLE economic_weekly ADD COLUMN IF NOT EXISTS outage_customer_hours numer
 ALTER TABLE economic_weekly ADD COLUMN IF NOT EXISTS avg_price_usd_per_mwh numeric;  -- EIA-861M revenue / MWh that month
 ALTER TABLE economic_weekly ADD COLUMN IF NOT EXISTS est_revenue_usd       numeric;  -- demand x average price (estimate)
 
+-- Contract disruption (ml/contract_disruption.py). Public stand-ins until a utility's own contract records exist:
+-- federal field-construction contracts (USAspending), company revenue (SEC), storm damage (OpenFEMA).
+CREATE TABLE IF NOT EXISTS field_contracts (
+    award_key           text PRIMARY KEY,                -- USAspending contract_award_unique_key
+    piid                text,
+    recipient           text,
+    recipient_parent    text,
+    recipient_uei       text,
+    agency              text,
+    sub_agency          text,
+    naics               text,
+    naics_description   text,
+    description         text,
+    county_fips         text NOT NULL,                   -- where the work was performed
+    county_name         text,
+    state               text,
+    city                text,
+    start_date          date,
+    original_end_date   date,                            -- as first awarded
+    final_end_date      date,                            -- after every change
+    last_action_date    date,
+    obligated_usd       numeric,
+    potential_value_usd numeric,
+    mods                int,
+    change_orders       int,
+    terminated          text,                            -- default / cause / convenience / cancelled / ''
+    slip_days           int,                             -- end date moved later by changes other than option years
+    weather_cited       boolean,                         -- a change says weather held the work up
+    weather_cited_text  text
+);
+CREATE INDEX IF NOT EXISTS field_contracts_county_idx ON field_contracts (county_fips);
+CREATE TABLE IF NOT EXISTS contract_weather_attribution (
+    award_key           text PRIMARY KEY REFERENCES field_contracts ON DELETE CASCADE,
+    model_version       text NOT NULL,
+    disrupted           boolean NOT NULL,                -- terminated, or slipped 30+ days
+    exposure            jsonb NOT NULL,                  -- weather days by type in the county during the planned window
+    p_disruption        numeric,                         -- model, with the weather that happened
+    p_without_weather   numeric,                         -- model, same contract with no disruptive weather
+    prob_weather_caused numeric,                         -- 1 - p_without / p_with (0 when weather didn't raise it)
+    attributed          boolean NOT NULL,                -- disrupted and prob_weather_caused >= 0.5
+    top_weather         text,
+    site_ids            bigint[],                        -- power plant sites in the same county
+    evidence            text,                            -- documented_and_corroborated / documented / storm_overlap_only / none
+    storm_match         text                             -- NOAA storm days that corroborate the documented delay
+);
+CREATE TABLE IF NOT EXISTS company_quarterly_revenue (    -- SEC EDGAR XBRL
+    cik                 bigint NOT NULL,
+    company             text NOT NULL,
+    kind                text NOT NULL CHECK (kind IN ('contractor', 'utility')),
+    quarter_end         date NOT NULL,
+    revenue_usd         numeric NOT NULL,
+    tag                 text,
+    PRIMARY KEY (cik, quarter_end)
+);
+CREATE TABLE IF NOT EXISTS fema_declarations (
+    disaster_number     int NOT NULL,
+    county_fips         text NOT NULL,
+    incident_type       text,
+    title               text,
+    incident_begin      date,
+    incident_end        date,
+    declared            date,
+    PRIMARY KEY (disaster_number, county_fips)
+);
+CREATE TABLE IF NOT EXISTS fema_utility_projects (       -- Public Assistance, damage category F (utilities)
+    disaster_number     int NOT NULL,
+    pw_number           int NOT NULL,
+    county_fips         text,
+    incident_type       text,
+    title               text,
+    declared            date,
+    project_usd         numeric,
+    PRIMARY KEY (disaster_number, pw_number)
+);
+
+CREATE TABLE IF NOT EXISTS weather_bounceback (          -- ml/bounceback.py: does business rise after a storm?
+    scope           text NOT NULL,                       -- county_field_contracts / national_contractor_revenue / ...
+    weather_kind    text NOT NULL,
+    outcome         text NOT NULL,
+    horizon         text NOT NULL,                       -- e.g. months +1..+6
+    effect          numeric,                             -- bounce vs the months before (outcome units)
+    ci_low          numeric,                             -- 95% interval
+    ci_high         numeric,
+    relative        numeric,                             -- effect as a share of normal (0.25 = +25%)
+    events          int,
+    supported       boolean NOT NULL,                    -- interval entirely above zero
+    model_version   text,
+    computed_at     timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (scope, weather_kind, outcome)
+);
+
 CREATE TABLE IF NOT EXISTS economic_correlations (
     scope           text NOT NULL,                       -- weekly_ba / monthly_utility
     entity          text NOT NULL,                       -- grid operator code or utility name

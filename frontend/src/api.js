@@ -53,6 +53,7 @@ export const api = {
   report: (id, refresh = false) =>
     request(`/sites/${id}/report${refresh ? "?refresh=true" : ""}`, { method: "POST", timeout: 120000 }),
   economics: (id) => request(`/sites/${id}/economics?weeks=8`),
+  siteContracts: (id) => request(`/sites/${id}/contracts?limit=50`),
   compliance: (id, refresh = false) =>
     request(`/sites/${id}/compliance${refresh ? "?refresh=true" : ""}`, { method: "POST", timeout: 120000 }),
   setCrewReportStatus: (reportId, status) => request(`/crew-reports/${reportId}`, { method: "PATCH", json: { status } }),

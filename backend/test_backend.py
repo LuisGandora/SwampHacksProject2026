@@ -115,3 +115,19 @@ assert [wants(ch, i) for i in [("a", 7, "alert", "stop_work", ""), ("a", 7, "ale
                                ("a", 8, "alert", "stop_work", ""), ("r", 7, "report", None, ""),
                                ("b", 7, "briefing", None, "")]] == [True, False, False, True, False]
 print("notify channels ok")
+
+# contract evidence: storm words must match whole words ("notice" isn't ice, "drainage" isn't rain, "window" isn't wind)
+import re as _re
+from ml.contract_disruption import CITED_KINDS
+_kinds = lambda t: set().union(*[k for pat, k in CITED_KINDS if _re.search(pat, t)])
+assert _kinds("hurricane ian impacts") == {"tropical"} and "flood" in _kinds("rea 0002 - flooding delays 2021")
+assert _kinds("notice to proceed: drainage, window and training") == set()
+print("contract evidence ok")
+
+# bounceback: a county-specific September spike (fiscal year end) must not survive the seasonal adjustment
+from ml.bounceback import seasonal_residual
+_months = _pd.period_range("2020-01", "2022-12", freq="M")
+_idx = _pd.MultiIndex.from_product([["A", "B"], _months], names=["county_fips", "month"])
+_y = _pd.Series([(5.0 if c == "A" else 1.0) * (m.month == 9) for c, m in _idx], index=_idx)  # A spikes 5x harder
+assert seasonal_residual(_y).abs().max() < 1e-9
+print("bounceback seasonal adjustment ok")
