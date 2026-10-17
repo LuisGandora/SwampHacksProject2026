@@ -1,0 +1,695 @@
+plant_id,plant_name,state,hazard_index
+56407,West County Energy Center,FL,8.9
+628,Crystal River,FL,1.5
+621,Turkey Point,FL,9.6
+6042,Manatee,FL,8.7
+612,Fort Myers,FL,9.7
+6043,Martin,FL,7.6
+620,Sanford,FL,9.7
+7873,H L Culbreath Bayside Power Station,FL,9.1
+7302,Hines Energy Complex,FL,6.5
+6045,St Lucie,FL,7.8
+641,Gulf Clean Energy Center,FL,8.7
+136,Seminole (FL),FL,4.3
+645,Big Bend,FL,9.4
+60345,Okeechobee Clean Energy Center,FL,4.2
+634,P L Bartow,FL,9.4
+7242,Polk,FL,6.7
+65978,Dania Beach 7,FL,9.9
+667,Northside Generating Station,FL,8.5
+617,Port Everglades,FL,9.9
+609,Cape Canaveral,FL,6.7
+619,Riviera,FL,9.3
+564,Stanton Energy Center,FL,8.7
+613,Lauderdale,FL,9.9
+8049,Intercession City,FL,8.5
+8048,Anclote,FL,9.4
+55286,Oleander Power Project LP,FL,6.6
+7380,Midulla Generating Station,FL,6.1
+7846,Brandy Branch,FL,7.0
+6046,DeBary,FL,10.0
+55415,Vandolah Power Station,FL,5.8
+7238,Cane Island,FL,8.1
+55821,Curtis H Stanton Energy Center,FL,8.0
+688,Arvah B Hopkins,FL,4.9
+676,C D McIntosh Jr,FL,5.4
+643,Lansing Smith,FL,9.8
+55412,Osprey Energy Center Power Plant,FL,4.8
+55318,Indian River,FL,4.5
+55192,Osceola Generating Station (FL),FL,7.6
+55414,Shady Hills Generating Station,FL,2.9
+60014,Manatee Solar Energy Center,FL,7.4
+663,Deerhaven Generating Station,FL,1.6
+50949,Hardee Power Station,FL,5.3
+56400,Treasure Coast Energy Center,FL,6.4
+56799,Greenland Energy Center,FL,7.1
+666,J D Kennedy,FL,8.1
+683,Indian River Plant,FL,4.8
+7699,Tiger Bay,FL,5.2
+55242,Santa Rosa Energy Center,FL,7.6
+689,S O Purdom,FL,3.9
+638,Suwannee River,FL,7.4
+627,Bayboro,FL,9.3
+54365,Orange Cogeneration Facility,FL,5.3
+65422,FPL Chipola River Solar Energy Center,FL,2.1
+65429,FPL Shirer Branch Solar Energy Center,FL,8.7
+65433,Blackwater River Solar Energy Center,FL,5.0
+65866,Canoe,FL,5.0
+65886,Tenmile Creek,FL,2.1
+65888,Kayak,FL,8.1
+65927,Fourmile Creek,FL,2.1
+664,John R Kelly,FL,0.5
+10434,Mosaic New Wales Operations,FL,3.4
+675,Larsen Memorial,FL,4.2
+54627,Okeelanta Cogeneration,FL,2.4
+54426,Mulberry Cogeneration Facility,FL,4.2
+6584,Stock Island,FL,5.0
+54466,Orlando Cogen LP,FL,7.6
+57241,Deerhaven Renewable,FL,1.2
+61667,Wimauma Solar and Battery Storage,FL,9.0
+66128,Lake Mabel Solar and Battery Storage,FL,4.1
+61763,Sunshine Gateway Solar Energy Center,FL,7.0
+62490,Echo River Solar,FL,7.0
+10416,Pensacola Florida Plant,FL,7.5
+673,Tom G Smith,FL,8.8
+10202,Fernandina Beach Mill,FL,7.5
+57898,Palm Beach Renewable Energy Facility 2,FL,9.6
+59993,Babcock Solar Energy Center Hybrid,FL,9.7
+50250,International Paper Pensacola,FL,8.1
+50633,Mosaic Co Bartow Facility,FL,4.7
+10611,Georgia-Pacific Palatka Operations,FL,0.8
+60061,Citrus Solar Energy Center Hybrid,FL,3.0
+50884,Pinellas County Resource Recovery,FL,9.3
+66920,South Tampa Resilience Project,FL,8.3
+68595,Whistling Duck I,FL,0.9
+61807,Hamilton Solar Power Plant,FL,1.6
+61982,Columbia Solar Power Plant,FL,1.1
+62543,Trenton Solar Power Plant,FL,1.1
+63517,Santa Fe Solar Power Plant,FL,1.1
+63518,Twin Rivers Solar Power Plant,FL,1.6
+63982,Charlie Creek Solar Power Plant,FL,4.6
+64145,Bay Trail Solar Power Plant,FL,0.8
+64146,Sandy Creek Solar Power Plant,FL,9.8
+64533,Fort Green Solar Power Plant,FL,4.6
+65170,Hildreth Solar Power Plant,FL,1.1
+65171,Bay Ranch Solar Power Plant,FL,9.8
+65172,High Springs Solar Power Plant,FL,1.1
+65173,Hardeetown Solar Power Plant,FL,1.1
+65292,Rice Creek,FL,4.5
+65501,Mule Creek Renewable Energy Center,FL,9.8
+66553,Winquepin Renewable Energy Center,FL,1.6
+66639,Falmouth Renewable Energy Center,FL,1.6
+67049,County Line Renewable Energy Center,FL,1.1
+67692,Sundance Renewable Energy Center,FL,1.6
+68472,Long Branch Solar,FL,7.4
+69354,Rattler Solar Plant,FL,0.8
+69355,Half Moon Solar Plant,FL,3.4
+69627,Jumper Creek Solar Plant,FL,3.4
+61020,Indian River Solar Center,FL,3.7
+61021,Horizon Solar Energy Center,FL,1.7
+61022,Coral Farms Solar Energy Center,FL,1.7
+61024,Hammock Solar,FL,2.3
+61029,Blue Cypress Solar Energy Center,FL,3.7
+61050,Wildflower Solar Energy Center,FL,5.7
+61051,Barefoot Bay Solar Energy Center,FL,3.7
+61052,Loggerhead Solar Energy Center,FL,6.0
+61663,Lithia Solar,FL,8.4
+61766,Miami Dade Solar Energy Center,FL,8.5
+61767,Pioneer Trail Solar Energy Center,FL,9.4
+61768,Interstate Solar Energy Center,FL,6.0
+62206,Hibiscus Solar Energy Center,FL,9.5
+62394,Sweetbay Solar Center,FL,6.0
+62491,Okeechobee Solar,FL,3.7
+62493,Southfork Solar,FL,7.7
+62542,Debary Solar Power Plant,FL,9.6
+62631,Blue Heron Solar,FL,2.3
+62632,Cattle Ranch,FL,5.7
+62633,Twin Lakes,FL,1.7
+62634,Babcock Preserve,FL,5.7
+62645,Northern Preserve Solar,FL,5.5
+62750,Little Manatee River Solar,FL,8.8
+62914,Nassau Solar Center,FL,5.5
+62915,Magnolia Springs Solar Center,FL,4.9
+62916,Trailside Solar Center,FL,4.9
+62917,Rodeo Solar Center,FL,5.7
+62919,Orange Blossom Solar Center,FL,3.7
+62921,Palm Bay Solar,FL,3.3
+62922,Lakeside Solar Center,FL,6.0
+62923,Union Springs Solar Center,FL,1.7
+62924,Pelican Solar Center,FL,6.0
+62925,Egret Solar Center,FL,5.5
+63109,Discovery Solar Center,FL,3.3
+63110,Sabal Palm Solar Center,FL,9.5
+63582,Harmony Solar (FL),FL,7.8
+63583,Taylor Creek Solar,FL,7.8
+63754,Gulf Power Blue Indigo Energy,FL,6.9
+63978,Duette Solar Power Plant,FL,7.7
+64300,Fort Drum Energy Center,FL,3.7
+64301,Willow Solar Energy Center,FL,7.7
+64631,Jamison Solar (FL),FL,5.2
+64657,Magnolia Solar,FL,5.2
+64757,Blue Springs,FL,3.5
+65036,Cotton Creek Solar Energy Center,FL,5.1
+65037,Sawgrass Solar Energy Center,FL,2.3
+65038,Ghost Orchid Solar Energy Center,FL,2.3
+65039,Sundew,FL,6.0
+65040,Immokalee,FL,2.3
+65041,Elder Branch,FL,7.7
+65042,Grove,FL,3.7
+65420,Bluefield Preserve Solar,FL,6.0
+65421,Chautauqua Solar Energy Center,FL,0.3
+65423,Everglades Solar Energy Center,FL,8.5
+65424,First City Solar Energy Center,FL,5.1
+65427,FPL Flowers Creek Solar Energy Center,FL,3.5
+65428,Pink Trial Solar Energy Center,FL,6.0
+65430,Wild Azalea Solar Energy Center,FL,3.5
+65431,Anhinga Solar Energy Center,FL,4.9
+65432,Apalachee,FL,3.5
+65438,FPL Cavendish Solar Energy Center,FL,3.7
+65519,Bell Ridge Solar,FL,1.7
+65592,FPL Saw Palmetto Solar Energy Center,FL,9.9
+65593,FPL Cypress Pond Solar,FL,9.9
+65594,FPL Etonia Creek,FL,1.7
+65862,Big Juniper Solar,FL,8.0
+65863,Three Creeks,FL,7.7
+65864,Sambucus,FL,7.7
+65865,Pineapple,FL,6.0
+65867,Sparkleberry,FL,8.5
+65868,Prairie Creek FL,FL,5.7
+65869,White Tail,FL,6.0
+65871,Caloosahatchee,FL,2.3
+65872,Monarch,FL,6.0
+65873,Turnpike,FL,3.7
+65874,Beautyberry,FL,2.3
+65875,Woodyard,FL,2.3
+65877,Ibis,FL,3.3
+65878,Silver Palm,FL,9.5
+65879,Pecan Tree,FL,0.3
+65882,Terrill Creek,FL,4.9
+65883,North Orange,FL,6.0
+65885,Boardwalk,FL,2.3
+65887,Price Creek,FL,1.7
+65905,Mare Branch,FL,5.7
+65906,Long Creek,FL,7.7
+65907,Georges Lake,FL,1.7
+65908,Norton Creek,FL,2.7
+65909,Hendry Isles,FL,2.3
+65910,Wild Quail,FL,0.3
+65911,Mitchell Creek,FL,5.1
+65912,Big Water,FL,6.0
+65913,Speckled Perch,FL,6.0
+65914,Redlands,FL,8.5
+65915,Hog Bay,FL,5.7
+65916,Fox Trail,FL,3.3
+65917,Thomas Creek,FL,5.5
+65918,Green Pasture,FL,5.7
+65919,Fawn,FL,6.0
+65920,Buttonwood,FL,3.7
+65921,Honeybell,FL,3.7
+65922,Holopaw,FL,9.5
+65924,Nature Trail,FL,5.5
+65925,Orchard,FL,3.7
+65926,Hawthorne Creek,FL,5.7
+67182,Tupelo Solar,FL,9.4
+67203,Bullfrog Creek Solar,FL,8.8
+67205,Gadsden County Solar,FL,3.9
+67206,Columbia County Solar,FL,1.7
+67207,Gilchrist County Solar,FL,1.7
+67208,Harmony Florida Solar II,FL,7.8
+67209,Storey Bend Solar,FL,7.8
+67672,Cedar Trail,FL,5.5
+67673,Swallowtail,FL,0.3
+68276,Swamp Cabbage,FL,2.3
+68372,Bronson Solar,FL,1.7
+68551,Cottonmouth Ranch Solar,FL,8.8
+68817,Mallard,FL,3.3
+68818,Sand Pine,FL,3.5
+68819,Sea Grape,FL,6.0
+68820,Big Brook,FL,3.5
+68821,Clover FL,FL,6.0
+68822,Flatford,FL,7.7
+68823,Goldenrod,FL,2.3
+61654,Balm Solar,FL,8.4
+10204,Mosaic Co Tampa Facility,FL,8.4
+61665,Payne Creek Solar,FL,6.4
+65683,Juniper Solar (FL),FL,6.4
+50887,Wheelabrator South Broward,FL,9.9
+50071,Palm Beach Renewable Energy Facility 1,FL,9.6
+62541,Lake Placid Solar Power Plant,FL,2.0
+65684,Laurel Oaks Solar,FL,6.6
+61656,Grange Hall Solar,FL,8.9
+61653,Alafia Solar,FL,6.9
+63495,Durrance,FL,6.9
+52010,Lee County Solid Waste Energy,FL,9.6
+61666,Peace Creek Solar,FL,6.7
+65687,Riverside Solar,FL,9.5
+61664,Mountain View Solar (FL),FL,6.3
+7345,University of Florida,FL,2.9
+61988,Citrus Ridge Solar,FL,8.3
+7997,Winston,FL,7.3
+59691,Gulf Coast Solar Center III,FL,8.7
+61657,Lake Hancock Solar,FL,6.2
+50482,Clewiston Sugar House,FL,8.0
+7954,Field Street,FL,9.9
+50858,Hillsborough County Resource Recovery,FL,9.1
+50971,Tropicana Products Bradenton,FL,8.2
+64641,Big Bend II Solar,FL,9.3
+690,J Woodruff,FL,5.5
+10562,Fernandina Plant,FL,8.1
+63187,"FL Solar 4, LLC",FL,4.2
+59690,Gulf Coast Solar Center II,FL,7.9
+66129,Dover Solar and Battery Storage,FL,8.6
+10004,Mosaic South Pierce Operations,FL,6.2
+61655,Bonnie Mine Solar,FL,6.4
+665,G W Ivey,FL,8.6
+69187,Big Bend 1 Solar and Battery Storage,FL,9.4
+50666,Pasco Cnty Solid Waste Resource Recovery,FL,9.0
+50803,Seminole Mill,FL,8.6
+59689,Gulf Coast Solar Center I,FL,8.4
+56929,DeSoto Next Generation Solar Energy,FL,3.0
+66921,English Creek Solar,FL,6.4
+50875,McKay Bay Facility,FL,9.2
+60025,Eight Flags Energy,FL,8.0
+60582,CoTAL Solar Farm,FL,4.3
+69165,Bayside Battery Storage,FL,8.9
+50474,Swift Creek Chemical Complex,FL,4.0
+61080,Sub 12,FL,4.8
+50629,Covanta Lake County Energy,FL,5.8
+7715,Pea Ridge,FL,8.2
+50310,Standby Generation Plant,FL,8.4
+57202,Jacksonville Solar,FL,6.5
+66392,Jax LNG,FL,8.4
+56518,South Energy Center,FL,2.7
+50572,CSL Gas Recovery,FL,9.8
+63995,Trenton,FL,2.5
+10275,Florida's Natural Growers,FL,5.6
+56930,Space Coast Next Gen Solar Energy,FL,5.0
+63186,Imeson Solar,FL,8.3
+64546,Wynwood Energy Storage,FL,10.0
+57123,Trail Ridge Landfill Gas Recovery,FL,6.7
+60701,JED Solid Waste Mgmt Renewable Energy,FL,4.6
+10008,Baptist Medical Center,FL,8.2
+60788,Suwannee Solar Facility,FL,5.8
+10431,Anheuser-Busch Jacksonville,FL,8.4
+63999,Micanopy Energy Storage Facility,FL,2.5
+10188,Cutrale Citrus Juices USA II,FL,5.3
+54624,South District Wastewater Treatment Plt,FL,8.8
+61879,Bartow Solar Energy LLC,FL,5.6
+61388,AEP Jacksonville Solar Project,FL,8.3
+59686,Sarasota County LFGTE Facility,FL,8.3
+61777,Brevard,FL,5.8
+59611,"LKL BLBD, LLC",FL,6.5
+63996,Cape San Blas,FL,4.5
+63998,Jennings Energy Storage Facility,FL,6.8
+57565,"RP-Orlando, LLC",FL,8.5
+60071,Perry Solar Facility,FL,5.0
+62940,Starratt Solar,FL,8.3
+69250,Suwannee,FL,4.7
+59973,Walt Disney World Solar Facility,FL,8.6
+61694,Lockheed Martin Solar,FL,9.1
+54623,Central District Wastewater Treat Plant,FL,9.3
+56522,Springhill Gas Recovery Plant,FL,7.4
+61246,ACE-Stanton PV,FL,8.6
+61780,Seminole Energy,FL,9.7
+10020,Cutrale Citrus Juices USA I,FL,5.3
+61247,ACE-Stanton A PV,FL,8.6
+57168,Waste Management Naples LFGTE Project,FL,8.7
+62778,Hecate Energy Blair Road LLC,FL,6.8
+70179,"FL Solar D1, LLC",FL,5.1
+59954,Osceola Solar Facility,FL,7.9
+59754,Lakeland Electric Co. (FL) - Airport II,FL,6.7
+64752,John Hopkins Middle School Microgrid,FL,9.5
+57502,Perdido,FL,8.8
+59240,Port Charlotte Energy LLC,FL,10.0
+60124,Goldfinch,FL,6.4
+66202,"Old Plank Road Solar Farm, LLC",FL,6.6
+54347,Howard F Curren Advncd Wastewater Plant,FL,9.0
+59744,Lakeland Electric Co. (FL)-Airport 1,FL,6.2
+67491,Mount Dora Solar Farm F,FL,4.7
+70180,"FL Solar D2, LLC",FL,3.9
+59867,Lockheed Martin Solar System,FL,9.6
+67492,Mount Dora Solar Farm W,FL,4.5
+57438,"Solar Park Gainesville, LLC",FL,2.5
+59769,TIA Solar,FL,9.5
+60005,Daytona International Speedway Solar,FL,9.8
+63254,Altamonte Mall,FL,9.1
+60371,Legoland Solar,FL,4.5
+61821,IKEA Jacksonville Rooftop PV System,FL,8.2
+58618,Butler Plaza,FL,0.1
+60006,FIU Solar,FL,9.7
+63256,Pembroke Lakes Mall,FL,9.8
+58012,IKEA Tampa 042,FL,9.6
+61173,IKEA Miami 327,FL,10.0
+65771,Big Bend Agrivoltaics,FL,9.7
+65772,Big Bend Floating Solar I,FL,9.7
+69000,MLH 2,FL,2.2
+69001,MLH 3,FL,2.2
+57128,G2 Energy Marion LLC,FL,3.2
+649,Vogtle,GA,5.0
+703,Bowen,GA,2.2
+710,Jack McDonough,GA,6.9
+6257,Scherer,GA,7.0
+6051,Edwin I Hatch,GA,4.0
+56150,McIntosh Combined Cycle Facility,GA,5.3
+55965,Wansley Combined Cycle,GA,4.3
+55382,Thomas A Smith Energy Facility,GA,6.3
+55061,Tenaska Georgia Generation Facility,GA,3.2
+7709,Dahlberg,GA,1.0
+6189,Rocky Mountain Hydroelectric Plant,GA,4.1
+6124,McIntosh,GA,4.0
+728,Yates,GA,2.8
+55332,Washington County Power LLC,GA,1.9
+7916,Talbot County Energy,GA,8.7
+55267,Edward L. Addison Generating Plant,GA,3.6
+55672,AL Sandersville LLC,GA,5.2
+6132,Richard B Russell,GA,0.2
+55406,Bobby C Smith Jr Energy Facility,GA,3.3
+7946,Wansley Unit 9,GA,2.5
+7813,Sewell Creek Energy,GA,1.5
+715,McManus,GA,9.3
+7917,Chattahoochee Energy Facility,GA,2.6
+68512,McGrau Ford Battery Storage Facility,GA,1.4
+6130,Carters,GA,4.6
+55141,Hawk Road Facility,GA,3.9
+55128,Walton County Energy Facility,GA,1.8
+754,Hartwell Lake,GA,1.5
+55244,Doyle Energy Facility,GA,1.8
+7764,MPC Generating,GA,1.8
+54538,Hartwell Energy Facility,GA,1.8
+55040,Mid-Georgia Cogeneration Facility,GA,1.1
+6087,Wallace Dam,GA,0.6
+6258,Wilson,GA,3.9
+66626,Wadley Solar,GA,2.0
+61648,Robins Air Force Base Solar,GA,0.5
+63721,Cool Springs Solar (Hybrid),GA,3.2
+67127,"SR Toombs, LLC",GA,0.6
+7829,Smarr Energy Center,GA,0.9
+63522,Hickory Park Solar Hybrid,GA,6.6
+61696,Twiggs Solar,GA,0.5
+67047,Decatur Solar,GA,1.9
+7348,Robins,GA,2.1
+61785,Camilla Solar Energy Project,GA,6.7
+761,Walter F George,GA,2.1
+64841,"SR DeSoto I, LLC",GA,6.9
+62584,Quitman Solar,GA,9.0
+64335,Quitman II Solar,GA,9.0
+66990,Washington County Solar,GA,2.1
+59897,Taylor County Solar,GA,3.2
+10361,Savannah River Mill,GA,2.8
+65892,Timberland Solar,GA,0.0
+759,Buford,GA,1.4
+55304,Baconton Power Plant,GA,7.8
+62375,"Dougherty County Solar, LLC",GA,7.1
+65376,SR Snipesville II,GA,0.4
+66171,SR Snipesville III,GA,0.4
+64838,"SR Clay, LLC",GA,0.4
+59896,Butler Solar Project 103,GA,0.2
+62367,SR Arlington II,GA,4.7
+60064,"White Pine Solar, LLC",GA,0.2
+64191,SR Lumpkin,GA,0.4
+7768,Sowega Power,GA,7.5
+62377,Moody Air Force Base Solar,GA,8.9
+760,Allatoona,GA,1.4
+62165,Snipesville,GA,0.4
+54358,Clearwater Paper Corporation - Augusta,GA,2.1
+54004,"WestRock Southeast, LLC.",GA,0.3
+56015,Walton Bainbridge Power Facility,GA,4.8
+59450,"Decatur Parkway Solar Project, LLC",GA,2.9
+64150,Lancaster Solar GA,GA,0.1
+66025,Blackwater Solar,GA,0.2
+66173,SR Ailey,GA,0.2
+66542,Bulldog Solar LLC,GA,3.0
+67021,CPV Stagecoach Solar,GA,0.5
+68549,"Pineview Solar, LLC",GA,0.5
+50465,Flint River Operations,GA,0.1
+60082,"White Oak Solar, LLC",GA,1.9
+62058,SR Terrell,GA,6.4
+6133,West Point (GA),GA,9.1
+50804,Port Wentworth Mill,GA,4.4
+10605,Brunswick Cellulose,GA,3.1
+723,Tallulah Falls,GA,1.3
+50398,International Paper Savanna Mill,GA,5.4
+10426,Inland Paperboard Packaging Rome,GA,3.4
+64840,"SR Cedar Springs, LLC",GA,6.3
+66026,Hobnail Solar,GA,3.4
+60084,PCA-Valdosta Mill,GA,7.9
+10560,Jesup Plant,GA,1.2
+54464,Graphic Packaging Intl Macon Mill,GA,1.0
+64151,SR Perry,GA,1.4
+65018,Mossy Branch Battery Facility,GA,7.9
+66172,SR DeSoto II,GA,7.3
+720,Oliver Dam,GA,9.2
+57909,Piedmont Green Power,GA,6.6
+66825,SR DeSoto III,GA,7.9
+60550,GRP Franklin Renewable Energy Facility,GA,0.2
+61213,GRP Madison Renewable Energy Facility,GA,2.2
+63350,OE_GA3,GA,7.5
+60340,Albany Green Energy,GA,8.0
+60554,Hazlehurst II,GA,1.4
+60063,"Live Oak Solar, LLC",GA,4.2
+722,Sinclair Dam,GA,1.3
+725,Tugalo,GA,0.9
+62057,Hazlehurst III,GA,0.8
+66024,Bird Dog Solar,GA,2.7
+66418,Sonny Solar LLC,GA,1.4
+66027,Wolfskin Solar,GA,1.9
+59876,Marine Corps Logistics Base Solar,GA,7.4
+59894,Pawpaw Solar Plant,GA,1.2
+54239,Naval Submarine Base Kings Bay,GA,7.4
+58628,Simon Solar Farm LLC,GA,3.1
+59863,Fort Gordon Solar Facility,GA,6.9
+59864,Kings Bay Solar Facility,GA,6.5
+59865,Fort Stewart Solar Facility,GA,4.4
+719,North Highlands,GA,9.1
+64211,Baxley,GA,1.2
+757,Blue Ridge,GA,0.9
+729,Yonah,GA,0.9
+753,Crisp Plant,GA,8.2
+59891,Butler Solar Farm 20,GA,4.3
+59449,Decatur County Solar Project,GA,4.1
+59535,SR Hazlehurst,GA,0.8
+59874,Richland Solar Center,GA,0.6
+62436,SR Arlington I,GA,5.6
+63814,SR Odom,GA,8.2
+60741,Old Midville Solar,GA,2.5
+60702,Rincon Solar I,GA,3.5
+60469,Solar Glynn,GA,0.4
+736,Stevens Creek,GA,7.6
+752,Lake Blackshear Project,GA,8.1
+717,Morgan Falls,GA,7.1
+724,Terrora,GA,1.5
+58892,Camilla Solar Plant,GA,7.3
+758,Nottely,GA,1.5
+712,Lloyd Shoals,GA,5.6
+50146,Imperial Savannah LP,GA,6.2
+61387,Georgia LFG Richland Creek Plant,GA,3.2
+55274,State Farm Support Center East,GA,7.2
+63062,Fort Valley State University Solar,GA,0.7
+67864,McIntosh Solar,GA,4.1
+69688,Allatoona Substation #10,GA,4.6
+69745,MCLB Biosteam to Energy,GA,8.0
+56870,Taylor,GA,5.2
+58482,"Azalea Solar, LLC",GA,2.2
+58484,MAS ASB Cogen Plant,GA,7.0
+61385,Georgia LFG Oak Grove Plant,GA,3.4
+61386,Georgia LFG Pine Ridge Plant,GA,7.3
+59556,Dalton 2,GA,6.5
+57026,Superior Landfill Gas Recovery,GA,5.4
+59221,Pecan Row Landfill To Electric Facility,GA,9.0
+704,Burton Dam,GA,3.0
+54813,Shepherd Center,GA,7.5
+54848,South Georgia Medical Center Inc,GA,8.9
+706,Flint River,GA,8.3
+54457,Hewlett Packard Enterprise,GA,7.3
+718,Nacoochee,GA,2.9
+55319,Athens Regional Medical Center,GA,4.5
+60930,Dublin Solar I,GA,0.9
+59335,MCLB Landfill Gas to Energy,GA,8.2
+54830,Emory Decatur Hospital,GA,7.6
+62392,Guyton Community Solar,GA,5.5
+63535,Solar BESS Hybrid,GA,6.8
+54839,Valdosta Water Treatment Plant,GA,9.2
+55152,Bank of America Plaza,GA,7.1
+61740,Gratis Road Solar Facility,GA,2.6
+64276,Franklin Milliken,GA,2.6
+64277,Greene Durham,GA,2.6
+64280,Meriwether Jackson,GA,4.8
+64281,Murray Treadwell Farms,GA,5.1
+64285,Ware Avra I,GA,1.0
+65481,Wilkinson DeFore (Safari Energy),GA,0.7
+65727,Statesboro Solar LLC,GA,4.4
+65728,BE Solar LLC,GA,2.7
+65994,"Polk County GA S1, LLC",GA,5.1
+65995,"Reidsville Renewables, Inc.",GA,1.0
+66205,"Turnipseed Solar, LLC",GA,6.6
+66344,Bulloch County GA S4 LLC,GA,4.4
+66346,Bulloch County GA S3 LLC,GA,4.4
+66350,Richmond County GA S2 LLC,GA,2.9
+66353,Upson County GA S1 LLC,GA,5.9
+67240,Lowndes Cowart,GA,8.8
+67245,Tift Fletcher,GA,7.0
+68618,Gordon Thompson,GA,2.0
+61459,Georgia Power at Swainsboro,GA,2.9
+65759,Putnam Erikson 2,GA,0.7
+68609,Tift Boyd,GA,7.0
+68622,Bulloch Rushing,GA,4.4
+60184,ADS Renewable Energy-Wolf Creek LLC,GA,1.3
+64275,Bulloch Neville Farms,GA,4.4
+64282,Putnam Erickson,GA,2.6
+64571,Coody Cochran,GA,0.7
+64583,Westberry Jesup,GA,1.0
+65730,Rockmart,GA,1.2
+66980,Bartow Davidson,GA,1.2
+60586,Pleasant Valley Solar,GA,2.8
+64565,Apalachicola,GA,3.2
+54818,191 Peachtree Tower,GA,7.1
+54845,Sun Trust Plaza,GA,7.1
+58893,Camp Solar Plant,GA,5.4
+62409,Waynesboro Community Solar,GA,2.8
+68619,Polk Cedartown 2,GA,4.7
+68626,Gordon Pine Hall,GA,0.9
+68627,Chattooga Gore,GA,4.7
+7191,Tallassee Hydro Project,GA,2.8
+62884,Richmond Hayes Solar,GA,2.7
+62885,Troup RC50,GA,4.1
+62886,Wilkinson DeFore (Westbound),GA,0.5
+62960,Kimberly-Clark Solar,GA,4.1
+64279,Lowndes Tycor Farms,GA,8.6
+67048,Bibb Williams,GA,0.5
+58011,IKEA Savannah 490,GA,4.2
+61000,King Mill,GA,7.2
+64586,Polk Cedartown,GA,4.6
+69436,Prologis Portside 2509 - SLSAV502,GA,4.2
+54322,Sibley Mill,GA,7.3
+64584,Fountain Folkston,GA,4.0
+64585,Harris Shiloh,GA,4.1
+61554,Comer Solar,GA,1.3
+64570,Columbia Substation,GA,6.6
+64582,Shawnee - GA,GA,2.7
+66199,"Cairo Solar Farm, LLC",GA,2.0
+66200,"Cedar Creek Solar, LLC",GA,1.5
+62878,McCleskey Cotton,GA,5.3
+62883,Telfair Thompson,GA,0.7
+64286,Ware Avra II,GA,0.7
+66936,Bryan Floyd,GA,3.9
+67246,Tift Bowen,GA,5.3
+68621,Pierce Eunice,GA,0.7
+58572,Lakeland Solar Energy LLC,GA,9.0
+65729,Brady Solar LLC,GA,5.6
+66991,"CG PS Portfolio 1, LLC",GA,0.8
+64283,Terrell Riles Stovall,GA,5.4
+64569,Arnold Cochran,GA,0.4
+56231,Emory Hillandale Hospital,GA,7.5
+59650,CII Methane Management III LFG Plant,GA,2.4
+60514,Seminole (GA),GA,5.4
+54566,YKK USA Chestney,GA,3.6
+61397,Georgia Power at Jakin GA PV,GA,6.3
+62881,Muscogee Public Works,GA,8.9
+64278,Lowndes IDA,GA,9.2
+64284,Troup RC50 II,GA,8.9
+10121,High Shoals Hydro (GA),GA,1.4
+54906,Georgia Pacific Center,GA,7.2
+61441,Denver Braswell PV,GA,1.3
+62879,Columbia Bryson,GA,6.8
+62882,Oil Dri 2 Solar,GA,1.3
+62887,Freeman Avenue,GA,1.3
+63775,Tech Square Microgrid,GA,7.2
+54290,Inforum,GA,7.2
+54462,Graniteville Enterprise Division,GA,7.4
+54877,Atlanta Gift Mart LP,GA,7.2
+54816,Riverwood 100 Building,GA,7.3
+64226,Curry Solar,GA,0.1
+68610,Whitfield Cooper,GA,5.2
+58064,Laredo Bus Facility Solar Canopies,GA,7.0
+59843,Georgia Power at Wadley GA,GA,2.6
+60448,Valdosta (Terraform),GA,9.2
+60512,Greenville,GA,5.9
+60513,Richland (GA),GA,0.1
+60544,Tri-County Solar Facility,GA,1.9
+60585,Mount Vernon Solar,GA,1.9
+61468,Valdosta Prison,GA,9.2
+62393,Atlanta Falcons Solar,GA,6.8
+64011,Bainbridge Solar,GA,3.8
+58485,Upson Rocky Creek Solar Plant,GA,5.9
+59459,Hickory Ridge Landfill Solar Project,GA,6.8
+46,Browns Ferry,AL,2.9
+3,Barry,AL,0.6
+6002,James H Miller Jr,AL,7.9
+26,E C Gaston,AL,2.6
+7710,H Allen Franklin Combined Cycle,AL,9.2
+6001,Joseph M Farley,AL,6.3
+7897,E B Harris Electric Generating Plant,AL,5.4
+10,Greene County,AL,5.0
+47,Colbert,AL,6.5
+55271,Tenaska Lindsay Hill Generating Station,AL,4.9
+55440,Central Alabama Generating Station,AL,4.9
+55292,Decatur Energy Center,AL,3.0
+55293,Morgan Energy Center,AL,3.0
+55411,Hillabee Energy Center,AL,2.4
+55409,Calhoun Energy Center,AL,3.1
+56,Lowman Energy Center,AL,3.1
+7063,McIntosh (AL),AL,2.2
+6440,Wilson Dam,AL,6.2
+533,McWilliams,AL,0.7
+49,Wheeler Dam,AL,5.6
+7721,Theodore Cogen Facility,AL,6.3
+55241,Hog Bayou Energy Center,AL,6.2
+62462,Muscle Shoals,AL,4.4
+4,Walter Bouldin Dam,AL,3.6
+16,Martin Dam,AL,3.6
+18,Lewis Smith Dam,AL,4.8
+15,Lay Dam,AL,3.1
+702,Bartletts Ferry,AL,9.3
+17,Mitchell Dam,AL,3.1
+6188,Harris Dam,AL,0.4
+14,Logan Martin Dam,AL,4.4
+7697,Washington County Cogeneration Facility,AL,0.6
+54802,Mead Coated Board,AL,0.1
+48,Guntersville,AL,4.6
+54096,International Paper Riverdale Mill,AL,3.2
+54789,Georgia-Pacific Brewton Mill,AL,0.6
+55138,Walton Discover Power Facility,AL,8.1
+38,Millers Ferry,AL,2.0
+13,Jordan Dam,AL,3.8
+63765,Black Bear Solar 1,AL,2.8
+56018,AMEA Peaking,AL,1.2
+7698,General Electric Plastic,AL,3.5
+19,Thurlow Dam,AL,3.8
+52140,International Paper Prattville Mill,AL,4.0
+20,Weiss Dam,AL,4.8
+10699,Georgia-Pacific Consr Prods LP-Naheola,AL,2.0
+6131,Jones Bluff,AL,3.4
+64469,Wing,AL,2.8
+67957,East Atmore Solar,AL,3.3
+68001,"Old Hayneville Solar, LLC",AL,2.7
+68669,Walker Springs II,AL,0.1
+68670,Walker Springs I,AL,0.1
+60583,LaFayette Solar Farm,AL,6.8
+54752,International Paper Pine Hill Mill,AL,0.0
+60058,"River Bend Solar, LLC (AL)",AL,4.7
+11,H Neely Henry Dam,AL,4.0
+54429,Alabama Pine Pulp,AL,0.2
+2,Bankhead Dam,AL,4.5
+21,Yates Dam,AL,3.5
+62449,Kimberly Clark Mobile - CHP Plant,AL,7.1
+10216,Alabama River Pulp,AL,0.3
+54763,WestRock Demopolis Mill,AL,2.6
+12,Holt Dam,AL,3.9
+55044,Packaging Corp. of America Jackson Mill,AL,1.5
+707,Goat Rock,AL,9.5
+67488,TAI Huntsville Solar Hybrid,AL,5.2
+59862,Fort Benning Solar Facility,AL,8.0
+54216,U S Alliance Coosa Pines,AL,2.0
+61924,"Cumblerland Land Holdings, LLC",AL,3.1
+6150,Bellefonte,AL,6.7
+54550,W&T Onshore Treating Facility (OTF),AL,7.2
+61901,Redstone Arsenal Hybrid,AL,6.5
+60679,Fort Rucker Solar Array,AL,5.1
+54985,Crestwood Dothan,AL,6.3
+60680,ANAD Solar Array,AL,4.0
+55,Point A,AL,1.0
+59710,Sand Valley Power Station,AL,6.2
+7924,Albertville,AL,7.8
+56076,ABC Coke,AL,7.9
+53,Gantt,AL,1.8
+58061,Decatur-Morgan Co LFG Recovery Project,AL,2.9

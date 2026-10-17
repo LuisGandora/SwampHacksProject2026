@@ -1,0 +1,695 @@
+plant_id,plant_name,state,county,county_fips,capacity_mw,primary_technology,lat,lon,timezone,storm_casualty_events,storm_deaths,storm_injuries,top_storm_types,osha_weather_reports,cdc_county_weather_deaths,cdc_suppressed_rows,hazard_index
+56407,West County Energy Center,FL,Palm Beach County,12099,4263.0,Natural Gas Fired Combined Cycle,26.6986,-80.3747,America/New_York,49,23,70,Rip Current; Lightning; Tornado,27,27.0,0.0,8.9
+628,Crystal River,FL,Citrus County,12017,3449.0,Natural Gas Fired Combined Cycle,28.9656,-82.6977,America/New_York,5,1,7,Thunderstorm Wind; Lightning; Tropical Storm,3,0.0,1.0,1.5
+621,Turkey Point,FL,Miami-Dade County,12086,2978.4,Nuclear,25.4356,-80.3308,America/New_York,23,24,42,Rip Current; Heat; Tropical Storm,15,23.0,0.0,9.6
+6042,Manatee,FL,Manatee County,12081,2951.2,Natural Gas Steam Turbine,27.6058,-82.3456,America/New_York,21,24,15,Lightning; Tornado; Hurricane (Typhoon),52,12.0,0.0,8.7
+612,Fort Myers,FL,Lee County,12071,2680.9,Natural Gas Fired Combined Cycle,26.6967,-81.7831,America/New_York,11,66,9,Hurricane (Typhoon); Lightning; Tornado,25,55.0,0.0,9.7
+6043,Martin,FL,Martin County,12085,2448.5,Natural Gas Fired Combined Cycle,27.0536,-80.5628,America/New_York,11,13,12,Tornado; Lightning; Rip Current,14,0.0,1.0,7.6
+620,Sanford,FL,Volusia County,12127,2377.8,Natural Gas Fired Combined Cycle,28.8419,-81.3256,America/New_York,50,63,35,Rip Current; Tropical Storm; Lightning,33,21.0,0.0,9.7
+7873,H L Culbreath Bayside Power Station,FL,Hillsborough County,12057,2293.7,Natural Gas Fired Combined Cycle,27.9072,-82.4231,America/New_York,32,20,30,Lightning; Thunderstorm Wind; Hurricane (Typhoon),75,31.0,0.0,9.1
+7302,Hines Energy Complex,FL,Polk County,12105,2266.3,Natural Gas Fired Combined Cycle,27.788215,-81.86998,America/New_York,6,11,6,Tornado; Hurricane (Typhoon); Tropical Storm,22,12.0,0.0,6.5
+6045,St Lucie,FL,St. Lucie County,12111,2160.0,Nuclear,27.348611,-80.24639,America/New_York,17,20,9,Lightning; Tornado; Rip Current,17,10.0,0.0,7.8
+641,Gulf Clean Energy Center,FL,Escambia County,12033,2107.5,Natural Gas Steam Turbine,30.5661,-87.2244,America/Chicago,29,17,28,Rip Current; Lightning; Tornado,10,21.0,0.0,8.7
+136,Seminole (FL),FL,Putnam County,12107,1897.8,Natural Gas Fired Combined Cycle,29.733056,-81.63278,America/New_York,9,4,11,Lightning; Thunderstorm Wind; Tropical Storm,4,0.0,1.0,4.3
+645,Big Bend,FL,Hillsborough County,12057,1797.0,Natural Gas Fired Combined Cycle,27.7944,-82.4036,America/New_York,35,29,33,Lightning; Tornado; Hurricane (Typhoon),76,31.0,0.0,9.4
+60345,Okeechobee Clean Energy Center,FL,Okeechobee County,12093,1723.1,Natural Gas Fired Combined Cycle,27.634167,-80.79111,America/New_York,4,1,5,Thunderstorm Wind; Tornado; Lightning,6,0.0,0.0,4.2
+634,P L Bartow,FL,Pinellas County,12103,1475.6,Natural Gas Fired Combined Cycle,27.859535,-82.60176,America/New_York,42,24,49,Lightning; Marine Thunderstorm Wind; Thunderstorm Wind,69,22.0,0.0,9.4
+7242,Polk,FL,Polk County,12105,1458.2,Natural Gas Fired Combined Cycle,27.7286,-81.9897,America/New_York,8,13,8,Tornado; Hurricane (Typhoon); Lightning,27,12.0,0.0,6.7
+65978,Dania Beach 7,FL,Broward County,12011,1447.7,Natural Gas Fired Combined Cycle,26.0686,-80.1984,America/New_York,41,43,72,Lightning; Heat; Tropical Storm,41,33.0,0.0,9.9
+667,Northside Generating Station,FL,Duval County,12031,1407.1,Conventional Steam Coal,30.4172,-81.5525,America/New_York,32,16,44,Rip Current; Tornado; Lightning,40,22.0,0.0,8.5
+617,Port Everglades,FL,Broward County,12011,1352.0,Natural Gas Fired Combined Cycle,26.0856,-80.1253,America/New_York,39,37,72,Lightning; Heat; Tropical Storm,40,33.0,0.0,9.9
+609,Cape Canaveral,FL,Brevard County,12009,1295.0,Natural Gas Fired Combined Cycle,28.4698,-80.7644,America/New_York,19,15,13,Lightning; Rip Current; Thunderstorm Wind,6,18.0,0.0,6.7
+619,Riviera,FL,Palm Beach County,12099,1295.0,Natural Gas Fired Combined Cycle,26.7653,-80.0525,America/New_York,53,26,74,Rip Current; Lightning; Tornado,23,27.0,0.0,9.3
+564,Stanton Energy Center,FL,Orange County,12095,1262.0,Conventional Steam Coal,28.4822,-81.1678,America/New_York,19,28,10,Tropical Storm; Lightning; Tropical Depression,55,18.0,0.0,8.7
+613,Lauderdale,FL,Broward County,12011,1215.9,Natural Gas Fired Combustion Turbine,26.0686,-80.1984,America/New_York,41,43,72,Lightning; Heat; Tropical Storm,41,33.0,0.0,9.9
+8049,Intercession City,FL,Osceola County,12097,1197.3,Natural Gas Fired Combustion Turbine,28.262778,-81.54861,America/New_York,19,34,9,Tropical Storm; Lightning; Hurricane (Typhoon),57,0.0,1.0,8.5
+8048,Anclote,FL,Pasco County,12101,1112.4,Natural Gas Steam Turbine,28.184444,-82.78861,America/New_York,28,13,30,Lightning; Thunderstorm Wind; Rip Current,39,0.0,1.0,9.4
+55286,Oleander Power Project LP,FL,Brevard County,12009,994.4,Natural Gas Fired Combustion Turbine,28.3661,-80.7947,America/New_York,20,15,14,Lightning; Rip Current; Thunderstorm Wind,7,18.0,0.0,6.6
+7380,Midulla Generating Station,FL,Hardee County,12049,853.3,Natural Gas Fired Combined Cycle,27.641667,-81.9625,America/New_York,8,14,7,Hurricane (Typhoon); Tornado; Lightning,11,0.0,1.0,6.1
+7846,Brandy Branch,FL,Duval County,12031,783.1,Natural Gas Fired Combined Cycle,30.320556,-81.94722,America/New_York,24,9,25,Lightning; Rip Current; Thunderstorm Wind,29,22.0,0.0,7.0
+6046,DeBary,FL,Volusia County,12127,748.0,Petroleum Liquids,28.903863,-81.33233,America/New_York,62,65,42,Rip Current; Dense Fog; Lightning,29,21.0,0.0,10.0
+55415,Vandolah Power Station,FL,Hardee County,12049,728.0,Natural Gas Fired Combustion Turbine,27.523607,-81.92395,America/New_York,9,15,7,Hurricane (Typhoon); Tornado; Lightning,9,0.0,1.0,5.8
+7238,Cane Island,FL,Osceola County,12097,706.0,Natural Gas Fired Combined Cycle,28.2764,-81.533,America/New_York,20,35,9,Tropical Storm; Lightning; Hurricane (Typhoon),58,0.0,1.0,8.1
+55821,Curtis H Stanton Energy Center,FL,Orange County,12095,688.3,Natural Gas Fired Combined Cycle,28.488246,-81.16694,America/New_York,19,28,10,Tropical Storm; Lightning; Tropical Depression,56,18.0,0.0,8.0
+688,Arvah B Hopkins,FL,Leon County,12073,673.1,Natural Gas Fired Combined Cycle,30.4522,-84.4,America/New_York,11,13,3,Hurricane (Typhoon); Thunderstorm Wind; Lightning,5,10.0,0.0,4.9
+676,C D McIntosh Jr,FL,Polk County,12105,666.5,Natural Gas Fired Combined Cycle,28.0801,-81.9229,America/New_York,4,6,1,Hurricane (Typhoon); Tropical Storm; Lightning,35,12.0,0.0,5.4
+643,Lansing Smith,FL,Bay County,12005,661.5,Natural Gas Fired Combined Cycle,30.2686,-85.7003,America/Chicago,42,73,10,Rip Current; Hurricane (Typhoon); Storm Surge/Tide,8,12.0,0.0,9.8
+55412,Osprey Energy Center Power Plant,FL,Polk County,12105,644.2,Natural Gas Fired Combined Cycle,28.0525,-81.8083,America/New_York,4,5,2,Hurricane (Typhoon); Tropical Storm; Lightning,30,12.0,0.0,4.8
+55318,Indian River,FL,Brevard County,12009,609.0,Natural Gas Steam Turbine,28.493176,-80.78025,America/New_York,18,15,11,Lightning; Rip Current; Thunderstorm Wind,7,18.0,0.0,4.5
+55192,Osceola Generating Station (FL),FL,Osceola County,12097,580.0,Natural Gas Fired Combustion Turbine,28.1289,-81.0978,America/New_York,5,6,2,Hurricane (Typhoon); Lightning; Tropical Depression,14,0.0,1.0,7.6
+55414,Shady Hills Generating Station,FL,Pasco County,12101,541.2,Natural Gas Fired Combustion Turbine,28.3665,-82.55861,America/New_York,7,3,4,Lightning; Hurricane (Typhoon); Thunderstorm Wind,21,0.0,1.0,2.9
+60014,Manatee Solar Energy Center,FL,Manatee County,12081,483.5,Batteries,27.607469,-82.35528,America/New_York,24,24,21,Lightning; Tornado; Hurricane (Typhoon),52,12.0,0.0,7.4
+663,Deerhaven Generating Station,FL,Alachua County,12001,471.0,Natural Gas Steam Turbine,29.7592,-82.3878,America/New_York,11,2,14,Thunderstorm Wind; Lightning; Tropical Storm,4,0.0,1.0,1.6
+50949,Hardee Power Station,FL,Hardee County,12049,470.1,Natural Gas Fired Combined Cycle,27.6364,-81.9636,America/New_York,8,14,7,Hurricane (Typhoon); Tornado; Lightning,11,0.0,1.0,5.3
+56400,Treasure Coast Energy Center,FL,St. Lucie County,12111,411.4,Natural Gas Fired Combined Cycle,27.383889,-80.3775,America/New_York,15,20,5,Tornado; Lightning; Rip Current,17,10.0,0.0,6.4
+56799,Greenland Energy Center,FL,Duval County,12031,380.8,Natural Gas Fired Combustion Turbine,30.159131,-81.51842,America/New_York,29,14,26,Lightning; Rip Current; Thunderstorm Wind,42,22.0,0.0,7.1
+666,J D Kennedy,FL,Duval County,12031,370.0,Natural Gas Fired Combustion Turbine,30.364818,-81.62597,America/New_York,32,16,28,Rip Current; Lightning; Thunderstorm Wind,43,22.0,0.0,8.1
+683,Indian River Plant,FL,Brevard County,12009,342.8,Natural Gas Fired Combustion Turbine,28.493232,-80.78012,America/New_York,18,15,11,Lightning; Rip Current; Thunderstorm Wind,6,18.0,0.0,4.8
+7699,Tiger Bay,FL,Polk County,12105,278.1,Natural Gas Fired Combined Cycle,27.746369,-81.84945,America/New_York,6,11,6,Tornado; Hurricane (Typhoon); Tropical Storm,20,12.0,0.0,5.2
+55242,Santa Rosa Energy Center,FL,Santa Rosa County,12113,274.5,Natural Gas Fired Combined Cycle,30.5664,-87.115,America/Chicago,29,17,26,Rip Current; Lightning; Tornado,10,0.0,1.0,7.6
+689,S O Purdom,FL,Wakulla County,12129,270.1,Natural Gas Fired Combined Cycle,30.162304,-84.20067,America/New_York,9,12,1,Hurricane (Typhoon); Thunderstorm Wind; Cold/Wind Chill,1,0.0,1.0,3.9
+638,Suwannee River,FL,Suwannee County,12121,197.7,Natural Gas Fired Combustion Turbine,30.376389,-83.18056,America/New_York,0,0,0,,1,0.0,1.0,7.4
+627,Bayboro,FL,Pinellas County,12103,170.1,Petroleum Liquids,27.758056,-82.63528,America/New_York,42,23,50,Lightning; Thunderstorm Wind; Marine Thunderstorm Wind,68,22.0,0.0,9.3
+54365,Orange Cogeneration Facility,FL,Polk County,12105,157.2,Natural Gas Fired Combined Cycle,27.87082,-81.82506,America/New_York,6,7,7,Tornado; Hurricane (Typhoon); Tropical Storm,25,12.0,0.0,5.3
+65422,FPL Chipola River Solar Energy Center,FL,Calhoun County,12013,149.0,Solar Photovoltaic,30.45463,-85.27853,America/Chicago,7,5,11,Tornado; Thunderstorm Wind; Hurricane (Typhoon),1,0.0,1.0,2.1
+65429,FPL Shirer Branch Solar Energy Center,FL,Calhoun County,12013,149.0,Solar Photovoltaic,30.3962,-85.27966,America/Chicago,8,5,12,Tornado; Thunderstorm Wind; Lightning,2,0.0,1.0,8.7
+65433,Blackwater River Solar Energy Center,FL,Santa Rosa County,12113,149.0,Solar Photovoltaic,30.64691,-86.93821,America/Chicago,44,29,37,Rip Current; Lightning; Tornado,8,0.0,1.0,5.0
+65866,Canoe,FL,Okaloosa County,12091,149.0,Solar Photovoltaic,30.68003,-86.78045,America/Chicago,27,15,44,Lightning; Rip Current; Tornado,6,0.0,1.0,5.0
+65886,Tenmile Creek,FL,Calhoun County,12013,149.0,Solar Photovoltaic,30.503643,-85.16738,America/Chicago,7,9,11,Tornado; Hurricane (Typhoon); Thunderstorm Wind,1,0.0,1.0,2.1
+65888,Kayak,FL,Okaloosa County,12091,149.0,Solar Photovoltaic,30.415143,-86.4233,America/Chicago,28,27,43,Rip Current; Lightning; Tornado,5,0.0,1.0,8.1
+65927,Fourmile Creek,FL,Calhoun County,12013,149.0,Solar Photovoltaic,30.43989,-85.27589,America/Chicago,7,5,11,Tornado; Thunderstorm Wind; Hurricane (Typhoon),1,0.0,1.0,2.1
+664,John R Kelly,FL,Alachua County,12001,141.6,Natural Gas Fired Combined Cycle,29.6461,-82.3208,America/New_York,13,3,15,Thunderstorm Wind; Lightning; Tropical Storm,4,0.0,1.0,0.5
+10434,Mosaic New Wales Operations,FL,Polk County,12105,135.5,All Other,27.833642,-82.05194,America/New_York,7,9,8,Tornado; Hurricane (Typhoon); Tropical Storm,41,12.0,0.0,3.4
+675,Larsen Memorial,FL,Polk County,12105,133.6,Natural Gas Fired Combined Cycle,28.0491,-81.9238,America/New_York,5,6,2,Hurricane (Typhoon); Tropical Storm; Lightning,34,12.0,0.0,4.2
+54627,Okeelanta Cogeneration,FL,Palm Beach County,12099,128.9,Other Waste Biomass,26.5769,-80.7469,America/New_York,0,0,0,,10,27.0,0.0,2.4
+54426,Mulberry Cogeneration Facility,FL,Polk County,12105,127.7,Natural Gas Fired Combined Cycle,27.8489,-81.8775,America/New_York,8,12,7,Tornado; Hurricane (Typhoon); Tropical Storm,28,12.0,0.0,4.2
+6584,Stock Island,FL,Monroe County,12087,126.5,Petroleum Liquids,24.563333,-81.7342,America/New_York,1,4,20,Hurricane (Typhoon),2,0.0,1.0,5.0
+54466,Orlando Cogen LP,FL,Orange County,12095,122.4,Natural Gas Fired Combined Cycle,28.442623,-81.41234,America/New_York,20,29,11,Tropical Storm; Lightning; Tropical Depression,66,18.0,0.0,7.6
+57241,Deerhaven Renewable,FL,Alachua County,12001,116.1,Wood/Wood Waste Biomass,29.7675,-82.39639,America/New_York,12,2,17,Thunderstorm Wind; Lightning; Tropical Storm,4,0.0,1.0,1.2
+61667,Wimauma Solar and Battery Storage,FL,Hillsborough County,12057,114.8,Solar Photovoltaic,27.730414,-82.26351,America/New_York,18,22,17,Lightning; Hurricane (Typhoon); Tornado,63,31.0,0.0,9.0
+66128,Lake Mabel Solar and Battery Storage,FL,Polk County,12105,114.5,Solar Photovoltaic,27.9788,-81.61015,America/New_York,4,5,2,Hurricane (Typhoon); Tropical Storm; Lightning,21,12.0,0.0,4.1
+61763,Sunshine Gateway Solar Energy Center,FL,Columbia County,12023,104.5,Solar Photovoltaic,30.29,-82.75,America/New_York,5,2,10,Lightning; Thunderstorm Wind,2,0.0,1.0,7.0
+62490,Echo River Solar,FL,Suwannee County,12121,104.5,Solar Photovoltaic,30.296207,-82.86433,America/New_York,5,2,10,Lightning; Thunderstorm Wind,2,0.0,1.0,7.0
+10416,Pensacola Florida Plant,FL,Escambia County,12033,102.0,Natural Gas Fired Combustion Turbine,30.5958,-87.2525,America/Chicago,29,17,27,Rip Current; Lightning; Tornado,9,21.0,0.0,7.5
+673,Tom G Smith,FL,Palm Beach County,12099,98.7,Petroleum Liquids,26.612767,-80.0677,America/New_York,54,26,78,Rip Current; Lightning; Tornado,28,27.0,0.0,8.8
+10202,Fernandina Beach Mill,FL,Nassau County,12089,96.9,Wood/Wood Waste Biomass,30.681823,-81.45541,America/New_York,22,13,37,Rip Current; Tornado; Lightning,19,0.0,1.0,7.5
+57898,Palm Beach Renewable Energy Facility 2,FL,Palm Beach County,12099,96.0,Municipal Solid Waste,26.772439,-80.14182,America/New_York,57,29,78,Rip Current; Lightning; Tornado,25,27.0,0.0,9.6
+59993,Babcock Solar Energy Center Hybrid,FL,Charlotte County,12015,84.5,Solar Photovoltaic,26.861592,-81.75101,America/New_York,12,73,8,Hurricane (Typhoon); Tornado; Lightning,19,0.0,1.0,9.7
+50250,International Paper Pensacola,FL,Escambia County,12033,82.8,Wood/Wood Waste Biomass,30.5966,-87.3264,America/Chicago,46,38,31,Rip Current; Tornado; Lightning,10,21.0,0.0,8.1
+50633,Mosaic Co Bartow Facility,FL,Polk County,12105,81.9,All Other,27.908,-81.9185,America/New_York,6,8,6,Tornado; Hurricane (Typhoon); Tropical Storm,33,12.0,0.0,4.7
+10611,Georgia-Pacific Palatka Operations,FL,Putnam County,12107,79.8,Wood/Wood Waste Biomass,29.6807,-81.6809,America/New_York,6,4,6,Lightning; Thunderstorm Wind; Tropical Storm,0,0.0,1.0,0.8
+60061,Citrus Solar Energy Center Hybrid,FL,DeSoto County,12027,78.5,Solar Photovoltaic,27.320919,-81.80686,America/New_York,5,6,4,Hurricane (Typhoon); Lightning; Tornado,2,0.0,1.0,3.0
+50884,Pinellas County Resource Recovery,FL,Pinellas County,12103,76.5,Municipal Solid Waste,27.8733,-82.6741,America/New_York,41,23,49,Lightning; Marine Thunderstorm Wind; Thunderstorm Wind,63,22.0,0.0,9.3
+66920,South Tampa Resilience Project,FL,Hillsborough County,12057,75.2,Natural Gas Internal Combustion Engine,27.863347,-82.51738,America/New_York,41,23,49,Lightning; Marine Thunderstorm Wind; Thunderstorm Wind,72,31.0,0.0,8.3
+68595,Whistling Duck I,FL,Levy County,12075,75.0,Solar Photovoltaic,29.472222,-82.43088,America/New_York,11,6,8,Lightning; Tropical Storm; Thunderstorm Wind,6,0.0,1.0,0.9
+61807,Hamilton Solar Power Plant,FL,Hamilton County,12047,74.9,Solar Photovoltaic,30.444324,-83.18694,America/New_York,1,0,2,Tornado,1,0.0,0.0,1.6
+61982,Columbia Solar Power Plant,FL,Columbia County,12023,74.9,Solar Photovoltaic,29.882644,-82.69615,America/New_York,6,1,8,Lightning; Tropical Storm; Thunderstorm Wind,6,0.0,1.0,1.1
+62543,Trenton Solar Power Plant,FL,Gilchrist County,12041,74.9,Solar Photovoltaic,29.635051,-82.84309,America/New_York,7,8,3,Hurricane (Typhoon); Tropical Storm; Lightning,3,0.0,1.0,1.1
+63517,Santa Fe Solar Power Plant,FL,Columbia County,12023,74.9,Solar Photovoltaic,29.880408,-82.73259,America/New_York,6,1,8,Lightning; Tropical Storm; Thunderstorm Wind,5,0.0,1.0,1.1
+63518,Twin Rivers Solar Power Plant,FL,Hamilton County,12047,74.9,Solar Photovoltaic,30.466428,-82.96872,America/New_York,2,2,4,Lightning; Thunderstorm Wind,1,0.0,0.0,1.6
+63982,Charlie Creek Solar Power Plant,FL,Hardee County,12049,74.9,Solar Photovoltaic,27.639778,-81.65437,America/New_York,5,9,2,Hurricane (Typhoon); Tropical Storm; Thunderstorm Wind,7,0.0,1.0,4.6
+64145,Bay Trail Solar Power Plant,FL,Citrus County,12017,74.9,Solar Photovoltaic,28.99999,-82.67224,America/New_York,6,1,8,Thunderstorm Wind; Lightning; Tropical Storm,3,0.0,1.0,0.8
+64146,Sandy Creek Solar Power Plant,FL,Bay County,12005,74.9,Solar Photovoltaic,30.103137,-85.41039,America/Chicago,49,78,20,Rip Current; Hurricane (Typhoon); Tornado,7,12.0,0.0,9.8
+64533,Fort Green Solar Power Plant,FL,Hardee County,12049,74.9,Solar Photovoltaic,27.641125,-81.94158,America/New_York,9,14,8,Hurricane (Typhoon); Tornado; Lightning,11,0.0,1.0,4.6
+65170,Hildreth Solar Power Plant,FL,Suwannee County,12121,74.9,Solar Photovoltaic,29.964842,-82.8232,America/New_York,6,1,37,Dense Fog; Lightning; Thunderstorm Wind,2,0.0,1.0,1.1
+65171,Bay Ranch Solar Power Plant,FL,Bay County,12005,74.9,Solar Photovoltaic,30.164754,-85.49179,America/Chicago,44,71,20,Rip Current; Hurricane (Typhoon); Tornado,8,12.0,0.0,9.8
+65172,High Springs Solar Power Plant,FL,Alachua County,12001,74.9,Solar Photovoltaic,29.810018,-82.63984,America/New_York,9,2,11,Lightning; Thunderstorm Wind; Tropical Storm,4,0.0,1.0,1.1
+65173,Hardeetown Solar Power Plant,FL,Levy County,12075,74.9,Solar Photovoltaic,29.48562,-82.84346,America/New_York,7,9,2,Hurricane (Typhoon); Tropical Storm; Lightning,1,0.0,1.0,1.1
+65292,Rice Creek,FL,Putnam County,12107,74.9,Solar Photovoltaic,29.74118,-81.69886,America/New_York,6,4,6,Lightning; Thunderstorm Wind; Tropical Storm,2,0.0,1.0,4.5
+65501,Mule Creek Renewable Energy Center,FL,Bay County,12005,74.9,Solar Photovoltaic,30.110543,-85.39761,America/Chicago,49,78,20,Rip Current; Hurricane (Typhoon); Tornado,7,12.0,0.0,9.8
+66553,Winquepin Renewable Energy Center,FL,Madison County,12079,74.9,Solar Photovoltaic,30.282497,-83.29823,America/New_York,2,2,30,Dense Fog; Tropical Storm,0,0.0,0.0,1.6
+66639,Falmouth Renewable Energy Center,FL,Suwannee County,12121,74.9,Solar Photovoltaic,30.3436,-83.1562,America/New_York,2,1,34,Dense Fog; Lightning,1,0.0,1.0,1.6
+67049,County Line Renewable Energy Center,FL,Gilchrist County,12041,74.9,Solar Photovoltaic,29.812218,-82.67597,America/New_York,7,1,8,Lightning; Tropical Storm; Thunderstorm Wind,5,0.0,1.0,1.1
+67692,Sundance Renewable Energy Center,FL,Madison County,12079,74.9,Solar Photovoltaic,30.266826,-83.29554,America/New_York,2,2,30,Dense Fog; Tropical Storm,0,0.0,0.0,1.6
+68472,Long Branch Solar,FL,Manatee County,12081,74.9,Solar Photovoltaic,27.62574,-82.17134,America/New_York,10,16,7,Hurricane (Typhoon); Tornado; Lightning,32,12.0,0.0,7.4
+69354,Rattler Solar Plant,FL,Hernando County,12053,74.9,Solar Photovoltaic,28.634293,-82.2887,America/New_York,7,3,5,Thunderstorm Wind; Lightning; Hurricane (Typhoon),16,0.0,1.0,0.8
+69355,Half Moon Solar Plant,FL,Sumter County,12119,74.9,Solar Photovoltaic,28.955619,-82.15959,America/New_York,13,2,16,Lightning; Thunderstorm Wind; Tornado,19,0.0,1.0,3.4
+69627,Jumper Creek Solar Plant,FL,Sumter County,12119,74.9,Solar Photovoltaic,28.954544,-82.17652,America/New_York,14,2,18,Lightning; Thunderstorm Wind; Tornado,19,0.0,1.0,3.4
+61020,Indian River Solar Center,FL,Indian River County,12061,74.5,Solar Photovoltaic,27.573256,-80.57818,America/New_York,5,9,2,Tornado; Lightning; Rip Current,13,0.0,1.0,3.7
+61021,Horizon Solar Energy Center,FL,Alachua County,12001,74.5,Solar Photovoltaic,29.665556,-82.05833,America/New_York,9,1,13,Thunderstorm Wind; Lightning; Tornado,2,0.0,1.0,1.7
+61022,Coral Farms Solar Energy Center,FL,Putnam County,12107,74.5,Solar Photovoltaic,29.756944,-81.89722,America/New_York,12,6,17,Thunderstorm Wind; Lightning; Tornado,2,0.0,1.0,1.7
+61024,Hammock Solar,FL,Hendry County,12051,74.5,Solar Photovoltaic,26.692646,-81.32495,America/New_York,4,5,3,Hurricane (Typhoon); Tornado; Tropical Storm,6,0.0,1.0,2.3
+61029,Blue Cypress Solar Energy Center,FL,Indian River County,12061,74.5,Solar Photovoltaic,27.609456,-80.53719,America/New_York,5,9,2,Tornado; Lightning; Rip Current,13,0.0,1.0,3.7
+61050,Wildflower Solar Energy Center,FL,DeSoto County,12027,74.5,Solar Photovoltaic,27.316187,-81.7839,America/New_York,4,5,2,Hurricane (Typhoon); Tornado; Thunderstorm Wind,1,0.0,1.0,5.7
+61051,Barefoot Bay Solar Energy Center,FL,Brevard County,12009,74.5,Solar Photovoltaic,27.865833,-80.52111,America/New_York,8,8,8,Lightning; Tornado; Marine Strong Wind,10,18.0,0.0,3.7
+61052,Loggerhead Solar Energy Center,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.237778,-80.54139,America/New_York,14,16,7,Tornado; Lightning; Rip Current,13,10.0,0.0,6.0
+61663,Lithia Solar,FL,Hillsborough County,12057,74.5,Solar Photovoltaic,27.753272,-82.16466,America/New_York,13,18,12,Hurricane (Typhoon); Tornado; Tropical Storm,51,31.0,0.0,8.4
+61766,Miami Dade Solar Energy Center,FL,Miami-Dade County,12086,74.5,Solar Photovoltaic,25.64,-80.49,America/New_York,26,25,39,Rip Current; Heat; Tropical Storm,26,23.0,0.0,8.5
+61767,Pioneer Trail Solar Energy Center,FL,Volusia County,12127,74.5,Solar Photovoltaic,29.08,-81.1,America/New_York,60,61,43,Rip Current; Lightning; Dense Fog,15,21.0,0.0,9.4
+61768,Interstate Solar Energy Center,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.5,-80.44,America/New_York,9,12,3,Tornado; Lightning; Rip Current,14,10.0,0.0,6.0
+62206,Hibiscus Solar Energy Center,FL,Palm Beach County,12099,74.5,Solar Photovoltaic,26.7601,-80.3065,America/New_York,57,30,77,Rip Current; Lightning; Tornado,27,27.0,0.0,9.5
+62394,Sweetbay Solar Center,FL,Martin County,12085,74.5,Solar Photovoltaic,27.060112,-80.47449,America/New_York,18,20,16,Tornado; Lightning; Rip Current,14,0.0,1.0,6.0
+62491,Okeechobee Solar,FL,Okeechobee County,12093,74.5,Solar Photovoltaic,27.630392,-80.79478,America/New_York,3,1,4,Thunderstorm Wind; Tornado; Rip Current,6,0.0,0.0,3.7
+62493,Southfork Solar,FL,Manatee County,12081,74.5,Solar Photovoltaic,27.573193,-82.19142,America/New_York,10,16,7,Hurricane (Typhoon); Tornado; Lightning,26,12.0,0.0,7.7
+62542,Debary Solar Power Plant,FL,Volusia County,12127,74.5,Solar Photovoltaic,28.899548,-81.33086,America/New_York,62,65,42,Rip Current; Dense Fog; Lightning,30,21.0,0.0,9.6
+62631,Blue Heron Solar,FL,Hendry County,12051,74.5,Solar Photovoltaic,26.701639,-81.12916,America/New_York,4,5,3,Hurricane (Typhoon); Tornado; Tropical Storm,5,0.0,1.0,2.3
+62632,Cattle Ranch,FL,DeSoto County,12027,74.5,Solar Photovoltaic,27.321884,-81.80908,America/New_York,5,6,4,Hurricane (Typhoon); Lightning; Tornado,2,0.0,1.0,5.7
+62633,Twin Lakes,FL,Putnam County,12107,74.5,Solar Photovoltaic,29.612188,-81.84453,America/New_York,6,4,7,Lightning; Thunderstorm Wind; Tropical Storm,0,0.0,1.0,1.7
+62634,Babcock Preserve,FL,Charlotte County,12015,74.5,Solar Photovoltaic,26.857879,-81.75965,America/New_York,12,73,8,Hurricane (Typhoon); Tornado; Lightning,19,0.0,1.0,5.7
+62645,Northern Preserve Solar,FL,Baker County,12003,74.5,Solar Photovoltaic,30.2473,-82.22691,America/New_York,13,4,18,Lightning; Thunderstorm Wind; Tornado,1,0.0,1.0,5.5
+62750,Little Manatee River Solar,FL,Hillsborough County,12057,74.5,Solar Photovoltaic,27.691262,-82.41058,America/New_York,32,25,35,Lightning; Tornado; Hurricane (Typhoon),75,31.0,0.0,8.8
+62914,Nassau Solar Center,FL,Nassau County,12089,74.5,Solar Photovoltaic,30.50391,-81.88411,America/New_York,30,16,23,Rip Current; Lightning; Thunderstorm Wind,25,0.0,1.0,5.5
+62915,Magnolia Springs Solar Center,FL,Clay County,12019,74.5,Solar Photovoltaic,29.89857,-81.69333,America/New_York,15,6,20,Lightning; Tornado; Thunderstorm Wind,13,0.0,1.0,4.9
+62916,Trailside Solar Center,FL,St. Johns County,12109,74.5,Solar Photovoltaic,29.774987,-81.42785,America/New_York,12,7,15,Lightning; Dense Fog; Rip Current,6,0.0,1.0,4.9
+62917,Rodeo Solar Center,FL,DeSoto County,12027,74.5,Solar Photovoltaic,27.32063,-81.81024,America/New_York,5,6,4,Hurricane (Typhoon); Lightning; Tornado,2,0.0,1.0,5.7
+62919,Orange Blossom Solar Center,FL,Indian River County,12061,74.5,Solar Photovoltaic,27.59686,-80.57071,America/New_York,5,9,2,Tornado; Lightning; Rip Current,13,0.0,1.0,3.7
+62921,Palm Bay Solar,FL,Brevard County,12009,74.5,Solar Photovoltaic,27.8421,-80.63155,America/New_York,8,8,8,Lightning; Tornado; Marine Strong Wind,11,18.0,0.0,3.3
+62922,Lakeside Solar Center,FL,Okeechobee County,12093,74.5,Solar Photovoltaic,27.21421,-80.74458,America/New_York,6,10,5,Tornado; Lightning; Tropical Storm,3,0.0,0.0,6.0
+62923,Union Springs Solar Center,FL,Union County,12125,74.5,Solar Photovoltaic,29.97397,-82.30099,America/New_York,15,4,23,Lightning; Thunderstorm Wind; Tornado,3,0.0,0.0,1.7
+62924,Pelican Solar Center,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.522,-80.54726,America/New_York,7,11,2,Tornado; Lightning; Rip Current,12,10.0,0.0,6.0
+62925,Egret Solar Center,FL,Baker County,12003,74.5,Solar Photovoltaic,30.28251,-82.18378,America/New_York,12,4,14,Lightning; Thunderstorm Wind; Tornado,5,0.0,1.0,5.5
+63109,Discovery Solar Center,FL,Brevard County,12009,74.5,Solar Photovoltaic,28.528933,-80.6789,America/New_York,17,14,11,Lightning; Rip Current; Thunderstorm Wind,3,18.0,0.0,3.3
+63110,Sabal Palm Solar Center,FL,Palm Beach County,12099,74.5,Solar Photovoltaic,26.782655,-80.35262,America/New_York,56,30,75,Rip Current; Lightning; Tornado,27,27.0,0.0,9.5
+63582,Harmony Solar (FL),FL,Osceola County,12097,74.5,Solar Photovoltaic,28.155322,-81.10833,America/New_York,5,6,2,Hurricane (Typhoon); Lightning; Tropical Depression,17,0.0,1.0,7.8
+63583,Taylor Creek Solar,FL,Orange County,12095,74.5,Solar Photovoltaic,28.503469,-81.04833,America/New_York,20,29,13,Tropical Storm; Lightning; Tropical Depression,35,18.0,0.0,7.8
+63754,Gulf Power Blue Indigo Energy,FL,Jackson County,12063,74.5,Solar Photovoltaic,30.877262,-85.40065,America/Chicago,15,17,39,Tornado; Thunderstorm Wind; Hurricane (Typhoon),1,0.0,1.0,6.9
+63978,Duette Solar Power Plant,FL,Manatee County,12081,74.5,Solar Photovoltaic,27.585836,-82.06196,America/New_York,9,15,7,Hurricane (Typhoon); Tornado; Lightning,14,12.0,0.0,7.7
+64300,Fort Drum Energy Center,FL,Indian River County,12061,74.5,Solar Photovoltaic,27.607892,-80.75812,America/New_York,4,7,4,Tornado; Thunderstorm Wind; Rip Current,7,0.0,1.0,3.7
+64301,Willow Solar Energy Center,FL,Manatee County,12081,74.5,Solar Photovoltaic,27.448142,-82.08069,America/New_York,13,26,7,Hurricane (Typhoon); Tornado; Lightning,16,12.0,0.0,7.7
+64631,Jamison Solar (FL),FL,Polk County,12105,74.5,Solar Photovoltaic,27.806645,-81.95568,America/New_York,7,12,6,Tornado; Hurricane (Typhoon); Tropical Storm,28,12.0,0.0,5.2
+64657,Magnolia Solar,FL,Polk County,12105,74.5,Solar Photovoltaic,27.917716,-82.0487,America/New_York,8,9,9,Tornado; Hurricane (Typhoon); Tropical Storm,47,12.0,0.0,5.2
+64757,Blue Springs,FL,Jackson County,12063,74.5,Solar Photovoltaic,30.782897,-85.07869,America/Chicago,7,10,25,Tornado; Hurricane (Typhoon); Thunderstorm Wind,1,0.0,1.0,3.5
+65036,Cotton Creek Solar Energy Center,FL,Escambia County,12033,74.5,Solar Photovoltaic,30.841873,-87.34398,America/Chicago,24,16,47,Tornado; Rip Current; Thunderstorm Wind,4,21.0,0.0,5.1
+65037,Sawgrass Solar Energy Center,FL,Hendry County,12051,74.5,Solar Photovoltaic,26.381386,-81.05372,America/New_York,4,4,1,Hurricane (Typhoon); Wildfire; Tropical Storm,4,0.0,1.0,2.3
+65038,Ghost Orchid Solar Energy Center,FL,Hendry County,12051,74.5,Solar Photovoltaic,26.417212,-81.03531,America/New_York,2,3,0,Hurricane (Typhoon); Tropical Storm,6,0.0,1.0,2.3
+65039,Sundew,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.264113,-80.54685,America/New_York,14,16,7,Tornado; Lightning; Rip Current,13,10.0,0.0,6.0
+65040,Immokalee,FL,Collier County,12021,74.5,Solar Photovoltaic,26.474576,-81.43347,America/New_York,11,8,6,Lightning; Hurricane (Typhoon); Tornado,15,0.0,1.0,2.3
+65041,Elder Branch,FL,Manatee County,12081,74.5,Solar Photovoltaic,27.5966,-82.25272,America/New_York,13,14,10,Tornado; Lightning; Hurricane (Typhoon),37,12.0,0.0,7.7
+65042,Grove,FL,Indian River County,12061,74.5,Solar Photovoltaic,27.580883,-80.65271,America/New_York,7,9,6,Tornado; Thunderstorm Wind; Lightning,13,0.0,1.0,3.7
+65420,Bluefield Preserve Solar,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.24354,-80.67097,America/New_York,7,12,2,Tornado; Lightning; Tropical Storm,10,10.0,0.0,6.0
+65421,Chautauqua Solar Energy Center,FL,Walton County,12131,74.5,Solar Photovoltaic,30.87576,-86.20813,America/Chicago,3,1,3,Lightning; Flood; Tornado,1,0.0,1.0,0.3
+65423,Everglades Solar Energy Center,FL,Miami-Dade County,12086,74.5,Solar Photovoltaic,25.54255,-80.55434,America/New_York,24,24,38,Rip Current; Heat; Tropical Storm,15,23.0,0.0,8.5
+65424,First City Solar Energy Center,FL,Escambia County,12033,74.5,Solar Photovoltaic,30.91993,-87.34002,America/Chicago,7,2,36,Tornado; Thunderstorm Wind; Lightning,2,21.0,0.0,5.1
+65427,FPL Flowers Creek Solar Energy Center,FL,Calhoun County,12013,74.5,Solar Photovoltaic,30.569958,-85.04024,America/Chicago,6,9,9,Tornado; Hurricane (Typhoon); Thunderstorm Wind,1,0.0,1.0,3.5
+65428,Pink Trial Solar Energy Center,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.29783,-80.54214,America/New_York,14,16,7,Tornado; Lightning; Rip Current,17,10.0,0.0,6.0
+65430,Wild Azalea Solar Energy Center,FL,Gadsden County,12039,74.5,Solar Photovoltaic,30.6758,-84.74033,America/New_York,9,12,3,Hurricane (Typhoon); Thunderstorm Wind; Tornado,8,0.0,1.0,3.5
+65431,Anhinga Solar Energy Center,FL,Clay County,12019,74.5,Solar Photovoltaic,29.88213,-81.67618,America/New_York,14,6,19,Lightning; Thunderstorm Wind; Tornado,12,0.0,1.0,4.9
+65432,Apalachee,FL,Jackson County,12063,74.5,Solar Photovoltaic,30.76055,-85.06952,America/Chicago,6,9,9,Tornado; Hurricane (Typhoon); Thunderstorm Wind,1,0.0,1.0,3.5
+65438,FPL Cavendish Solar Energy Center,FL,Okeechobee County,12093,74.5,Solar Photovoltaic,27.627009,-80.80416,America/New_York,3,1,4,Thunderstorm Wind; Tornado; Rip Current,6,0.0,0.0,3.7
+65519,Bell Ridge Solar,FL,Gilchrist County,12041,74.5,Solar Photovoltaic,29.718728,-82.71078,America/New_York,8,7,5,Hurricane (Typhoon); Lightning; Tropical Storm,4,0.0,1.0,1.7
+65592,FPL Saw Palmetto Solar Energy Center,FL,Bay County,12005,74.5,Solar Photovoltaic,30.419835,-85.44149,America/Chicago,46,75,19,Rip Current; Hurricane (Typhoon); Tornado,7,12.0,0.0,9.9
+65593,FPL Cypress Pond Solar,FL,Bay County,12005,74.5,Solar Photovoltaic,30.4213,-85.44103,America/Chicago,46,75,19,Rip Current; Hurricane (Typhoon); Tornado,7,12.0,0.0,9.9
+65594,FPL Etonia Creek,FL,Putnam County,12107,74.5,Solar Photovoltaic,29.76723,-81.77749,America/New_York,10,5,13,Lightning; Thunderstorm Wind; Tornado,2,0.0,1.0,1.7
+65862,Big Juniper Solar,FL,Santa Rosa County,12113,74.5,Solar Photovoltaic,30.63933,-86.92558,America/Chicago,42,29,34,Rip Current; Lightning; Tornado,8,0.0,1.0,8.0
+65863,Three Creeks,FL,Manatee County,12081,74.5,Solar Photovoltaic,27.57934,-82.26058,America/New_York,13,14,10,Tornado; Lightning; Hurricane (Typhoon),35,12.0,0.0,7.7
+65864,Sambucus,FL,Manatee County,12081,74.5,Solar Photovoltaic,27.44844,-82.06377,America/New_York,13,26,7,Hurricane (Typhoon); Tornado; Lightning,14,12.0,0.0,7.7
+65865,Pineapple,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.2551,-80.57123,America/New_York,12,13,7,Tornado; Lightning; Tropical Storm,13,10.0,0.0,6.0
+65867,Sparkleberry,FL,Escambia County,12033,74.5,Solar Photovoltaic,30.76314,-87.4332,America/Chicago,43,37,29,Rip Current; Tornado; Thunderstorm Wind,4,21.0,0.0,8.5
+65868,Prairie Creek FL,FL,DeSoto County,12027,74.5,Solar Photovoltaic,27.074158,-81.69657,America/New_York,2,1,1,Tornado; Hurricane (Typhoon),6,0.0,1.0,5.7
+65869,White Tail,FL,Martin County,12085,74.5,Solar Photovoltaic,27.07794,-80.37925,America/New_York,18,20,16,Tornado; Lightning; Rip Current,16,0.0,1.0,6.0
+65871,Caloosahatchee,FL,Hendry County,12051,74.5,Solar Photovoltaic,26.75408,-81.18562,America/New_York,4,5,3,Hurricane (Typhoon); Tornado; Tropical Storm,5,0.0,1.0,2.3
+65872,Monarch,FL,Martin County,12085,74.5,Solar Photovoltaic,27.03074,-80.5248,America/New_York,13,14,14,Tornado; Lightning; Rip Current,14,0.0,1.0,6.0
+65873,Turnpike,FL,Indian River County,12061,74.5,Solar Photovoltaic,27.56702,-80.64496,America/New_York,7,9,6,Tornado; Thunderstorm Wind; Lightning,12,0.0,1.0,3.7
+65874,Beautyberry,FL,Hendry County,12051,74.5,Solar Photovoltaic,26.36044,-81.02654,America/New_York,4,4,1,Hurricane (Typhoon); Wildfire; Tropical Storm,4,0.0,1.0,2.3
+65875,Woodyard,FL,Hendry County,12051,74.5,Solar Photovoltaic,26.40932,-81.04845,America/New_York,4,4,1,Hurricane (Typhoon); Wildfire; Tropical Storm,6,0.0,1.0,2.3
+65877,Ibis,FL,Brevard County,12009,74.5,Solar Photovoltaic,27.848073,-80.6955,America/New_York,6,1,7,Lightning; Marine Strong Wind; Rip Current,10,18.0,0.0,3.3
+65878,Silver Palm,FL,Palm Beach County,12099,74.5,Solar Photovoltaic,26.78768,-80.35192,America/New_York,56,30,75,Rip Current; Lightning; Tornado,27,27.0,0.0,9.5
+65879,Pecan Tree,FL,Walton County,12131,74.5,Solar Photovoltaic,30.938167,-86.24011,America/Chicago,3,3,2,Lightning; Flood,1,0.0,1.0,0.3
+65882,Terrill Creek,FL,Clay County,12019,74.5,Solar Photovoltaic,29.88143,-81.76258,America/New_York,16,6,21,Lightning; Thunderstorm Wind; Tornado,8,0.0,1.0,4.9
+65883,North Orange,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.51422,-80.57074,America/New_York,6,10,2,Tornado; Rip Current; Lightning,12,10.0,0.0,6.0
+65885,Boardwalk,FL,Collier County,12021,74.5,Solar Photovoltaic,26.483507,-81.46766,America/New_York,9,7,5,Lightning; Tornado; Hurricane (Typhoon),20,0.0,1.0,2.3
+65887,Price Creek,FL,Columbia County,12023,74.5,Solar Photovoltaic,30.160723,-82.55836,America/New_York,9,4,13,Lightning; Thunderstorm Wind; Dense Fog,2,0.0,1.0,1.7
+65905,Mare Branch,FL,DeSoto County,12027,74.5,Solar Photovoltaic,27.30365,-81.76741,America/New_York,5,5,3,Hurricane (Typhoon); Tornado; Thunderstorm Wind,2,0.0,1.0,5.7
+65906,Long Creek,FL,Manatee County,12081,74.5,Solar Photovoltaic,27.411974,-82.10387,America/New_York,13,26,7,Hurricane (Typhoon); Tornado; Lightning,19,12.0,0.0,7.7
+65907,Georges Lake,FL,Putnam County,12107,74.5,Solar Photovoltaic,29.756975,-81.75913,America/New_York,9,5,12,Lightning; Thunderstorm Wind; Tornado,2,0.0,1.0,1.7
+65908,Norton Creek,FL,Madison County,12079,74.5,Solar Photovoltaic,30.390039,-83.34395,America/New_York,1,2,0,Tropical Storm,0,0.0,0.0,2.7
+65909,Hendry Isles,FL,Hendry County,12051,74.5,Solar Photovoltaic,26.749144,-81.19209,America/New_York,4,5,3,Hurricane (Typhoon); Tornado; Tropical Storm,5,0.0,1.0,2.3
+65910,Wild Quail,FL,Walton County,12131,74.5,Solar Photovoltaic,30.89805,-86.25007,America/Chicago,2,1,2,Lightning; Flood,1,0.0,1.0,0.3
+65911,Mitchell Creek,FL,Santa Rosa County,12113,74.5,Solar Photovoltaic,30.92851,-87.26414,America/Chicago,8,2,37,Tornado; Thunderstorm Wind; Lightning,2,0.0,1.0,5.1
+65912,Big Water,FL,Okeechobee County,12093,74.5,Solar Photovoltaic,27.44193,-80.80183,America/New_York,4,8,4,Tornado; Thunderstorm Wind; Lightning,2,0.0,0.0,6.0
+65913,Speckled Perch,FL,Okeechobee County,12093,74.5,Solar Photovoltaic,27.278413,-80.80238,America/New_York,5,9,5,Tornado; Lightning,3,0.0,0.0,6.0
+65914,Redlands,FL,Miami-Dade County,12086,74.5,Solar Photovoltaic,25.542897,-80.54673,America/New_York,24,24,38,Rip Current; Heat; Tropical Storm,15,23.0,0.0,8.5
+65915,Hog Bay,FL,DeSoto County,12027,74.5,Solar Photovoltaic,27.078175,-81.83212,America/New_York,4,10,1,Hurricane (Typhoon); Tornado; Rip Current,6,0.0,1.0,5.7
+65916,Fox Trail,FL,Brevard County,12009,74.5,Solar Photovoltaic,27.846074,-80.674,America/New_York,7,2,8,Lightning; Marine Strong Wind; Rip Current,10,18.0,0.0,3.3
+65917,Thomas Creek,FL,Nassau County,12089,74.5,Solar Photovoltaic,30.51999,-81.88676,America/New_York,31,16,40,Rip Current; Tornado; Lightning,24,0.0,1.0,5.5
+65918,Green Pasture,FL,Charlotte County,12015,74.5,Solar Photovoltaic,27.023117,-81.77712,America/New_York,4,10,1,Hurricane (Typhoon); Tornado; Rip Current,6,0.0,1.0,5.7
+65919,Fawn,FL,Martin County,12085,74.5,Solar Photovoltaic,27.05476,-80.37958,America/New_York,19,22,16,Tornado; Lightning; Rip Current,16,0.0,1.0,6.0
+65920,Buttonwood,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.550293,-80.67111,America/New_York,6,9,4,Tornado; Thunderstorm Wind; Rip Current,13,10.0,0.0,3.7
+65921,Honeybell,FL,Okeechobee County,12093,74.5,Solar Photovoltaic,27.50809,-80.73638,America/New_York,4,7,4,Tornado; Thunderstorm Wind; Rip Current,8,0.0,0.0,3.7
+65922,Holopaw,FL,Palm Beach County,12099,74.5,Solar Photovoltaic,26.77617,-80.41104,America/New_York,50,24,71,Rip Current; Lightning; Tornado,27,27.0,0.0,9.5
+65924,Nature Trail,FL,Baker County,12003,74.5,Solar Photovoltaic,30.272333,-82.15683,America/New_York,14,5,15,Lightning; Thunderstorm Wind; Tornado,6,0.0,1.0,5.5
+65925,Orchard,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.55776,-80.5701,America/New_York,6,10,2,Tornado; Lightning; Rip Current,12,10.0,0.0,3.7
+65926,Hawthorne Creek,FL,DeSoto County,12027,74.5,Solar Photovoltaic,27.08314,-81.84124,America/New_York,4,10,1,Hurricane (Typhoon); Tornado; Rip Current,6,0.0,1.0,5.7
+67182,Tupelo Solar,FL,Putnam County,12107,74.5,Solar Photovoltaic,29.603731,-81.52725,America/New_York,11,7,14,Lightning; Dense Fog; Rip Current,3,0.0,1.0,9.4
+67203,Bullfrog Creek Solar,FL,Hillsborough County,12057,74.5,Solar Photovoltaic,27.660584,-82.29563,America/New_York,17,21,16,Lightning; Hurricane (Typhoon); Tornado,53,31.0,0.0,8.8
+67205,Gadsden County Solar,FL,Gadsden County,12039,74.5,Solar Photovoltaic,30.656542,-84.72439,America/New_York,9,12,3,Hurricane (Typhoon); Thunderstorm Wind; Tornado,8,0.0,1.0,3.9
+67206,Columbia County Solar,FL,Columbia County,12023,74.5,Solar Photovoltaic,29.882422,-82.73425,America/New_York,6,1,8,Lightning; Tropical Storm; Thunderstorm Wind,5,0.0,1.0,1.7
+67207,Gilchrist County Solar,FL,Gilchrist County,12041,74.5,Solar Photovoltaic,29.618349,-82.67018,America/New_York,10,4,8,Lightning; Tropical Storm; Thunderstorm Wind,4,0.0,1.0,1.7
+67208,Harmony Florida Solar II,FL,Osceola County,12097,74.5,Solar Photovoltaic,28.16701,-81.08417,America/New_York,5,6,2,Hurricane (Typhoon); Lightning; Tropical Depression,16,0.0,1.0,7.8
+67209,Storey Bend Solar,FL,Osceola County,12097,74.5,Solar Photovoltaic,28.282565,-81.08145,America/New_York,17,29,10,Tropical Storm; Lightning; Tropical Depression,29,0.0,1.0,7.8
+67672,Cedar Trail,FL,Baker County,12003,74.5,Solar Photovoltaic,30.339139,-82.19286,America/New_York,9,3,9,Lightning; Tornado; Dense Fog,2,0.0,1.0,5.5
+67673,Swallowtail,FL,Walton County,12131,74.5,Solar Photovoltaic,30.92362,-86.23106,America/Chicago,3,3,2,Lightning; Flood,1,0.0,1.0,0.3
+68276,Swamp Cabbage,FL,Hendry County,12051,74.5,Solar Photovoltaic,26.762014,-81.25302,America/New_York,4,5,3,Hurricane (Typhoon); Tornado; Tropical Storm,4,0.0,1.0,2.3
+68372,Bronson Solar,FL,Levy County,12075,74.5,Solar Photovoltaic,29.464985,-82.6239,America/New_York,9,4,7,Lightning; Thunderstorm Wind; Tropical Storm,4,0.0,1.0,1.7
+68551,Cottonmouth Ranch Solar,FL,Hillsborough County,12057,74.5,Solar Photovoltaic,27.654491,-82.29003,America/New_York,17,21,16,Lightning; Hurricane (Typhoon); Tornado,51,31.0,0.0,8.8
+68817,Mallard,FL,Brevard County,12009,74.5,Solar Photovoltaic,27.832062,-80.68207,America/New_York,6,1,7,Lightning; Marine Strong Wind; Rip Current,10,18.0,0.0,3.3
+68818,Sand Pine,FL,Calhoun County,12013,74.5,Solar Photovoltaic,30.44763,-85.26373,America/Chicago,7,5,11,Tornado; Thunderstorm Wind; Hurricane (Typhoon),1,0.0,1.0,3.5
+68819,Sea Grape,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.452435,-80.56397,America/New_York,7,11,2,Tornado; Rip Current; Marine Thunderstorm Wind,15,10.0,0.0,6.0
+68820,Big Brook,FL,Calhoun County,12013,74.5,Solar Photovoltaic,30.443398,-85.2618,America/Chicago,7,5,11,Tornado; Thunderstorm Wind; Hurricane (Typhoon),1,0.0,1.0,3.5
+68821,Clover FL,FL,St. Lucie County,12111,74.5,Solar Photovoltaic,27.472021,-80.51902,America/New_York,8,12,1,Tornado; Lightning; Rip Current,14,10.0,0.0,6.0
+68822,Flatford,FL,Manatee County,12081,74.5,Solar Photovoltaic,27.389575,-82.09888,America/New_York,13,26,7,Hurricane (Typhoon); Tornado; Lightning,18,12.0,0.0,7.7
+68823,Goldenrod,FL,Collier County,12021,74.5,Solar Photovoltaic,26.480745,-81.49189,America/New_York,10,7,6,Lightning; Tornado; Hurricane (Typhoon),22,0.0,1.0,2.3
+61654,Balm Solar,FL,Hillsborough County,12057,74.4,Solar Photovoltaic,27.76284,-82.23463,America/New_York,18,22,17,Lightning; Hurricane (Typhoon); Tornado,60,31.0,0.0,8.4
+10204,Mosaic Co Tampa Facility,FL,Hillsborough County,12057,72.4,All Other,27.8605,-82.3903,America/New_York,31,22,32,Lightning; Tornado; Thunderstorm Wind,73,31.0,0.0,8.4
+61665,Payne Creek Solar,FL,Polk County,12105,70.3,Solar Photovoltaic,27.664583,-81.96422,America/New_York,11,19,8,Hurricane (Typhoon); Tornado; Lightning,13,12.0,0.0,6.4
+65683,Juniper Solar (FL),FL,Pasco County,12101,70.0,Solar Photovoltaic,28.181569,-82.15533,America/New_York,7,3,6,Thunderstorm Wind; Tropical Storm; Lightning,47,0.0,1.0,6.4
+50887,Wheelabrator South Broward,FL,Broward County,12011,66.0,Municipal Solid Waste,26.0687,-80.1986,America/New_York,41,43,72,Lightning; Heat; Tropical Storm,41,33.0,0.0,9.9
+50071,Palm Beach Renewable Energy Facility 1,FL,Palm Beach County,12099,62.3,Municipal Solid Waste,26.771389,-80.14194,America/New_York,56,29,75,Rip Current; Lightning; Tornado,25,27.0,0.0,9.6
+62541,Lake Placid Solar Power Plant,FL,Highlands County,12055,62.3,Solar Photovoltaic,27.331136,-81.36402,America/New_York,4,6,4,Hurricane (Typhoon); Tornado; Lightning,3,0.0,0.0,2.0
+65684,Laurel Oaks Solar,FL,Hillsborough County,12057,61.2,Solar Photovoltaic,27.926882,-82.06767,America/New_York,11,15,11,Tornado; Hurricane (Typhoon); Tropical Storm,49,31.0,0.0,6.6
+61656,Grange Hall Solar,FL,Hillsborough County,12057,61.1,Solar Photovoltaic,27.681278,-82.16466,America/New_York,10,13,8,Tornado; Lightning; Hurricane (Typhoon),44,31.0,0.0,8.9
+61653,Alafia Solar,FL,Polk County,12105,60.0,Solar Photovoltaic,27.723197,-82.02561,America/New_York,12,20,8,Hurricane (Typhoon); Tornado; Lightning,31,12.0,0.0,6.9
+63495,Durrance,FL,Polk County,12105,60.0,Solar Photovoltaic,27.78,-81.98,America/New_York,7,12,6,Tornado; Hurricane (Typhoon); Tropical Storm,27,12.0,0.0,6.9
+52010,Lee County Solid Waste Energy,FL,Lee County,12071,59.0,Municipal Solid Waste,26.631549,-81.76066,America/New_York,11,66,9,Hurricane (Typhoon); Lightning; Tornado,25,55.0,0.0,9.6
+61666,Peace Creek Solar,FL,Polk County,12105,55.4,Solar Photovoltaic,27.913306,-81.81011,America/New_York,4,5,2,Hurricane (Typhoon); Tropical Storm; Lightning,26,12.0,0.0,6.7
+65687,Riverside Solar,FL,Hillsborough County,12057,55.2,Solar Photovoltaic,27.68368,-82.47243,America/New_York,44,34,39,Lightning; Tornado; Hurricane (Typhoon),77,31.0,0.0,9.5
+61664,Mountain View Solar (FL),FL,Pasco County,12101,54.6,Solar Photovoltaic,28.39799,-82.22043,America/New_York,4,3,1,Hurricane (Typhoon); Thunderstorm Wind; Tropical Storm,11,0.0,1.0,6.3
+7345,University of Florida,FL,Alachua County,12001,54.2,Natural Gas Fired Combustion Turbine,29.640278,-82.34861,America/New_York,12,3,14,Thunderstorm Wind; Lightning; Tropical Storm,4,0.0,1.0,2.9
+61988,Citrus Ridge Solar,FL,Orange County,12095,52.0,Solar Photovoltaic,28.40078,-81.61632,America/New_York,19,28,10,Tropical Storm; Lightning; Tropical Depression,62,18.0,0.0,8.3
+7997,Winston,FL,Polk County,12105,50.0,Petroleum Liquids,28.0274,-82.0164,America/New_York,5,6,3,Hurricane (Typhoon); Tropical Storm; Thunderstorm Wind,47,12.0,0.0,7.3
+59691,Gulf Coast Solar Center III,FL,Escambia County,12033,50.0,Solar Photovoltaic,30.470351,-87.33519,America/Chicago,48,40,36,Rip Current; Lightning; Tornado,8,21.0,0.0,8.7
+61657,Lake Hancock Solar,FL,Polk County,12105,49.5,Solar Photovoltaic,27.719139,-82.03389,America/New_York,12,20,8,Hurricane (Typhoon); Tornado; Lightning,30,12.0,0.0,6.2
+50482,Clewiston Sugar House,FL,Hendry County,12051,49.0,Other Waste Biomass,26.7351,-80.9377,America/New_York,4,5,3,Hurricane (Typhoon); Tornado; Tropical Storm,9,0.0,1.0,8.0
+7954,Field Street,FL,Volusia County,12127,48.0,Petroleum Liquids,29.0213,-80.9949,America/New_York,59,61,42,Rip Current; Lightning; Dense Fog,15,21.0,0.0,9.9
+50858,Hillsborough County Resource Recovery,FL,Hillsborough County,12057,47.0,Municipal Solid Waste,27.954901,-82.34047,America/New_York,24,20,16,Lightning; Hurricane (Typhoon); Tropical Storm,71,31.0,0.0,9.1
+50971,Tropicana Products Bradenton,FL,Manatee County,12081,46.8,Natural Gas Fired Combustion Turbine,27.483358,-82.54834,America/New_York,24,17,29,Lightning; Tornado; Hurricane (Typhoon),36,12.0,0.0,8.2
+64641,Big Bend II Solar,FL,Hillsborough County,12057,45.8,Solar Photovoltaic,27.781988,-82.39045,America/New_York,34,30,28,Lightning; Tornado; Hurricane (Typhoon),79,31.0,0.0,9.3
+690,J Woodruff,FL,Jackson County,12063,43.5,Conventional Hydroelectric,30.708571,-84.86387,America/Chicago,8,10,9,Hurricane (Typhoon); Tornado; Thunderstorm Wind,6,0.0,1.0,5.5
+10562,Fernandina Plant,FL,Nassau County,12089,42.0,Wood/Wood Waste Biomass,30.6612,-81.473,America/New_York,24,13,40,Rip Current; Tornado; Lightning,22,0.0,1.0,8.1
+63187,"FL Solar 4, LLC",FL,Wakulla County,12129,42.0,Solar Photovoltaic,30.2354,-84.2233,America/New_York,9,12,1,Hurricane (Typhoon); Thunderstorm Wind; Cold/Wind Chill,3,0.0,1.0,4.2
+59690,Gulf Coast Solar Center II,FL,Santa Rosa County,12113,40.0,Solar Photovoltaic,30.430766,-86.8952,America/Chicago,29,13,51,Lightning; Rip Current; Tornado,11,0.0,1.0,7.9
+66129,Dover Solar and Battery Storage,FL,Hillsborough County,12057,40.0,Solar Photovoltaic,27.955865,-82.20138,America/New_York,10,11,12,Tornado; Thunderstorm Wind; Tropical Storm,56,31.0,0.0,8.6
+10004,Mosaic South Pierce Operations,FL,Polk County,12105,38.0,All Other,27.76522,-81.93879,America/New_York,7,12,6,Tornado; Hurricane (Typhoon); Tropical Storm,24,12.0,0.0,6.2
+61655,Bonnie Mine Solar,FL,Polk County,12105,37.5,Solar Photovoltaic,27.89008,-81.98717,America/New_York,7,8,7,Tornado; Hurricane (Typhoon); Tropical Storm,38,12.0,0.0,6.4
+665,G W Ivey,FL,Miami-Dade County,12086,35.7,Natural Gas Internal Combustion Engine,25.4756,-80.47,America/New_York,25,25,43,Rip Current; Heat; Tropical Storm,15,23.0,0.0,8.6
+69187,Big Bend 1 Solar and Battery Storage,FL,Hillsborough County,12057,32.4,Solar Photovoltaic,27.78529,-82.38471,America/New_York,33,29,28,Lightning; Tornado; Hurricane (Typhoon),76,31.0,0.0,9.4
+50666,Pasco Cnty Solid Waste Resource Recovery,FL,Pasco County,12101,31.2,Municipal Solid Waste,28.3681,-82.5583,America/New_York,7,3,4,Lightning; Hurricane (Typhoon); Thunderstorm Wind,21,0.0,1.0,9.0
+50803,Seminole Mill,FL,Duval County,12031,30.0,Natural Gas Steam Turbine,30.4178,-81.5978,America/New_York,33,16,45,Rip Current; Tornado; Lightning,42,22.0,0.0,8.6
+59689,Gulf Coast Solar Center I,FL,Okaloosa County,12091,30.0,Solar Photovoltaic,30.515448,-86.51841,America/Chicago,32,27,51,Rip Current; Lightning; Tornado,7,0.0,1.0,8.4
+56929,DeSoto Next Generation Solar Energy,FL,DeSoto County,12027,25.0,Solar Photovoltaic,27.3232,-81.8019,America/New_York,4,5,2,Hurricane (Typhoon); Tornado; Thunderstorm Wind,2,0.0,1.0,3.0
+66921,English Creek Solar,FL,Hillsborough County,12057,23.0,Solar Photovoltaic,27.945756,-82.06723,America/New_York,9,9,11,Tornado; Thunderstorm Wind; Hurricane (Typhoon),49,31.0,0.0,6.4
+50875,McKay Bay Facility,FL,Hillsborough County,12057,22.1,Municipal Solid Waste,27.949528,-82.42118,America/New_York,36,24,29,Lightning; Thunderstorm Wind; Hurricane (Typhoon),75,31.0,0.0,9.2
+60025,Eight Flags Energy,FL,Nassau County,12089,21.6,Natural Gas Fired Combustion Turbine,30.6608,-81.4706,America/New_York,24,13,40,Rip Current; Tornado; Lightning,22,0.0,1.0,8.0
+60582,CoTAL Solar Farm,FL,Leon County,12073,20.0,Solar Photovoltaic,30.37926,-84.35394,America/New_York,13,15,3,Hurricane (Typhoon); Thunderstorm Wind; Cold/Wind Chill,4,10.0,0.0,4.3
+69165,Bayside Battery Storage,FL,Hillsborough County,12057,20.0,Batteries,27.90752,-82.41128,America/New_York,32,20,30,Lightning; Thunderstorm Wind; Hurricane (Typhoon),75,31.0,0.0,8.9
+50474,Swift Creek Chemical Complex,FL,Hamilton County,12047,18.8,All Other,30.4522,-82.8644,America/New_York,4,2,7,Lightning; Thunderstorm Wind,3,0.0,0.0,4.0
+61080,Sub 12,FL,Leon County,12073,18.6,Natural Gas Internal Combustion Engine,30.459813,-84.26003,America/New_York,11,13,3,Hurricane (Typhoon); Thunderstorm Wind; Lightning,6,10.0,0.0,4.8
+50629,Covanta Lake County Energy,FL,Lake County,12069,15.5,Municipal Solid Waste,28.740206,-81.88919,America/New_York,11,8,9,Dense Fog; Lightning; Tropical Storm,19,0.0,1.0,5.8
+7715,Pea Ridge,FL,Santa Rosa County,12113,14.1,Natural Gas Fired Combustion Turbine,30.59208,-87.13539,America/Chicago,31,17,31,Rip Current; Lightning; Tornado,10,0.0,1.0,8.2
+50310,Standby Generation Plant,FL,Escambia County,12033,13.7,Natural Gas Internal Combustion Engine,30.4736,-87.2361,America/Chicago,28,17,24,Rip Current; Lightning; Tornado,9,21.0,0.0,8.4
+57202,Jacksonville Solar,FL,Duval County,12031,12.6,Solar Photovoltaic,30.320748,-81.95638,America/New_York,23,9,24,Lightning; Rip Current; Thunderstorm Wind,29,22.0,0.0,6.5
+66392,Jax LNG,FL,Duval County,12031,12.6,Natural Gas Internal Combustion Engine,30.394298,-81.55721,America/New_York,32,16,44,Rip Current; Tornado; Lightning,42,22.0,0.0,8.4
+56518,South Energy Center,FL,Alachua County,12001,11.5,Natural Gas Internal Combustion Engine,29.6383,-82.34,America/New_York,13,3,15,Thunderstorm Wind; Lightning; Tropical Storm,4,0.0,1.0,2.7
+50572,CSL Gas Recovery,FL,Broward County,12011,11.2,Landfill Gas,26.287966,-80.16653,America/New_York,37,41,73,Heat; Tropical Storm; Lightning,28,33.0,0.0,9.8
+63995,Trenton,FL,Gilchrist County,12041,11.0,Batteries,29.613561,-82.80689,America/New_York,10,9,5,Hurricane (Typhoon); Lightning; Tropical Storm,4,0.0,1.0,2.5
+10275,Florida's Natural Growers,FL,Polk County,12105,10.7,Natural Gas Fired Combustion Turbine,27.9114,-81.6006,America/New_York,4,5,2,Hurricane (Typhoon); Tropical Storm; Lightning,17,12.0,0.0,5.6
+56930,Space Coast Next Gen Solar Energy,FL,Brevard County,12009,10.0,Solar Photovoltaic,28.4586,-80.6811,America/New_York,18,14,13,Lightning; Rip Current; Thunderstorm Wind,5,18.0,0.0,5.0
+63186,Imeson Solar,FL,Duval County,12031,10.0,Solar Photovoltaic,30.456753,-81.71486,America/New_York,33,16,48,Rip Current; Tornado; Lightning,40,22.0,0.0,8.3
+64546,Wynwood Energy Storage,FL,Miami-Dade County,12086,10.0,Batteries,25.798978,-80.1971,America/New_York,46,57,90,Heat; Rip Current; Tropical Storm,37,23.0,0.0,10.0
+57123,Trail Ridge Landfill Gas Recovery,FL,Duval County,12031,9.6,Landfill Gas,30.227953,-82.04088,America/New_York,18,6,19,Lightning; Thunderstorm Wind; Tornado,19,22.0,0.0,6.7
+60701,JED Solid Waste Mgmt Renewable Energy,FL,Osceola County,12097,9.6,Landfill Gas,28.063777,-81.09724,America/New_York,3,6,0,Hurricane (Typhoon); Tropical Depression; Flood,7,0.0,1.0,4.6
+10008,Baptist Medical Center,FL,Duval County,12031,9.0,Natural Gas Fired Combustion Turbine,30.314467,-81.66271,America/New_York,34,17,31,Rip Current; Lightning; Thunderstorm Wind,42,22.0,0.0,8.2
+60788,Suwannee Solar Facility,FL,Suwannee County,12121,8.8,Solar Photovoltaic,30.376254,-83.17411,America/New_York,1,1,4,Lightning,1,0.0,1.0,5.8
+10431,Anheuser-Busch Jacksonville,FL,Duval County,12031,8.7,Natural Gas Fired Combustion Turbine,30.43424,-81.64535,America/New_York,34,16,49,Rip Current; Tornado; Lightning,41,22.0,0.0,8.4
+63999,Micanopy Energy Storage Facility,FL,Alachua County,12001,8.3,Batteries,29.5112,-82.27483,America/New_York,11,5,9,Lightning; Thunderstorm Wind; Tropical Storm,10,0.0,1.0,2.5
+10188,Cutrale Citrus Juices USA II,FL,Polk County,12105,8.2,Natural Gas Fired Combustion Turbine,28.05485,-81.79817,America/New_York,4,5,2,Hurricane (Typhoon); Tropical Storm; Lightning,30,12.0,0.0,5.3
+54624,South District Wastewater Treatment Plt,FL,Miami-Dade County,12086,8.0,Natural Gas Internal Combustion Engine,25.549834,-80.33625,America/New_York,26,25,39,Rip Current; Heat; Tropical Storm,26,23.0,0.0,8.8
+61879,Bartow Solar Energy LLC,FL,Polk County,12105,7.3,Solar Photovoltaic,27.925984,-81.8191,America/New_York,4,5,2,Hurricane (Typhoon); Tropical Storm; Lightning,26,12.0,0.0,5.6
+61388,AEP Jacksonville Solar Project,FL,Duval County,12031,7.1,Solar Photovoltaic,30.523647,-81.68644,America/New_York,33,16,48,Rip Current; Tornado; Lightning,36,22.0,0.0,8.3
+59686,Sarasota County LFGTE Facility,FL,Sarasota County,12115,6.4,Landfill Gas,27.203,-82.387,America/New_York,17,23,8,Hurricane (Typhoon); Lightning; Tornado,35,12.0,0.0,8.3
+61777,Brevard,FL,Brevard County,12009,6.4,Landfill Gas,28.39265,-80.82867,America/New_York,20,15,14,Lightning; Rip Current; Thunderstorm Wind,9,18.0,0.0,5.8
+59611,"LKL BLBD, LLC",FL,Polk County,12105,6.0,Solar Photovoltaic,28.066389,-82.0175,America/New_York,4,6,1,Hurricane (Typhoon); Tropical Storm; Lightning,48,12.0,0.0,6.5
+63996,Cape San Blas,FL,Gulf County,12045,5.5,Batteries,29.732141,-85.39143,America/New_York,6,7,10,Tornado; Rip Current; Hurricane (Typhoon),1,0.0,1.0,4.5
+63998,Jennings Energy Storage Facility,FL,Hamilton County,12047,5.5,Batteries,30.603831,-83.09806,America/New_York,3,3,86,Hurricane (Typhoon); Tornado,2,0.0,0.0,6.8
+57565,"RP-Orlando, LLC",FL,Orange County,12095,5.1,Solar Photovoltaic,28.488889,-81.18222,America/New_York,20,29,11,Tropical Storm; Lightning; Tropical Depression,57,18.0,0.0,8.5
+60071,Perry Solar Facility,FL,Taylor County,12123,5.1,Solar Photovoltaic,30.119304,-83.56005,America/New_York,2,2,30,Dense Fog; Tropical Storm,0,0.0,0.0,5.0
+62940,Starratt Solar,FL,Duval County,12031,5.0,Solar Photovoltaic,30.494361,-81.60056,America/New_York,32,16,47,Rip Current; Tornado; Lightning,37,22.0,0.0,8.3
+69250,Suwannee,FL,Suwannee County,12121,5.0,Batteries,30.37651,-83.18066,America/New_York,0,0,0,,1,0.0,1.0,4.7
+59973,Walt Disney World Solar Facility,FL,Orange County,12095,4.9,Solar Photovoltaic,28.3737,-81.56259,America/New_York,19,28,10,Tropical Storm; Lightning; Tropical Depression,64,18.0,0.0,8.6
+61694,Lockheed Martin Solar,FL,Orange County,12095,4.9,Petroleum Liquids,28.539415,-81.21637,America/New_York,21,30,12,Tropical Storm; Lightning; Thunderstorm Wind,62,18.0,0.0,9.1
+54623,Central District Wastewater Treat Plant,FL,Miami-Dade County,12086,4.8,Other Waste Biomass,25.748565,-80.15279,America/New_York,31,28,46,Rip Current; Heat; Lightning,36,23.0,0.0,9.3
+56522,Springhill Gas Recovery Plant,FL,Jackson County,12063,4.8,Landfill Gas,30.928333,-85.42611,America/Chicago,14,13,39,Tornado; Thunderstorm Wind; Hurricane (Typhoon),4,0.0,1.0,7.4
+61246,ACE-Stanton PV,FL,Orange County,12095,4.8,Solar Photovoltaic,28.47735,-81.18036,America/New_York,20,29,11,Tropical Storm; Lightning; Tropical Depression,55,18.0,0.0,8.6
+61780,Seminole Energy,FL,Seminole County,12117,4.8,Landfill Gas,28.790186,-81.08902,America/New_York,68,81,43,Rip Current; Tropical Storm; Lightning,23,10.0,0.0,9.7
+10020,Cutrale Citrus Juices USA I,FL,Lake County,12069,4.1,Natural Gas Fired Combustion Turbine,28.811828,-81.86527,America/New_York,11,8,9,Dense Fog; Lightning; Tropical Storm,18,0.0,1.0,5.3
+61247,ACE-Stanton A PV,FL,Orange County,12095,4.1,Solar Photovoltaic,28.48455,-81.17411,America/New_York,19,28,10,Tropical Storm; Lightning; Tropical Depression,56,18.0,0.0,8.6
+57168,Waste Management Naples LFGTE Project,FL,Collier County,12021,4.0,Landfill Gas,26.155833,-81.65806,America/New_York,16,15,20,Lightning; Storm Surge/Tide; Rip Current,16,0.0,1.0,8.7
+62778,Hecate Energy Blair Road LLC,FL,Duval County,12031,4.0,Solar Photovoltaic,30.286,-81.834,America/New_York,33,17,30,Rip Current; Lightning; Thunderstorm Wind,36,22.0,0.0,6.8
+70179,"FL Solar D1, LLC",FL,Gadsden County,12039,4.0,Solar Photovoltaic,30.654933,-84.42836,America/New_York,9,10,4,Hurricane (Typhoon); Tornado; Lightning,9,0.0,1.0,5.1
+59954,Osceola Solar Facility,FL,Osceola County,12097,3.8,Solar Photovoltaic,28.058078,-81.24168,America/New_York,3,6,0,Hurricane (Typhoon); Tropical Depression; Flood,15,0.0,1.0,7.9
+59754,Lakeland Electric Co. (FL) - Airport II,FL,Polk County,12105,3.5,Solar Photovoltaic,27.991144,-82.0473,America/New_York,7,8,8,Tornado; Hurricane (Typhoon); Tropical Storm,47,12.0,0.0,6.7
+64752,John Hopkins Middle School Microgrid,FL,Pinellas County,12103,3.3,Batteries,27.767931,-82.65477,America/New_York,43,23,51,Lightning; Marine Thunderstorm Wind; Thunderstorm Wind,64,22.0,0.0,9.5
+57502,Perdido,FL,Escambia County,12033,3.2,Landfill Gas,30.57,-87.39,America/Chicago,47,39,32,Rip Current; Tornado; Lightning,10,21.0,0.0,8.8
+59240,Port Charlotte Energy LLC,FL,Charlotte County,12015,3.0,Landfill Gas,26.790833,-81.96528,America/New_York,13,74,9,Hurricane (Typhoon); Tornado; Lightning,24,0.0,1.0,10.0
+60124,Goldfinch,FL,Polk County,12105,3.0,Solar Photovoltaic,27.982089,-82.04201,America/New_York,7,8,8,Tornado; Hurricane (Typhoon); Tropical Storm,45,12.0,0.0,6.4
+66202,"Old Plank Road Solar Farm, LLC",FL,Duval County,12031,3.0,Solar Photovoltaic,30.3185,-81.88828,America/New_York,36,19,32,Rip Current; Lightning; Thunderstorm Wind,34,22.0,0.0,6.6
+54347,Howard F Curren Advncd Wastewater Plant,FL,Hillsborough County,12057,2.5,Other Waste Biomass,27.9389,-82.4389,America/New_York,39,23,44,Lightning; Thunderstorm Wind; Hurricane (Typhoon),76,31.0,0.0,9.0
+59744,Lakeland Electric Co. (FL)-Airport 1,FL,Polk County,12105,2.3,Solar Photovoltaic,27.988523,-82.0473,America/New_York,7,8,8,Tornado; Hurricane (Typhoon); Tropical Storm,46,12.0,0.0,6.2
+67491,Mount Dora Solar Farm F,FL,Lake County,12069,2.1,Solar Photovoltaic,28.815358,-81.68239,America/New_York,14,11,10,Lightning; Dense Fog; Tropical Storm,33,0.0,1.0,4.7
+70180,"FL Solar D2, LLC",FL,Wakulla County,12129,2.0,Solar Photovoltaic,30.279908,-84.35885,America/New_York,10,12,2,Hurricane (Typhoon); Thunderstorm Wind; Cold/Wind Chill,3,0.0,1.0,3.9
+59867,Lockheed Martin Solar System,FL,Pinellas County,12103,1.9,Solar Photovoltaic,28.0479,-82.6853,America/New_York,41,22,50,Lightning; Marine Thunderstorm Wind; Thunderstorm Wind,62,22.0,0.0,9.6
+67492,Mount Dora Solar Farm W,FL,Lake County,12069,1.9,Solar Photovoltaic,28.793954,-81.62314,America/New_York,21,18,15,Lightning; Thunderstorm Wind; Dense Fog,39,0.0,1.0,4.5
+57438,"Solar Park Gainesville, LLC",FL,Alachua County,12001,1.6,Solar Photovoltaic,29.700407,-82.33783,America/New_York,12,2,15,Thunderstorm Wind; Lightning; Tropical Storm,4,0.0,1.0,2.5
+59769,TIA Solar,FL,Hillsborough County,12057,1.6,Solar Photovoltaic,27.965797,-82.53282,America/New_York,41,23,49,Lightning; Marine Thunderstorm Wind; Thunderstorm Wind,74,31.0,0.0,9.5
+60005,Daytona International Speedway Solar,FL,Volusia County,12127,1.6,Solar Photovoltaic,29.17016,-81.06412,America/New_York,59,60,42,Rip Current; Lightning; Dense Fog,12,21.0,0.0,9.8
+63254,Altamonte Mall,FL,Seminole County,12117,1.5,Solar Photovoltaic,28.66633,-81.3781,America/New_York,24,33,16,Tropical Storm; Lightning; Thunderstorm Wind,61,10.0,0.0,9.1
+60371,Legoland Solar,FL,Polk County,12105,1.4,Solar Photovoltaic,27.986163,-81.69017,America/New_York,4,5,2,Hurricane (Typhoon); Tropical Storm; Lightning,25,12.0,0.0,4.5
+61821,IKEA Jacksonville Rooftop PV System,FL,Duval County,12031,1.4,Solar Photovoltaic,30.23,-81.51,America/New_York,28,13,24,Rip Current; Lightning; Thunderstorm Wind,41,22.0,0.0,8.2
+58618,Butler Plaza,FL,Alachua County,12001,1.2,Solar Photovoltaic,29.623056,-82.38,America/New_York,9,3,9,Lightning; Thunderstorm Wind; Tropical Storm,4,0.0,1.0,0.1
+60006,FIU Solar,FL,Miami-Dade County,12086,1.2,Solar Photovoltaic,25.770008,-80.36774,America/New_York,34,29,48,Rip Current; Lightning; Heat,37,23.0,0.0,9.7
+63256,Pembroke Lakes Mall,FL,Broward County,12011,1.1,Solar Photovoltaic,26.0106,-80.3046,America/New_York,40,43,68,Heat; Tropical Storm; Lightning,45,33.0,0.0,9.8
+58012,IKEA Tampa 042,FL,Hillsborough County,12057,1.0,Solar Photovoltaic,27.953889,-82.4325,America/New_York,41,25,44,Lightning; Thunderstorm Wind; Hurricane (Typhoon),76,31.0,0.0,9.6
+61173,IKEA Miami 327,FL,Miami-Dade County,12086,1.0,Solar Photovoltaic,25.7915,-80.3838,America/New_York,37,51,75,Heat; Tropical Storm; Rip Current,37,23.0,0.0,10.0
+65771,Big Bend Agrivoltaics,FL,Hillsborough County,12057,1.0,Solar Photovoltaic,27.782731,-82.4008,America/New_York,36,30,33,Lightning; Tornado; Hurricane (Typhoon),77,31.0,0.0,9.7
+65772,Big Bend Floating Solar I,FL,Hillsborough County,12057,1.0,Solar Photovoltaic,27.78822,-82.39541,America/New_York,36,30,33,Lightning; Tornado; Hurricane (Typhoon),76,31.0,0.0,9.7
+69000,MLH 2,FL,Alachua County,12001,1.0,Solar Photovoltaic,29.70408,-82.29238,America/New_York,12,2,15,Thunderstorm Wind; Lightning; Tropical Storm,4,0.0,1.0,2.2
+69001,MLH 3,FL,Alachua County,12001,1.0,Solar Photovoltaic,29.70408,-82.29238,America/New_York,12,2,15,Thunderstorm Wind; Lightning; Tropical Storm,4,0.0,1.0,2.2
+57128,G2 Energy Marion LLC,FL,Marion County,12083,0.8,Landfill Gas,29.122882,-82.05545,America/New_York,10,2,12,Lightning; Thunderstorm Wind; Heavy Rain,17,12.0,0.0,3.2
+649,Vogtle,GA,Burke County,13033,4658.0,Nuclear,33.1427,-81.7625,America/New_York,5,8,6,Tropical Storm; High Wind; Lightning,2,0.0,1.0,5.0
+703,Bowen,GA,Bartow County,13015,3498.6,Conventional Steam Coal,34.1256,-84.9222,America/New_York,8,2,9,Thunderstorm Wind; Tornado; Lightning,8,0.0,0.0,2.2
+710,Jack McDonough,GA,Cobb County,13067,2848.4,Natural Gas Fired Combined Cycle,33.8239,-84.4758,America/New_York,29,11,28,Thunderstorm Wind; Strong Wind; Tropical Storm,24,14.0,0.0,6.9
+6257,Scherer,GA,Monroe County,13207,2673.0,Conventional Steam Coal,33.0606,-83.8075,America/New_York,7,10,59,Tornado; Winter Weather,8,0.0,1.0,7.0
+6051,Edwin I Hatch,GA,Appling County,13001,1848.0,Nuclear,31.9342,-82.3447,America/New_York,3,4,1,Tornado; Hurricane (Typhoon); Thunderstorm Wind,3,0.0,1.0,4.0
+56150,McIntosh Combined Cycle Facility,GA,Effingham County,13103,1376.6,Natural Gas Fired Combined Cycle,32.3478,-81.1817,America/New_York,14,2,37,Tornado; Lightning; Thunderstorm Wind,4,0.0,1.0,5.3
+55965,Wansley Combined Cycle,GA,Heard County,13149,1239.0,Natural Gas Fired Combined Cycle,33.406385,-85.03699,America/New_York,6,5,8,Thunderstorm Wind; Heat; Flash Flood,1,0.0,0.0,4.3
+55382,Thomas A Smith Energy Facility,GA,Murray County,13213,1192.0,Natural Gas Fired Combined Cycle,34.7094,-84.9175,America/New_York,9,12,52,Tornado; Thunderstorm Wind; Excessive Heat,2,0.0,1.0,6.3
+55061,Tenaska Georgia Generation Facility,GA,Heard County,13149,1099.2,Natural Gas Fired Combustion Turbine,33.3516,-84.9996,America/New_York,8,5,16,Tornado; Thunderstorm Wind; Heat,3,0.0,0.0,3.2
+7709,Dahlberg,GA,Jackson County,13157,919.0,Natural Gas Fired Combustion Turbine,34.042267,-83.39772,America/New_York,3,1,2,Thunderstorm Wind,10,0.0,1.0,1.0
+6189,Rocky Mountain Hydroelectric Plant,GA,Floyd County,13115,847.8,Hydroelectric Pumped Storage,34.355538,-85.30394,America/New_York,2,0,2,Thunderstorm Wind,6,0.0,1.0,4.1
+6124,McIntosh,GA,Effingham County,13103,810.4,Natural Gas Fired Combustion Turbine,32.356287,-81.16835,America/New_York,14,2,37,Tornado; Lightning; Thunderstorm Wind,4,0.0,1.0,4.0
+728,Yates,GA,Coweta County,13077,807.4,Natural Gas Steam Turbine,33.4622,-84.8986,America/New_York,9,4,12,Thunderstorm Wind; Tornado; Heat,4,0.0,0.0,2.8
+55332,Washington County Power LLC,GA,Washington County,13303,795.6,Natural Gas Fired Combustion Turbine,33.092239,-82.97999,America/New_York,3,3,1,Hurricane (Typhoon); Thunderstorm Wind; Tornado,0,0.0,1.0,1.9
+7916,Talbot County Energy,GA,Talbot County,13263,726.0,Natural Gas Fired Combustion Turbine,32.5892,-84.6917,America/New_York,7,25,102,Tornado; Heat; Tropical Storm,1,0.0,0.0,8.7
+55267,Edward L. Addison Generating Plant,GA,Upson County,13293,701.2,Natural Gas Fired Combustion Turbine,32.9111,-84.3064,America/New_York,5,2,48,Tornado; Winter Weather,0,0.0,1.0,3.6
+55672,AL Sandersville LLC,GA,Washington County,13303,692.0,Natural Gas Fired Combustion Turbine,33.1189,-82.8608,America/New_York,3,3,1,Hurricane (Typhoon); Thunderstorm Wind; Tornado,0,0.0,1.0,5.2
+6132,Richard B Russell,GA,Elbert County,13105,628.0,Hydroelectric Pumped Storage,34.0256,-82.5953,America/New_York,5,1,4,Thunderstorm Wind; Flash Flood; Tornado,1,0.0,1.0,0.2
+55406,Bobby C Smith Jr Energy Facility,GA,Effingham County,13103,596.6,Natural Gas Fired Combined Cycle,32.277252,-81.28441,America/New_York,14,2,37,Tornado; Lightning; Thunderstorm Wind,4,0.0,1.0,3.3
+7946,Wansley Unit 9,GA,Heard County,13149,594.1,Natural Gas Fired Combined Cycle,33.4083,-85.0403,America/New_York,6,5,8,Thunderstorm Wind; Heat; Flash Flood,1,0.0,0.0,2.5
+7813,Sewell Creek Energy,GA,Polk County,13233,570.0,Natural Gas Fired Combustion Turbine,33.9486,-85.2769,America/New_York,5,7,18,Tornado; Flash Flood; Strong Wind,2,0.0,1.0,1.5
+715,McManus,GA,Glynn County,13127,560.0,Petroleum Liquids,31.213645,-81.54617,America/New_York,5,3,11,Thunderstorm Wind; Tornado; Rip Current,4,0.0,0.0,9.3
+7917,Chattahoochee Energy Facility,GA,Heard County,13149,539.7,Natural Gas Fired Combined Cycle,33.4072,-85.0386,America/New_York,6,5,8,Thunderstorm Wind; Heat; Flash Flood,1,0.0,0.0,2.6
+68512,McGrau Ford Battery Storage Facility,GA,Cherokee County,13057,530.0,Batteries,34.324977,-84.3289,America/New_York,11,5,10,Thunderstorm Wind; Tornado; Tropical Storm,9,0.0,1.0,1.4
+6130,Carters,GA,Murray County,13213,500.0,Conventional Hydroelectric,34.6121,-84.6733,America/New_York,5,10,31,Tornado; Thunderstorm Wind; Lightning,5,0.0,1.0,4.6
+55141,Hawk Road Facility,GA,Heard County,13149,495.0,Natural Gas Fired Combustion Turbine,33.358472,-84.99139,America/New_York,8,5,16,Tornado; Thunderstorm Wind; Heat,3,0.0,0.0,3.9
+55128,Walton County Energy Facility,GA,Walton County,13297,494.1,Natural Gas Fired Combustion Turbine,33.8148,-83.6954,America/New_York,12,6,24,Tornado; Thunderstorm Wind; Tropical Storm,17,0.0,1.0,1.8
+754,Hartwell Lake,GA,Hart County,13147,420.0,Conventional Hydroelectric,34.3564,-82.8219,America/New_York,6,7,6,Tornado; Thunderstorm Wind; Cold/Wind Chill,2,0.0,0.0,1.5
+55244,Doyle Energy Facility,GA,Walton County,13297,409.0,Natural Gas Fired Combustion Turbine,33.837699,-83.69958,America/New_York,12,4,15,Tornado; Thunderstorm Wind; Tropical Storm,17,0.0,1.0,1.8
+7764,MPC Generating,GA,Walton County,13297,386.1,Natural Gas Fired Combustion Turbine,33.8119,-83.6953,America/New_York,11,6,23,Tornado; Thunderstorm Wind; Tropical Storm,17,0.0,1.0,1.8
+54538,Hartwell Energy Facility,GA,Hart County,13147,360.0,Natural Gas Fired Combustion Turbine,34.339588,-82.81987,America/New_York,6,7,6,Tornado; Thunderstorm Wind; Cold/Wind Chill,2,0.0,0.0,1.8
+55040,Mid-Georgia Cogeneration Facility,GA,Houston County,13153,323.0,Natural Gas Fired Combined Cycle,32.4856,-83.6039,America/New_York,7,3,8,Tornado; Thunderstorm Wind; Winter Weather,16,0.0,1.0,1.1
+6087,Wallace Dam,GA,Hancock County,13141,321.2,Hydroelectric Pumped Storage,33.3502,-83.1574,America/New_York,2,0,3,Winter Weather; Thunderstorm Wind,3,0.0,1.0,0.6
+6258,Wilson,GA,Burke County,13033,317.6,Petroleum Liquids,33.137711,-81.74829,America/New_York,7,8,8,Tropical Storm; High Wind; Tornado,2,0.0,1.0,3.9
+66626,Wadley Solar,GA,Jefferson County,13163,260.0,Solar Photovoltaic,32.820018,-82.40879,America/New_York,4,2,10,Hurricane (Typhoon); Thunderstorm Wind; Flash Flood,0,0.0,1.0,2.0
+61648,Robins Air Force Base Solar,GA,Bibb County,13021,256.0,Solar Photovoltaic,32.681222,-83.61639,America/New_York,7,3,8,Tornado; Thunderstorm Wind; Winter Weather,16,0.0,1.0,0.5
+63721,Cool Springs Solar (Hybrid),GA,Decatur County,13087,253.0,Solar Photovoltaic,30.747916,-84.68049,America/New_York,9,12,3,Hurricane (Typhoon); Tornado; Thunderstorm Wind,7,0.0,1.0,3.2
+67127,"SR Toombs, LLC",GA,Toombs County,13279,250.0,Solar Photovoltaic,32.294555,-82.41625,America/New_York,1,2,0,Tornado,3,0.0,1.0,0.6
+7829,Smarr Energy Center,GA,Monroe County,13207,242.0,Natural Gas Fired Combustion Turbine,32.9842,-83.8464,America/New_York,2,2,1,Winter Weather; Tornado,9,0.0,1.0,0.9
+63522,Hickory Park Solar Hybrid,GA,Mitchell County,13205,235.5,Solar Photovoltaic,31.269676,-84.17632,America/New_York,5,8,34,Tornado; Lightning; Thunderstorm Wind,4,0.0,0.0,6.6
+61696,Twiggs Solar,GA,Twiggs County,13289,204.0,Solar Photovoltaic,32.604997,-83.49124,America/New_York,7,3,8,Tornado; Thunderstorm Wind; Winter Weather,16,0.0,0.0,0.5
+67047,Decatur Solar,GA,Decatur County,13087,200.0,Solar Photovoltaic,30.854893,-84.44543,America/New_York,7,5,6,Heavy Rain; Tornado; Hurricane (Typhoon),8,0.0,1.0,1.9
+7348,Robins,GA,Houston County,13153,183.8,Petroleum Liquids,32.5792,-83.5822,America/New_York,7,3,8,Tornado; Thunderstorm Wind; Winter Weather,16,0.0,1.0,2.1
+61785,Camilla Solar Energy Project,GA,Mitchell County,13205,171.4,Solar Photovoltaic,31.26955,-84.22872,America/New_York,3,7,34,Tornado; Heavy Rain; Thunderstorm Wind,3,0.0,0.0,6.7
+761,Walter F George,GA,Clay County,13061,168.0,Conventional Hydroelectric,31.624501,-85.06524,America/New_York,6,1,12,Tornado; Thunderstorm Wind,0,0.0,1.0,2.1
+64841,"SR DeSoto I, LLC",GA,Lee County,13177,165.0,Solar Photovoltaic,31.886486,-84.02159,America/New_York,5,6,90,Tornado; Thunderstorm Wind,4,0.0,0.0,6.9
+62584,Quitman Solar,GA,Brooks County,13027,150.0,Solar Photovoltaic,30.849005,-83.64328,America/New_York,11,15,138,Hurricane (Typhoon); Tornado; Lightning,3,0.0,0.0,9.0
+64335,Quitman II Solar,GA,Brooks County,13027,150.0,Solar Photovoltaic,30.86205,-83.65165,America/New_York,10,15,136,Hurricane (Typhoon); Tornado; Lightning,5,0.0,0.0,9.0
+66990,Washington County Solar,GA,Washington County,13303,150.0,Solar Photovoltaic,32.989939,-82.71381,America/New_York,5,3,9,Hurricane (Typhoon); Thunderstorm Wind; Tornado,0,0.0,1.0,2.1
+59897,Taylor County Solar,GA,Taylor County,13269,148.0,Solar Photovoltaic,32.583056,-84.29722,America/New_York,3,0,4,Tornado; Winter Weather,2,0.0,1.0,3.2
+10361,Savannah River Mill,GA,Effingham County,13103,140.4,Petroleum Coke,32.331274,-81.2015,America/New_York,14,2,37,Tornado; Lightning; Thunderstorm Wind,4,0.0,1.0,2.8
+65892,Timberland Solar,GA,Oglethorpe County,13221,140.0,Solar Photovoltaic,33.964323,-82.81584,America/New_York,3,1,2,Flash Flood; Tornado; Tropical Storm,2,0.0,0.0,0.0
+759,Buford,GA,Forsyth County,13117,131.2,Conventional Hydroelectric,34.162279,-84.07737,America/New_York,19,11,13,Strong Wind; Thunderstorm Wind; Tropical Storm,16,0.0,1.0,1.4
+55304,Baconton Power Plant,GA,Mitchell County,13205,121.0,Natural Gas Fired Combustion Turbine,31.3869,-84.08,America/New_York,8,11,70,Tornado; Dense Fog; Tropical Storm,4,0.0,0.0,7.8
+62375,"Dougherty County Solar, LLC",GA,Dougherty County,13095,120.0,Solar Photovoltaic,31.512003,-84.0445,America/New_York,6,9,93,Tornado; Dense Fog; Thunderstorm Wind,3,0.0,0.0,7.1
+65376,SR Snipesville II,GA,Jeff Davis County,13161,107.0,Solar Photovoltaic,31.708821,-82.71572,America/New_York,7,5,6,Tornado; Hurricane (Typhoon); Funnel Cloud,2,0.0,1.0,0.4
+66171,SR Snipesville III,GA,Jeff Davis County,13161,107.0,Solar Photovoltaic,31.697152,-82.76455,America/New_York,7,3,8,Thunderstorm Wind; Hurricane (Typhoon); Funnel Cloud,2,0.0,1.0,0.4
+64838,"SR Clay, LLC",GA,Clay County,13061,106.0,Solar Photovoltaic,31.544831,-84.90057,America/New_York,7,1,17,Tornado; Thunderstorm Wind,0,0.0,1.0,0.4
+59896,Butler Solar Project 103,GA,Taylor County,13269,104.0,Solar Photovoltaic,32.561944,-84.27583,America/New_York,3,0,4,Tornado; Winter Weather,2,0.0,1.0,0.2
+62367,SR Arlington II,GA,Early County,13099,102.5,Solar Photovoltaic,31.415531,-84.83071,America/New_York,9,4,34,Tornado; Heavy Rain; Thunderstorm Wind,1,0.0,1.0,4.7
+60064,"White Pine Solar, LLC",GA,Taylor County,13269,101.2,Solar Photovoltaic,32.506017,-84.25698,America/New_York,3,0,4,Tornado; Winter Weather,2,0.0,1.0,0.2
+64191,SR Lumpkin,GA,Stewart County,13259,100.0,Solar Photovoltaic,32.025,-84.7325,America/New_York,2,0,4,Thunderstorm Wind; Tornado,0,0.0,1.0,0.4
+7768,Sowega Power,GA,Mitchell County,13205,99.6,Natural Gas Fired Combustion Turbine,31.3869,-84.08,America/New_York,8,11,70,Tornado; Dense Fog; Tropical Storm,4,0.0,0.0,7.5
+62377,Moody Air Force Base Solar,GA,Lowndes County,13185,99.0,Solar Photovoltaic,30.9574,-83.2229,America/New_York,8,14,134,Hurricane (Typhoon); Tornado; Lightning,6,0.0,1.0,8.9
+760,Allatoona,GA,Bartow County,13015,86.6,Conventional Hydroelectric,34.1637,-84.7282,America/New_York,9,4,8,Tornado; Thunderstorm Wind; Lightning,9,0.0,0.0,1.4
+62165,Snipesville,GA,Jeff Davis County,13161,86.0,Solar Photovoltaic,31.715814,-82.74946,America/New_York,7,5,6,Tornado; Hurricane (Typhoon); Funnel Cloud,2,0.0,1.0,0.4
+54358,Clearwater Paper Corporation - Augusta,GA,Richmond County,13245,84.7,Wood/Wood Waste Biomass,33.328259,-81.95308,America/New_York,10,21,26,Tropical Storm; Lightning; Tornado,7,10.0,0.0,2.1
+54004,"WestRock Southeast, LLC.",GA,Laurens County,13175,82.1,Wood/Wood Waste Biomass,32.5036,-82.8443,America/New_York,2,2,4,Hurricane (Typhoon),1,0.0,1.0,0.3
+56015,Walton Bainbridge Power Facility,GA,Decatur County,13087,80.0,Petroleum Liquids,30.910985,-84.5473,America/New_York,9,11,6,Hurricane (Typhoon); Heavy Rain; Tornado,7,0.0,1.0,4.8
+59450,"Decatur Parkway Solar Project, LLC",GA,Decatur County,13087,80.0,Solar Photovoltaic,30.991944,-84.63389,America/New_York,5,8,7,Hurricane (Typhoon); Tornado; Heavy Rain,5,0.0,1.0,2.9
+64150,Lancaster Solar GA,GA,Randolph County,13243,80.0,Solar Photovoltaic,31.766506,-84.79721,America/New_York,4,0,10,Tornado; Thunderstorm Wind,0,0.0,1.0,0.1
+66025,Blackwater Solar,GA,Ware County,13299,80.0,Solar Photovoltaic,31.394022,-82.62505,America/New_York,8,4,7,Funnel Cloud; Tornado; Thunderstorm Wind,3,0.0,1.0,0.2
+66173,SR Ailey,GA,Montgomery County,13209,80.0,Solar Photovoltaic,32.193594,-82.53874,America/New_York,1,2,0,Tornado,2,0.0,0.0,0.2
+66542,Bulldog Solar LLC,GA,Warren County,13301,80.0,Solar Photovoltaic,33.371,-82.678,America/New_York,3,4,2,Tropical Storm; Thunderstorm Wind; Flash Flood,2,0.0,1.0,3.0
+67021,CPV Stagecoach Solar,GA,Macon County,13193,80.0,Solar Photovoltaic,32.197779,-84.06931,America/New_York,2,0,3,Tornado; Thunderstorm Wind,2,0.0,1.0,0.5
+68549,"Pineview Solar, LLC",GA,Wilcox County,13315,80.0,Solar Photovoltaic,31.995,-83.544,America/New_York,8,1,63,Tornado; Thunderstorm Wind; Lightning,3,0.0,1.0,0.5
+50465,Flint River Operations,GA,Macon County,13193,77.0,Wood/Wood Waste Biomass,32.2544,-84.0667,America/New_York,4,0,5,Tornado; Thunderstorm Wind; Winter Weather,1,0.0,1.0,0.1
+60082,"White Oak Solar, LLC",GA,Burke County,13033,76.5,Solar Photovoltaic,33.036789,-82.11129,America/New_York,5,9,17,Tropical Storm; Lightning; Thunderstorm Wind,2,0.0,1.0,1.9
+62058,SR Terrell,GA,Terrell County,13273,74.0,Solar Photovoltaic,31.871387,-84.36195,America/New_York,0,0,0,,0,0.0,0.0,6.4
+6133,West Point (GA),GA,Troup County,13285,73.3,Conventional Hydroelectric,32.918674,-85.1887,America/New_York,10,26,110,Tornado; Thunderstorm Wind; Lightning,4,0.0,0.0,9.1
+50804,Port Wentworth Mill,GA,Chatham County,13051,72.3,Wood/Wood Waste Biomass,32.1561,-81.1586,America/New_York,18,6,41,Tornado; Lightning; Thunderstorm Wind,4,15.0,0.0,4.4
+10605,Brunswick Cellulose,GA,Glynn County,13127,72.2,Wood/Wood Waste Biomass,31.173147,-81.51925,America/New_York,6,3,26,Tornado; Rip Current,4,0.0,0.0,3.1
+723,Tallulah Falls,GA,Rabun County,13241,72.0,Conventional Hydroelectric,34.7388,-83.3956,America/New_York,6,5,10,Thunderstorm Wind; Tornado; Lightning,0,0.0,1.0,1.3
+50398,International Paper Savanna Mill,GA,Chatham County,13051,71.2,Natural Gas Steam Turbine,32.100354,-81.12425,America/New_York,18,6,34,Tornado; Lightning; Thunderstorm Wind,4,15.0,0.0,5.4
+10426,Inland Paperboard Packaging Rome,GA,Floyd County,13115,70.4,Wood/Wood Waste Biomass,34.2528,-85.3275,America/New_York,3,0,3,Thunderstorm Wind,3,0.0,1.0,3.4
+64840,"SR Cedar Springs, LLC",GA,Early County,13099,70.0,Solar Photovoltaic,31.2453,-85.08698,America/New_York,13,8,42,Tornado; Thunderstorm Wind; Lightning,5,0.0,1.0,6.3
+66026,Hobnail Solar,GA,Burke County,13033,70.0,Solar Photovoltaic,33.262,-82.178,America/New_York,10,15,22,Tropical Storm; Lightning; Strong Wind,7,0.0,1.0,3.4
+60084,PCA-Valdosta Mill,GA,Lowndes County,13185,69.9,Wood/Wood Waste Biomass,30.694444,-83.30306,America/New_York,4,3,88,Hurricane (Typhoon); Lightning; Tornado,4,0.0,1.0,7.9
+10560,Jesup Plant,GA,Wayne County,13305,69.5,Wood/Wood Waste Biomass,31.6593,-81.8439,America/New_York,2,0,14,Tornado; Thunderstorm Wind,0,0.0,1.0,1.2
+54464,Graphic Packaging Intl Macon Mill,GA,Bibb County,13021,68.7,Wood/Wood Waste Biomass,32.7714,-83.6281,America/New_York,6,3,6,Tornado; Thunderstorm Wind; Winter Weather,16,0.0,1.0,1.0
+64151,SR Perry,GA,Houston County,13153,68.0,Solar Photovoltaic,32.39597,-83.7629,America/New_York,6,1,8,Tornado; Thunderstorm Wind; Tropical Storm,10,0.0,1.0,1.4
+65018,Mossy Branch Battery Facility,GA,Talbot County,13263,65.0,Batteries,32.803569,-84.66039,America/New_York,7,2,19,Tornado; Heat; Tropical Storm,2,0.0,0.0,7.9
+66172,SR DeSoto II,GA,Lee County,13177,65.0,Solar Photovoltaic,31.87042,-84.03574,America/New_York,7,9,95,Tornado; Dense Fog; Thunderstorm Wind,4,0.0,0.0,7.3
+720,Oliver Dam,GA,Muscogee County,13215,60.0,Conventional Hydroelectric,32.5155,-85.0004,America/New_York,10,27,96,Tornado; Lightning; Heat,1,0.0,1.0,9.2
+57909,Piedmont Green Power,GA,Lamar County,13171,60.0,Wood/Wood Waste Biomass,33.045278,-84.12556,America/New_York,7,4,77,Tornado,0,0.0,0.0,6.6
+66825,SR DeSoto III,GA,Lee County,13177,60.0,Solar Photovoltaic,31.868033,-84.00777,America/New_York,8,9,96,Tornado; Dense Fog; Thunderstorm Wind,5,0.0,0.0,7.9
+60550,GRP Franklin Renewable Energy Facility,GA,Franklin County,13119,58.0,Wood/Wood Waste Biomass,34.376111,-83.33056,America/New_York,1,1,5,Tornado,1,0.0,0.0,0.2
+61213,GRP Madison Renewable Energy Facility,GA,Madison County,13195,58.0,Wood/Wood Waste Biomass,34.040559,-83.1929,America/New_York,2,0,2,Thunderstorm Wind,7,0.0,1.0,2.2
+63350,OE_GA3,GA,Mitchell County,13205,57.5,Solar Photovoltaic,31.196185,-84.14754,America/New_York,7,8,39,Tornado; Lightning; Thunderstorm Wind,5,0.0,0.0,7.5
+60340,Albany Green Energy,GA,Dougherty County,13095,54.5,Wood/Wood Waste Biomass,31.5559,-84.1103,America/New_York,6,9,93,Tornado; Dense Fog; Thunderstorm Wind,3,0.0,0.0,8.0
+60554,Hazlehurst II,GA,Jeff Davis County,13161,52.5,Solar Photovoltaic,31.819444,-82.60222,America/New_York,7,5,6,Tornado; Hurricane (Typhoon); Funnel Cloud,0,0.0,1.0,1.4
+60063,"Live Oak Solar, LLC",GA,Candler County,13043,51.0,Solar Photovoltaic,32.423798,-82.10282,America/New_York,5,4,6,Tropical Storm; Thunderstorm Wind; Flash Flood,6,0.0,0.0,4.2
+722,Sinclair Dam,GA,Baldwin County,13009,45.0,Conventional Hydroelectric,33.1405,-83.2018,America/New_York,3,1,3,Winter Weather; Thunderstorm Wind; Tornado,0,0.0,0.0,1.3
+725,Tugalo,GA,Habersham County,13137,44.8,Conventional Hydroelectric,34.714,-83.3522,America/New_York,5,4,10,Thunderstorm Wind; Tornado; Lightning,1,0.0,0.0,0.9
+62057,Hazlehurst III,GA,Jeff Davis County,13161,40.0,Solar Photovoltaic,31.832474,-82.60214,America/New_York,7,5,6,Tornado; Hurricane (Typhoon); Funnel Cloud,0,0.0,1.0,0.8
+66024,Bird Dog Solar,GA,Burke County,13033,40.0,Solar Photovoltaic,33.126562,-81.99937,America/New_York,6,10,17,Tropical Storm; Lightning; Thunderstorm Wind,2,0.0,1.0,2.7
+66418,Sonny Solar LLC,GA,Elbert County,13105,40.0,Solar Photovoltaic,34.052037,-82.7222,America/New_York,4,2,2,Thunderstorm Wind; Flash Flood; Tornado,1,0.0,1.0,1.4
+66027,Wolfskin Solar,GA,Oglethorpe County,13221,38.0,Solar Photovoltaic,33.881462,-83.24668,America/New_York,3,0,3,Thunderstorm Wind,9,0.0,0.0,1.9
+59876,Marine Corps Logistics Base Solar,GA,Dougherty County,13095,31.0,Solar Photovoltaic,31.560729,-84.09326,America/New_York,6,9,93,Tornado; Dense Fog; Thunderstorm Wind,3,0.0,0.0,7.4
+59894,Pawpaw Solar Plant,GA,Taylor County,13269,30.5,Solar Photovoltaic,32.572875,-84.25678,America/New_York,3,0,4,Tornado; Winter Weather,2,0.0,1.0,1.2
+54239,Naval Submarine Base Kings Bay,GA,Camden County,13039,30.0,Petroleum Liquids,30.7917,-81.5333,America/New_York,9,3,28,Tornado; Rip Current; Lightning,8,0.0,1.0,7.4
+58628,Simon Solar Farm LLC,GA,Walton County,13297,30.0,Solar Photovoltaic,33.678056,-83.67583,America/New_York,9,7,42,Tornado; Thunderstorm Wind; Lightning,11,0.0,1.0,3.1
+59863,Fort Gordon Solar Facility,GA,Richmond County,13245,30.0,Solar Photovoltaic,33.386625,-82.14012,America/New_York,12,15,29,Tropical Storm; Lightning; Tornado,9,10.0,0.0,6.9
+59864,Kings Bay Solar Facility,GA,Camden County,13039,30.0,Solar Photovoltaic,30.827627,-81.55624,America/New_York,8,3,27,Tornado; Rip Current; Lightning,7,0.0,1.0,6.5
+59865,Fort Stewart Solar Facility,GA,Liberty County,13179,30.0,Solar Photovoltaic,31.90474,-81.59537,America/New_York,2,1,13,Tornado,0,0.0,1.0,4.4
+719,North Highlands,GA,Muscogee County,13215,29.6,Conventional Hydroelectric,32.4994,-84.9965,America/New_York,10,27,96,Tornado; Lightning; Heat,1,0.0,1.0,9.1
+64211,Baxley,GA,Appling County,13001,25.0,Solar Photovoltaic,31.877717,-82.33389,America/New_York,6,4,13,Tornado; Funnel Cloud; Hurricane (Typhoon),3,0.0,1.0,1.2
+757,Blue Ridge,GA,Fannin County,13111,23.5,Conventional Hydroelectric,34.883889,-84.28222,America/New_York,0,0,0,,0,0.0,1.0,0.9
+729,Yonah,GA,Oconee County,45073,22.5,Conventional Hydroelectric,34.6821,-83.3418,America/New_York,5,4,10,Thunderstorm Wind; Tornado; Lightning,1,,,0.9
+753,Crisp Plant,GA,Worth County,13321,22.5,Natural Gas Steam Turbine,31.844708,-83.94073,America/New_York,8,9,96,Tornado; Dense Fog; Thunderstorm Wind,5,0.0,1.0,8.2
+59891,Butler Solar Farm 20,GA,Taylor County,13269,22.0,Solar Photovoltaic,32.575542,-84.31655,America/New_York,3,0,4,Tornado; Winter Weather,2,0.0,1.0,4.3
+59449,Decatur County Solar Project,GA,Decatur County,13087,20.0,Solar Photovoltaic,30.965,-84.62611,America/New_York,6,8,9,Tornado; Hurricane (Typhoon); Heavy Rain,5,0.0,1.0,4.1
+59535,SR Hazlehurst,GA,Jeff Davis County,13161,20.0,Solar Photovoltaic,31.810278,-82.575,America/New_York,7,5,6,Tornado; Hurricane (Typhoon); Funnel Cloud,0,0.0,1.0,0.8
+59874,Richland Solar Center,GA,Twiggs County,13289,20.0,Solar Photovoltaic,32.638034,-83.37892,America/New_York,5,3,5,Tornado; Thunderstorm Wind; Winter Weather,14,0.0,0.0,0.6
+62436,SR Arlington I,GA,Early County,13099,20.0,Solar Photovoltaic,31.402919,-84.83681,America/New_York,8,4,31,Tornado; Heavy Rain,1,0.0,1.0,5.6
+63814,SR Odom,GA,Colquitt County,13071,20.0,Solar Photovoltaic,31.06987,-83.59618,America/New_York,9,14,52,Tornado; Lightning; Tropical Storm,7,0.0,1.0,8.2
+60741,Old Midville Solar,GA,Jenkins County,13165,19.7,Solar Photovoltaic,32.820676,-81.98176,America/New_York,4,1,10,Thunderstorm Wind; Tropical Storm; Flash Flood,0,0.0,1.0,2.5
+60702,Rincon Solar I,GA,Effingham County,13103,18.4,Solar Photovoltaic,32.292879,-81.2844,America/New_York,14,2,37,Tornado; Lightning; Thunderstorm Wind,4,0.0,1.0,3.5
+60469,Solar Glynn,GA,Glynn County,13127,18.0,Solar Photovoltaic,31.25,-81.433,America/New_York,4,3,6,Thunderstorm Wind; Rip Current,4,0.0,0.0,0.4
+736,Stevens Creek,GA,Columbia County,13073,17.6,Conventional Hydroelectric,33.562644,-82.05124,America/New_York,12,20,30,Tropical Storm; Lightning; Tornado,8,0.0,1.0,7.6
+752,Lake Blackshear Project,GA,Worth County,13321,17.2,Conventional Hydroelectric,31.847697,-83.942,America/New_York,8,9,96,Tornado; Dense Fog; Thunderstorm Wind,5,0.0,1.0,8.1
+717,Morgan Falls,GA,Cobb County,13067,16.8,Conventional Hydroelectric,33.9681,-84.3841,America/New_York,29,14,24,Thunderstorm Wind; Strong Wind; Tropical Storm,22,14.0,0.0,7.1
+724,Terrora,GA,Rabun County,13241,16.0,Conventional Hydroelectric,34.7653,-83.4162,America/New_York,6,5,10,Thunderstorm Wind; Tornado; Lightning,0,0.0,1.0,1.5
+58892,Camilla Solar Plant,GA,Mitchell County,13205,16.0,Solar Photovoltaic,31.183889,-84.13194,America/New_York,7,8,39,Tornado; Lightning; Thunderstorm Wind,2,0.0,0.0,7.3
+758,Nottely,GA,Union County,13291,15.9,Conventional Hydroelectric,34.959153,-84.08765,America/New_York,1,0,1,Thunderstorm Wind,0,0.0,0.0,1.5
+712,Lloyd Shoals,GA,Jasper County,13159,14.4,Conventional Hydroelectric,33.3207,-83.8414,America/New_York,11,9,88,Tornado; Thunderstorm Wind,3,0.0,0.0,5.6
+50146,Imperial Savannah LP,GA,Chatham County,13051,11.7,Natural Gas Steam Turbine,32.143989,-81.14655,America/New_York,18,6,40,Tornado; Lightning; Thunderstorm Wind,4,15.0,0.0,6.2
+61387,Georgia LFG Richland Creek Plant,GA,Gwinnett County,13135,11.2,Landfill Gas,34.127146,-84.03338,America/New_York,16,10,10,Strong Wind; Thunderstorm Wind; Tropical Storm,18,18.0,0.0,3.2
+55274,State Farm Support Center East,GA,Fulton County,13121,10.8,Petroleum Liquids,34.086,-84.245,America/New_York,25,13,17,Thunderstorm Wind; Strong Wind; Tropical Storm,20,68.0,0.0,7.2
+63062,Fort Valley State University Solar,GA,Peach County,13225,10.8,Solar Photovoltaic,32.501558,-83.88339,America/New_York,8,3,9,Tornado; Winter Weather; Thunderstorm Wind,11,0.0,0.0,0.7
+67864,McIntosh Solar,GA,Effingham County,13103,10.0,Solar Photovoltaic,32.350833,-81.17194,America/New_York,14,2,37,Tornado; Lightning; Thunderstorm Wind,4,0.0,1.0,4.1
+69688,Allatoona Substation #10,GA,Bartow County,13015,10.0,Batteries,34.086784,-84.71883,America/New_York,17,8,15,Thunderstorm Wind; Strong Wind; Tornado,15,0.0,0.0,4.6
+69745,MCLB Biosteam to Energy,GA,Dougherty County,13095,8.5,All Other,31.554108,-84.1064,America/New_York,6,9,93,Tornado; Dense Fog; Thunderstorm Wind,3,0.0,0.0,8.0
+56870,Taylor,GA,Taylor County,13269,8.0,Landfill Gas,32.4522,-84.3872,America/New_York,2,0,3,Tornado; Winter Weather,0,0.0,1.0,5.2
+58482,"Azalea Solar, LLC",GA,Washington County,13303,7.7,Solar Photovoltaic,32.980833,-82.59167,America/New_York,4,2,9,Hurricane (Typhoon); Thunderstorm Wind; Tornado,0,0.0,1.0,2.2
+58484,MAS ASB Cogen Plant,GA,Fulton County,13121,6.6,Natural Gas Internal Combustion Engine,33.655,-84.39444,America/New_York,25,10,29,Thunderstorm Wind; Tornado; Strong Wind,20,68.0,0.0,7.0
+61385,Georgia LFG Oak Grove Plant,GA,Barrow County,13013,6.6,Landfill Gas,33.964988,-83.76564,America/New_York,10,4,7,Thunderstorm Wind; Tropical Storm; Lightning,15,0.0,1.0,3.4
+61386,Georgia LFG Pine Ridge Plant,GA,Butts County,13035,6.6,Landfill Gas,33.244192,-84.12203,America/New_York,13,10,107,Tornado; Tropical Storm; Thunderstorm Wind,1,0.0,1.0,7.3
+59556,Dalton 2,GA,Whitfield County,13313,6.5,Solar Photovoltaic,34.718056,-84.93194,America/New_York,10,13,52,Tornado; Thunderstorm Wind; Excessive Heat,2,0.0,1.0,6.5
+57026,Superior Landfill Gas Recovery,GA,Chatham County,13051,6.4,Landfill Gas,32.0303,-81.2722,America/New_York,16,6,37,Tornado; Lightning; Thunderstorm Wind,4,15.0,0.0,5.4
+59221,Pecan Row Landfill To Electric Facility,GA,Lowndes County,13185,6.4,Landfill Gas,30.815,-83.3625,America/New_York,9,14,137,Hurricane (Typhoon); Tornado; Lightning,4,0.0,1.0,9.0
+704,Burton Dam,GA,Rabun County,13241,6.0,Conventional Hydroelectric,34.7939,-83.5402,America/New_York,6,4,6,Thunderstorm Wind; Lightning,0,0.0,1.0,3.0
+54813,Shepherd Center,GA,Fulton County,13121,6.0,Petroleum Liquids,33.8111,-84.3928,America/New_York,28,13,25,Thunderstorm Wind; Strong Wind; Tropical Storm,24,68.0,0.0,7.5
+54848,South Georgia Medical Center Inc,GA,Lowndes County,13185,5.5,Petroleum Liquids,30.8625,-83.2894,America/New_York,8,14,134,Hurricane (Typhoon); Tornado; Lightning,6,0.0,1.0,8.9
+706,Flint River,GA,Dougherty County,13095,5.4,Conventional Hydroelectric,31.6026,-84.137,America/New_York,6,9,93,Tornado; Dense Fog; Thunderstorm Wind,3,0.0,0.0,8.3
+54457,Hewlett Packard Enterprise,GA,Fulton County,13121,5.0,Petroleum Liquids,34.0864,-84.2677,America/New_York,26,13,18,Thunderstorm Wind; Strong Wind; Tropical Storm,20,68.0,0.0,7.3
+718,Nacoochee,GA,Rabun County,13241,4.8,Conventional Hydroelectric,34.7549,-83.5012,America/New_York,6,4,6,Thunderstorm Wind; Lightning,0,0.0,1.0,2.9
+55319,Athens Regional Medical Center,GA,Clarke County,13059,4.6,Petroleum Liquids,33.9625,-83.3981,America/New_York,4,1,3,Thunderstorm Wind; Tropical Storm,12,0.0,1.0,4.5
+60930,Dublin Solar I,GA,Laurens County,13175,4.1,Solar Photovoltaic,32.581,-82.926,America/New_York,3,3,4,Hurricane (Typhoon); Thunderstorm Wind,1,0.0,1.0,0.9
+59335,MCLB Landfill Gas to Energy,GA,Dougherty County,13095,4.0,Landfill Gas,31.546111,-84.0675,America/New_York,6,9,93,Tornado; Dense Fog; Thunderstorm Wind,3,0.0,0.0,8.2
+54830,Emory Decatur Hospital,GA,DeKalb County,13089,3.9,Petroleum Liquids,33.7919,-84.2831,America/New_York,28,12,31,Thunderstorm Wind; Tornado; Strong Wind,26,33.0,0.0,7.6
+62392,Guyton Community Solar,GA,Effingham County,13103,3.6,Solar Photovoltaic,32.412773,-81.44285,America/New_York,11,10,86,Tornado; Tropical Storm; Lightning,3,0.0,1.0,5.5
+63535,Solar BESS Hybrid,GA,Cobb County,13067,3.5,Solar Photovoltaic,33.979348,-84.55613,America/New_York,27,11,26,Thunderstorm Wind; Strong Wind; Tornado,22,14.0,0.0,6.8
+54839,Valdosta Water Treatment Plant,GA,Lowndes County,13185,3.4,Petroleum Liquids,30.9136,-83.2529,America/New_York,8,14,134,Hurricane (Typhoon); Tornado; Lightning,6,0.0,1.0,9.2
+55152,Bank of America Plaza,GA,Fulton County,13121,3.0,Petroleum Liquids,33.7708,-84.3861,America/New_York,27,12,25,Thunderstorm Wind; Strong Wind; Tropical Storm,24,68.0,0.0,7.1
+61740,Gratis Road Solar Facility,GA,Walton County,13297,3.0,Solar Photovoltaic,33.844621,-83.69736,America/New_York,11,4,14,Tornado; Thunderstorm Wind; Tropical Storm,17,0.0,1.0,2.6
+64276,Franklin Milliken,GA,Franklin County,13119,3.0,Solar Photovoltaic,34.442071,-83.09912,America/New_York,3,3,5,Tornado; Thunderstorm Wind,1,0.0,0.0,2.6
+64277,Greene Durham,GA,Greene County,13133,3.0,Solar Photovoltaic,33.631459,-83.09349,America/New_York,2,0,2,Flash Flood; Thunderstorm Wind,5,0.0,0.0,2.6
+64280,Meriwether Jackson,GA,Meriwether County,13199,3.0,Solar Photovoltaic,32.877496,-84.64437,America/New_York,5,0,36,Tornado,2,0.0,1.0,4.8
+64281,Murray Treadwell Farms,GA,Murray County,13213,3.0,Solar Photovoltaic,34.769747,-84.81328,America/New_York,6,11,32,Tornado; Thunderstorm Wind; Lightning,1,0.0,1.0,5.1
+64285,Ware Avra I,GA,Ware County,13299,3.0,Solar Photovoltaic,31.196314,-82.32236,America/New_York,8,3,12,Tornado; Funnel Cloud; Tropical Storm,1,0.0,1.0,1.0
+65481,Wilkinson DeFore (Safari Energy),GA,Wilkinson County,13319,3.0,Solar Photovoltaic,32.8813,-83.3029,America/New_York,2,3,0,Winter Weather; Thunderstorm Wind,9,0.0,1.0,0.7
+65727,Statesboro Solar LLC,GA,Bulloch County,13031,3.0,Solar Photovoltaic,32.468039,-81.80372,America/New_York,7,4,14,Tornado; Tropical Storm; Thunderstorm Wind,4,0.0,1.0,4.4
+65728,BE Solar LLC,GA,Decatur County,13087,3.0,Solar Photovoltaic,30.91,-84.548,America/New_York,9,11,6,Hurricane (Typhoon); Heavy Rain; Tornado,7,0.0,1.0,2.7
+65994,"Polk County GA S1, LLC",GA,Polk County,13233,3.0,Solar Photovoltaic,34.041911,-85.21392,America/New_York,7,8,18,Tornado; Flash Flood; Lightning,2,0.0,1.0,5.1
+65995,"Reidsville Renewables, Inc.",GA,Tattnall County,13267,3.0,Solar Photovoltaic,32.065366,-82.13351,America/New_York,1,0,2,Thunderstorm Wind,4,0.0,0.0,1.0
+66205,"Turnipseed Solar, LLC",GA,Douglas County,13097,3.0,Solar Photovoltaic,33.69915,-84.67891,America/New_York,24,12,23,Thunderstorm Wind; Strong Wind; Tropical Storm,18,0.0,1.0,6.6
+66344,Bulloch County GA S4 LLC,GA,Bulloch County,13031,3.0,Solar Photovoltaic,32.388399,-81.82055,America/New_York,8,5,26,Tornado; Tropical Storm; Thunderstorm Wind,4,0.0,1.0,4.4
+66346,Bulloch County GA S3 LLC,GA,Bulloch County,13031,3.0,Solar Photovoltaic,32.387793,-81.81603,America/New_York,8,5,26,Tornado; Tropical Storm; Thunderstorm Wind,4,0.0,1.0,4.4
+66350,Richmond County GA S2 LLC,GA,Richmond County,13245,3.0,Solar Photovoltaic,33.318438,-82.08294,America/New_York,9,11,26,Tropical Storm; Lightning; Tornado,7,10.0,0.0,2.9
+66353,Upson County GA S1 LLC,GA,Upson County,13293,3.0,Solar Photovoltaic,32.93,-84.28,America/New_York,4,2,47,Tornado,0,0.0,1.0,5.9
+67240,Lowndes Cowart,GA,Lowndes County,13185,3.0,Solar Photovoltaic,30.812481,-83.2604,America/New_York,7,14,133,Hurricane (Typhoon); Tornado; Lightning,4,0.0,1.0,8.8
+67245,Tift Fletcher,GA,Tift County,13277,3.0,Solar Photovoltaic,31.493821,-83.49665,America/New_York,9,4,66,Tornado; Dense Fog; Thunderstorm Wind,6,0.0,0.0,7.0
+68618,Gordon Thompson,GA,Gordon County,13129,3.0,Solar Photovoltaic,34.44161,-84.70632,America/New_York,7,2,10,Thunderstorm Wind; Tornado; Tropical Storm,5,0.0,1.0,2.0
+61459,Georgia Power at Swainsboro,GA,Emanuel County,13107,2.9,Solar Photovoltaic,32.605,-82.321,America/New_York,3,0,10,Thunderstorm Wind; Hurricane (Typhoon); Flash Flood,1,0.0,1.0,2.9
+65759,Putnam Erikson 2,GA,Putnam County,13237,2.9,Solar Photovoltaic,33.276821,-83.29845,America/New_York,2,0,3,Winter Weather; Thunderstorm Wind,4,0.0,0.0,0.7
+68609,Tift Boyd,GA,Tift County,13277,2.9,Solar Photovoltaic,31.5059,-83.5115,America/New_York,9,4,66,Tornado; Dense Fog; Thunderstorm Wind,5,0.0,0.0,7.0
+68622,Bulloch Rushing,GA,Bulloch County,13031,2.9,Solar Photovoltaic,32.403553,-81.74994,America/New_York,11,5,29,Tornado; Tropical Storm; Thunderstorm Wind,4,0.0,1.0,4.4
+60184,ADS Renewable Energy-Wolf Creek LLC,GA,Twiggs County,13289,2.8,Landfill Gas,32.7755,-83.4348,America/New_York,5,4,4,Thunderstorm Wind; Tornado; Winter Weather,14,0.0,0.0,1.3
+64275,Bulloch Neville Farms,GA,Bulloch County,13031,2.7,Solar Photovoltaic,32.384398,-81.67292,America/New_York,11,5,28,Tornado; Tropical Storm; Thunderstorm Wind,4,0.0,1.0,4.4
+64282,Putnam Erickson,GA,Putnam County,13237,2.7,Solar Photovoltaic,33.317653,-83.39233,America/New_York,3,2,13,Tornado; Winter Weather; Thunderstorm Wind,4,0.0,0.0,2.6
+64571,Coody Cochran,GA,Bleckley County,13023,2.6,Solar Photovoltaic,32.367009,-83.37428,America/New_York,5,1,6,Thunderstorm Wind; Tornado; Tropical Storm,6,0.0,1.0,0.7
+64583,Westberry Jesup,GA,Wayne County,13305,2.6,Solar Photovoltaic,31.602803,-81.93258,America/New_York,4,1,15,Tornado; Thunderstorm Wind; Tropical Storm,1,0.0,1.0,1.0
+65730,Rockmart,GA,Polk County,13233,2.6,Solar Photovoltaic,34.014833,-85.02224,America/New_York,8,2,10,Tornado; Thunderstorm Wind; Lightning,5,0.0,1.0,1.2
+66980,Bartow Davidson,GA,Bartow County,13015,2.6,Solar Photovoltaic,34.25745,-84.83149,America/New_York,9,4,8,Tornado; Thunderstorm Wind; Tropical Storm,5,0.0,0.0,1.2
+60586,Pleasant Valley Solar,GA,Walton County,13297,2.5,Solar Photovoltaic,33.7368,-83.6971,America/New_York,13,9,34,Tornado; Thunderstorm Wind; Tropical Storm,15,0.0,1.0,2.8
+64565,Apalachicola,GA,Richmond County,13245,2.5,Solar Photovoltaic,33.33632,-82.06055,America/New_York,9,11,26,Tropical Storm; Lightning; Tornado,7,10.0,0.0,3.2
+54818,191 Peachtree Tower,GA,Fulton County,13121,2.4,Petroleum Liquids,33.7583,-84.3869,America/New_York,25,9,25,Thunderstorm Wind; Strong Wind; Tropical Storm,25,68.0,0.0,7.1
+54845,Sun Trust Plaza,GA,Fulton County,13121,2.4,Petroleum Liquids,33.7625,-84.3872,America/New_York,27,12,25,Thunderstorm Wind; Strong Wind; Tropical Storm,24,68.0,0.0,7.1
+58893,Camp Solar Plant,GA,Meriwether County,13199,2.4,Solar Photovoltaic,32.964722,-84.54389,America/New_York,7,0,59,Tornado; Thunderstorm Wind,2,0.0,1.0,5.4
+62409,Waynesboro Community Solar,GA,Burke County,13033,2.4,Solar Photovoltaic,33.170593,-81.82394,America/New_York,6,9,6,Tropical Storm; High Wind; Heavy Rain,2,0.0,1.0,2.8
+68619,Polk Cedartown 2,GA,Polk County,13233,2.4,Solar Photovoltaic,34.046881,-85.2113,America/New_York,6,7,17,Tornado; Lightning; Strong Wind,2,0.0,1.0,4.7
+68626,Gordon Pine Hall,GA,Gordon County,13129,2.4,Solar Photovoltaic,34.440235,-84.70455,America/New_York,7,2,10,Thunderstorm Wind; Tornado; Tropical Storm,5,0.0,1.0,0.9
+68627,Chattooga Gore,GA,Chattooga County,13055,2.4,Solar Photovoltaic,34.497814,-85.45043,America/New_York,8,7,20,Tornado; Thunderstorm Wind; Excessive Heat,5,0.0,0.0,4.7
+7191,Tallassee Hydro Project,GA,Clarke County,13059,2.3,Conventional Hydroelectric,33.989153,-83.49845,America/New_York,4,1,3,Thunderstorm Wind; Tropical Storm,12,0.0,1.0,2.8
+62884,Richmond Hayes Solar,GA,Richmond County,13245,2.3,Solar Photovoltaic,33.364,-82.022,America/New_York,9,11,26,Tropical Storm; Lightning; Tornado,7,10.0,0.0,2.7
+62885,Troup RC50,GA,Meriwether County,13199,2.3,Solar Photovoltaic,32.895935,-84.84948,America/New_York,6,2,18,Tornado; Thunderstorm Wind; Lightning,3,0.0,1.0,4.1
+62886,Wilkinson DeFore (Westbound),GA,Wilkinson County,13319,2.3,Solar Photovoltaic,32.879593,-83.32099,America/New_York,3,3,3,Tornado; Winter Weather; Thunderstorm Wind,9,0.0,1.0,0.5
+62960,Kimberly-Clark Solar,GA,Troup County,13285,2.3,Solar Photovoltaic,33.0,-85.034,America/New_York,8,3,19,Tornado; Thunderstorm Wind; Lightning,3,0.0,0.0,4.1
+64279,Lowndes Tycor Farms,GA,Lowndes County,13185,2.3,Solar Photovoltaic,30.688193,-83.16715,America/New_York,4,3,88,Hurricane (Typhoon); Lightning; Tornado,4,0.0,1.0,8.6
+67048,Bibb Williams,GA,Bibb County,13021,2.3,Solar Photovoltaic,32.856937,-83.55016,America/New_York,3,3,3,Tornado; Winter Weather; Thunderstorm Wind,14,0.0,1.0,0.5
+58011,IKEA Savannah 490,GA,Chatham County,13051,2.2,Solar Photovoltaic,32.177535,-81.17378,America/New_York,18,6,41,Tornado; Lightning; Thunderstorm Wind,4,15.0,0.0,4.2
+61000,King Mill,GA,Richmond County,13245,2.2,Conventional Hydroelectric,33.485245,-81.9912,America/New_York,10,20,28,Tropical Storm; Lightning; Tornado,7,10.0,0.0,7.2
+64586,Polk Cedartown,GA,Polk County,13233,2.2,Solar Photovoltaic,34.019643,-85.28088,America/New_York,5,7,18,Tornado; Flash Flood; Strong Wind,2,0.0,1.0,4.6
+69436,Prologis Portside 2509 - SLSAV502,GA,Chatham County,13051,2.2,Solar Photovoltaic,32.122059,-81.17755,America/New_York,17,6,39,Tornado; Lightning; Thunderstorm Wind,4,15.0,0.0,4.2
+54322,Sibley Mill,GA,Richmond County,13245,2.1,Conventional Hydroelectric,33.487881,-81.99252,America/New_York,10,20,28,Tropical Storm; Lightning; Tornado,7,10.0,0.0,7.3
+64584,Fountain Folkston,GA,Charlton County,13049,2.1,Solar Photovoltaic,30.916375,-81.96023,America/New_York,8,3,28,Tornado; Rip Current; Lightning,0,0.0,1.0,4.0
+64585,Harris Shiloh,GA,Harris County,13145,2.1,Solar Photovoltaic,32.797582,-84.69659,America/New_York,7,2,19,Tornado; Heat; Tropical Storm,2,0.0,1.0,4.1
+61554,Comer Solar,GA,Madison County,13195,2.0,Solar Photovoltaic,34.0942,-83.1439,America/New_York,2,0,2,Thunderstorm Wind,7,0.0,1.0,1.3
+64570,Columbia Substation,GA,Columbia County,13073,2.0,Solar Photovoltaic,33.567718,-82.29907,America/New_York,12,15,26,Tropical Storm; Lightning; Tornado,8,0.0,1.0,6.6
+64582,Shawnee - GA,GA,Burke County,13033,2.0,Solar Photovoltaic,33.107648,-81.98075,America/New_York,5,10,13,Tropical Storm; Lightning; Heavy Rain,2,0.0,1.0,2.7
+66199,"Cairo Solar Farm, LLC",GA,Grady County,13131,2.0,Solar Photovoltaic,30.911286,-84.22888,America/New_York,4,0,7,Tornado; Thunderstorm Wind,6,0.0,1.0,2.0
+66200,"Cedar Creek Solar, LLC",GA,Barrow County,13013,2.0,Solar Photovoltaic,34.02783,-83.75747,America/New_York,11,4,8,Thunderstorm Wind; Tropical Storm; Lightning,13,0.0,1.0,1.5
+62878,McCleskey Cotton,GA,Terrell County,13273,1.9,Solar Photovoltaic,31.825063,-84.38558,America/New_York,2,0,8,Tornado; Thunderstorm Wind,1,0.0,0.0,5.3
+62883,Telfair Thompson,GA,Telfair County,13271,1.9,Solar Photovoltaic,32.058559,-82.87179,America/New_York,3,4,1,Tornado; Hurricane (Typhoon); Tropical Storm,0,0.0,0.0,0.7
+64286,Ware Avra II,GA,Ware County,13299,1.9,Solar Photovoltaic,31.196314,-82.32236,America/New_York,8,3,12,Tornado; Funnel Cloud; Tropical Storm,1,0.0,1.0,0.7
+66936,Bryan Floyd,GA,Bryan County,13029,1.9,Solar Photovoltaic,32.138772,-81.69404,America/New_York,9,5,26,Tornado; Tropical Storm; Thunderstorm Wind,5,0.0,1.0,3.9
+67246,Tift Bowen,GA,Tift County,13277,1.9,Solar Photovoltaic,31.457562,-83.55885,America/New_York,9,6,63,Tornado; Dense Fog; Tropical Storm,5,0.0,0.0,5.3
+68621,Pierce Eunice,GA,Pierce County,13229,1.9,Solar Photovoltaic,31.25259,-82.30219,America/New_York,8,3,12,Tornado; Funnel Cloud; Tropical Storm,1,0.0,1.0,0.7
+58572,Lakeland Solar Energy LLC,GA,Lanier County,13173,1.8,Solar Photovoltaic,31.026944,-83.055,America/New_York,9,13,137,Hurricane (Typhoon); Tornado; Lightning,5,0.0,0.0,9.0
+65729,Brady Solar LLC,GA,Sumter County,13261,1.8,Solar Photovoltaic,32.05569,-84.20261,America/New_York,0,0,0,,0,0.0,1.0,5.6
+66991,"CG PS Portfolio 1, LLC",GA,Houston County,13153,1.8,Landfill Gas,32.40147,-83.56124,America/New_York,7,1,9,Tornado; Thunderstorm Wind; Tropical Storm,10,0.0,1.0,0.8
+64283,Terrell Riles Stovall,GA,Terrell County,13273,1.7,Solar Photovoltaic,31.785503,-84.44841,America/New_York,3,5,40,Tornado; Thunderstorm Wind,0,0.0,0.0,5.4
+64569,Arnold Cochran,GA,Bleckley County,13023,1.7,Solar Photovoltaic,32.399366,-83.34378,America/New_York,6,3,6,Thunderstorm Wind; Tornado; Hurricane (Typhoon),6,0.0,1.0,0.4
+56231,Emory Hillandale Hospital,GA,DeKalb County,13089,1.6,Petroleum Liquids,33.7036,-84.1494,America/New_York,28,13,49,Tornado; Thunderstorm Wind; Strong Wind,18,33.0,0.0,7.5
+59650,CII Methane Management III LFG Plant,GA,Clarke County,13059,1.6,Landfill Gas,33.925556,-83.26389,America/New_York,2,0,2,Thunderstorm Wind,8,0.0,1.0,2.4
+60514,Seminole (GA),GA,Seminole County,13253,1.6,Solar Photovoltaic,31.065112,-84.9317,America/New_York,8,10,30,Tornado; Hurricane (Typhoon); Heavy Rain,5,0.0,0.0,5.4
+54566,YKK USA Chestney,GA,Bibb County,13021,1.5,Petroleum Liquids,32.8061,-83.5456,America/New_York,6,3,6,Tornado; Thunderstorm Wind; Winter Weather,16,0.0,1.0,3.6
+61397,Georgia Power at Jakin GA PV,GA,Early County,13099,1.5,Solar Photovoltaic,31.138,-85.031,America/New_York,13,8,42,Tornado; Thunderstorm Wind; Lightning,5,0.0,1.0,6.3
+62881,Muscogee Public Works,GA,Muscogee County,13215,1.5,Solar Photovoltaic,32.49375,-84.86133,America/New_York,9,27,95,Tornado; Lightning; Heat,1,0.0,1.0,8.9
+64278,Lowndes IDA,GA,Lowndes County,13185,1.5,Solar Photovoltaic,30.835452,-83.22752,America/New_York,7,14,133,Hurricane (Typhoon); Tornado; Lightning,4,0.0,1.0,9.2
+64284,Troup RC50 II,GA,Troup County,13285,1.5,Solar Photovoltaic,32.898784,-84.89617,America/New_York,7,25,108,Tornado; Thunderstorm Wind; Lightning,3,0.0,0.0,8.9
+10121,High Shoals Hydro (GA),GA,Morgan County,13211,1.4,Conventional Hydroelectric,33.816547,-83.50493,America/New_York,5,1,4,Thunderstorm Wind; Tropical Storm,14,0.0,1.0,1.4
+54906,Georgia Pacific Center,GA,Fulton County,13121,1.4,Petroleum Liquids,33.757513,-84.38687,America/New_York,25,9,25,Thunderstorm Wind; Strong Wind; Tropical Storm,25,68.0,0.0,7.2
+61441,Denver Braswell PV,GA,Colquitt County,13071,1.4,Solar Photovoltaic,31.3,-83.8,America/New_York,11,13,74,Tornado; Dense Fog; Tropical Storm,5,0.0,1.0,1.3
+62879,Columbia Bryson,GA,Columbia County,13073,1.4,Solar Photovoltaic,33.429859,-82.196,America/New_York,11,14,26,Tropical Storm; Lightning; Tornado,9,0.0,1.0,6.8
+62882,Oil Dri 2 Solar,GA,Thomas County,13275,1.4,Solar Photovoltaic,30.991,-84.066,America/New_York,6,3,7,Tornado; Lightning; Thunderstorm Wind,2,0.0,1.0,1.3
+62887,Freeman Avenue,GA,Sumter County,13261,1.4,Solar Photovoltaic,32.182026,-84.14762,America/New_York,2,0,3,Tornado; Thunderstorm Wind,1,0.0,1.0,1.3
+63775,Tech Square Microgrid,GA,Fulton County,13121,1.4,Petroleum Liquids,33.7756,-84.3899,America/New_York,27,12,25,Thunderstorm Wind; Strong Wind; Tropical Storm,24,68.0,0.0,7.2
+54290,Inforum,GA,Fulton County,13121,1.3,Petroleum Liquids,33.7533,-84.3889,America/New_York,25,9,25,Thunderstorm Wind; Strong Wind; Tropical Storm,25,68.0,0.0,7.2
+54462,Graniteville Enterprise Division,GA,Richmond County,13245,1.2,Conventional Hydroelectric,33.477027,-81.98273,America/New_York,10,20,28,Tropical Storm; Lightning; Tornado,7,10.0,0.0,7.4
+54877,Atlanta Gift Mart LP,GA,Fulton County,13121,1.2,Petroleum Liquids,33.7611,-84.3892,America/New_York,25,9,25,Thunderstorm Wind; Strong Wind; Tropical Storm,24,68.0,0.0,7.2
+54816,Riverwood 100 Building,GA,Cobb County,13067,1.1,Petroleum Liquids,33.8775,-84.4603,America/New_York,28,10,28,Thunderstorm Wind; Strong Wind; Tropical Storm,21,14.0,0.0,7.3
+64226,Curry Solar,GA,Tattnall County,13267,1.1,Solar Photovoltaic,32.038819,-82.14032,America/New_York,1,0,2,Thunderstorm Wind,4,0.0,0.0,0.1
+68610,Whitfield Cooper,GA,Whitfield County,13313,1.1,Solar Photovoltaic,34.952825,-84.94459,America/New_York,13,21,55,Tornado; Thunderstorm Wind; Heavy Rain,1,0.0,1.0,5.2
+58064,Laredo Bus Facility Solar Canopies,GA,DeKalb County,13089,1.0,Solar Photovoltaic,33.783333,-84.26778,America/New_York,28,12,31,Thunderstorm Wind; Tornado; Strong Wind,26,33.0,0.0,7.0
+59843,Georgia Power at Wadley GA,GA,Jefferson County,13163,1.0,Solar Photovoltaic,32.883,-82.41,America/New_York,4,2,9,Hurricane (Typhoon); Thunderstorm Wind; Tornado,0,0.0,1.0,2.6
+60448,Valdosta (Terraform),GA,Lowndes County,13185,1.0,Solar Photovoltaic,30.81012,-83.22596,America/New_York,7,14,133,Hurricane (Typhoon); Tornado; Lightning,4,0.0,1.0,9.2
+60512,Greenville,GA,Meriwether County,13199,1.0,Solar Photovoltaic,33.045801,-84.71443,America/New_York,8,1,59,Tornado; Thunderstorm Wind,2,0.0,1.0,5.9
+60513,Richland (GA),GA,Stewart County,13259,1.0,Solar Photovoltaic,32.088982,-84.66353,America/New_York,2,0,4,Thunderstorm Wind; Tornado,0,0.0,1.0,0.1
+60544,Tri-County Solar Facility,GA,Putnam County,13237,1.0,Solar Photovoltaic,33.308113,-83.3896,America/New_York,3,2,13,Tornado; Winter Weather; Thunderstorm Wind,4,0.0,0.0,1.9
+60585,Mount Vernon Solar,GA,Walton County,13297,1.0,Solar Photovoltaic,33.8388,-83.638,America/New_York,9,4,7,Thunderstorm Wind; Tropical Storm; Tornado,17,0.0,1.0,1.9
+61468,Valdosta Prison,GA,Lowndes County,13185,1.0,Solar Photovoltaic,30.9,-83.3,America/New_York,8,14,134,Hurricane (Typhoon); Tornado; Lightning,6,0.0,1.0,9.2
+62393,Atlanta Falcons Solar,GA,Fulton County,13121,1.0,Solar Photovoltaic,33.755421,-84.40093,America/New_York,25,9,25,Thunderstorm Wind; Strong Wind; Tropical Storm,24,68.0,0.0,6.8
+64011,Bainbridge Solar,GA,Decatur County,13087,1.0,Solar Photovoltaic,30.967159,-84.62554,America/New_York,6,8,9,Tornado; Hurricane (Typhoon); Heavy Rain,5,0.0,1.0,3.8
+58485,Upson Rocky Creek Solar Plant,GA,Upson County,13293,0.8,Solar Photovoltaic,32.920833,-84.34306,America/New_York,4,2,47,Tornado,0,0.0,1.0,5.9
+59459,Hickory Ridge Landfill Solar Project,GA,DeKalb County,13089,0.6,Solar Photovoltaic,33.665,-84.33611,America/New_York,26,10,30,Thunderstorm Wind; Tornado; Strong Wind,19,33.0,0.0,6.8
+46,Browns Ferry,AL,Limestone County,1083,3854.0,Nuclear,34.7042,-87.1189,America/Chicago,14,5,19,Tornado; Thunderstorm Wind; Flash Flood,5,0.0,1.0,2.9
+3,Barry,AL,Mobile County,1097,3343.5,Natural Gas Fired Combined Cycle,31.0069,-88.0103,America/Chicago,3,1,4,Tornado; Thunderstorm Wind; Lightning,5,14.0,0.0,0.6
+6002,James H Miller Jr,AL,Jefferson County,1073,2822.0,Conventional Steam Coal,33.6319,-87.0597,America/Chicago,29,14,69,Tornado; Thunderstorm Wind; Flash Flood,14,29.0,0.0,7.9
+26,E C Gaston,AL,Shelby County,1117,2034.0,Natural Gas Steam Turbine,33.244211,-86.45806,America/Chicago,11,5,14,Tornado; Thunderstorm Wind; Lightning,7,0.0,1.0,2.6
+7710,H Allen Franklin Combined Cycle,AL,Lee County,1081,1995.7,Natural Gas Fired Combined Cycle,32.6078,-85.0975,America/New_York,13,28,106,Tornado; Lightning; Thunderstorm Wind,7,29.0,0.0,9.2
+6001,Joseph M Farley,AL,Houston County,1069,1776.4,Nuclear,31.2231,-85.1116,America/Chicago,13,8,42,Tornado; Thunderstorm Wind; Lightning,5,0.0,1.0,6.3
+7897,E B Harris Electric Generating Plant,AL,Autauga County,1001,1304.0,Natural Gas Fired Combined Cycle,32.381352,-86.57437,America/Chicago,10,10,32,Tornado; Lightning; Thunderstorm Wind,7,0.0,1.0,5.4
+10,Greene County,AL,Greene County,1063,1288.4,Natural Gas Fired Combustion Turbine,32.6017,-87.7811,America/Chicago,9,3,23,Tornado; Winter Weather; Thunderstorm Wind,3,0.0,0.0,5.0
+47,Colbert,AL,Colbert County,1033,1169.6,Natural Gas Fired Combustion Turbine,34.7439,-87.8486,America/Chicago,22,7,22,Tornado; Thunderstorm Wind; Lightning,4,0.0,1.0,6.5
+55271,Tenaska Lindsay Hill Generating Station,AL,Autauga County,1001,939.4,Natural Gas Fired Combined Cycle,32.6514,-86.7386,America/Chicago,8,10,26,Tornado; Lightning; Thunderstorm Wind,2,0.0,1.0,4.9
+55440,Central Alabama Generating Station,AL,Autauga County,1001,927.1,Natural Gas Fired Combined Cycle,32.6497,-86.74,America/Chicago,8,10,26,Tornado; Lightning; Thunderstorm Wind,2,0.0,1.0,4.9
+55292,Decatur Energy Center,AL,Morgan County,1103,902.4,Natural Gas Fired Combined Cycle,34.6292,-87.0214,America/Chicago,14,6,22,Thunderstorm Wind; Lightning; Tornado,6,0.0,1.0,3.0
+55293,Morgan Energy Center,AL,Morgan County,1103,900.0,Natural Gas Fired Combined Cycle,34.6397,-87.0639,America/Chicago,13,6,16,Thunderstorm Wind; Lightning; Tornado,5,0.0,1.0,3.0
+55411,Hillabee Energy Center,AL,Tallapoosa County,1123,822.8,Natural Gas Fired Combined Cycle,33.000669,-85.90328,America/Chicago,6,0,11,Tornado; Thunderstorm Wind; Tropical Storm,0,0.0,1.0,2.4
+55409,Calhoun Energy Center,AL,Calhoun County,1015,748.0,Natural Gas Fired Combustion Turbine,33.5883,-85.9731,America/Chicago,9,9,20,Tornado; Lightning; Thunderstorm Wind,1,11.0,0.0,3.1
+56,Lowman Energy Center,AL,Washington County,1129,732.7,Natural Gas Fired Combined Cycle,31.488019,-87.91075,America/Chicago,1,0,1,High Wind,2,0.0,1.0,3.1
+7063,McIntosh (AL),AL,Washington County,1129,676.0,Natural Gas Fired Combustion Turbine,31.2546,-88.0299,America/Chicago,1,0,3,Tornado,1,0.0,1.0,2.2
+6440,Wilson Dam,AL,Lauderdale County,1077,666.7,Conventional Hydroelectric,34.79782,-87.62537,America/Chicago,22,9,23,Tornado; Lightning; Thunderstorm Wind,4,0.0,1.0,6.2
+533,McWilliams,AL,Covington County,1039,654.0,Natural Gas Fired Combined Cycle,31.400255,-86.47645,America/Chicago,5,4,4,Lightning; Flood; Tornado,1,0.0,1.0,0.7
+49,Wheeler Dam,AL,Lauderdale County,1077,404.0,Conventional Hydroelectric,34.8069,-87.3819,America/Chicago,20,9,21,Tornado; Thunderstorm Wind; Lightning,5,0.0,1.0,5.6
+7721,Theodore Cogen Facility,AL,Mobile County,1097,317.4,Natural Gas Fired Combined Cycle,30.525445,-88.12848,America/Chicago,13,13,17,Lightning; Marine Thunderstorm Wind; Tornado,11,14.0,0.0,6.3
+55241,Hog Bayou Energy Center,AL,Mobile County,1097,280.0,Natural Gas Fired Combined Cycle,30.7478,-88.0575,America/Chicago,9,11,8,Marine Thunderstorm Wind; Rip Current; Tornado,10,14.0,0.0,6.2
+62462,Muscle Shoals,AL,Colbert County,1033,227.0,Solar Photovoltaic,34.76973,-87.90454,America/Chicago,22,7,22,Tornado; Thunderstorm Wind; Lightning,4,0.0,1.0,4.4
+4,Walter Bouldin Dam,AL,Elmore County,1051,225.0,Conventional Hydroelectric,32.583889,-86.28306,America/Chicago,9,10,28,Tornado; Thunderstorm Wind; Lightning,6,0.0,1.0,3.6
+16,Martin Dam,AL,Elmore County,1051,210.6,Conventional Hydroelectric,32.680394,-85.91144,America/Chicago,8,2,14,Tornado; Thunderstorm Wind; Tropical Storm,3,0.0,1.0,3.6
+18,Lewis Smith Dam,AL,Walker County,1127,181.0,Conventional Hydroelectric,33.9406,-87.1077,America/Chicago,14,6,23,Thunderstorm Wind; Tornado; Heat,0,0.0,1.0,4.8
+15,Lay Dam,AL,Chilton County,1021,177.0,Conventional Hydroelectric,32.9633,-86.5187,America/Chicago,7,7,27,Tornado; Thunderstorm Wind,4,0.0,1.0,3.1
+702,Bartletts Ferry,AL,Harris County,13145,173.0,Conventional Hydroelectric,32.663,-85.0908,America/New_York,15,28,111,Tornado; Lightning; Thunderstorm Wind,5,0.0,1.0,9.3
+17,Mitchell Dam,AL,Chilton County,1021,170.0,Conventional Hydroelectric,32.806025,-86.44489,America/Chicago,5,8,23,Tornado; Lightning; Thunderstorm Wind,0,0.0,1.0,3.1
+6188,Harris Dam,AL,Randolph County,1111,135.0,Conventional Hydroelectric,33.258281,-85.61605,America/Chicago,3,1,3,Flash Flood; Thunderstorm Wind; Flood,0,0.0,0.0,0.4
+14,Logan Martin Dam,AL,St. Clair County,1115,128.1,Conventional Hydroelectric,33.425878,-86.33755,America/Chicago,17,11,58,Tornado; Thunderstorm Wind; Lightning,4,0.0,1.0,4.4
+7697,Washington County Cogeneration Facility,AL,Washington County,1129,122.5,Natural Gas Fired Combined Cycle,31.26423,-88.00267,America/Chicago,1,0,3,Tornado,1,0.0,1.0,0.6
+54802,Mead Coated Board,AL,Russell County,1113,120.5,Wood/Wood Waste Biomass,32.1761,-85.0272,America/Chicago,6,2,5,Heat; Lightning; Tropical Storm,1,0.0,1.0,0.1
+48,Guntersville,AL,Marshall County,1095,115.2,Conventional Hydroelectric,34.421272,-86.39393,America/Chicago,20,13,24,Thunderstorm Wind; Lightning; Tornado,5,0.0,1.0,4.6
+54096,International Paper Riverdale Mill,AL,Dallas County,1047,104.2,Natural Gas Fired Combined Cycle,32.426016,-86.87091,America/Chicago,6,10,24,Tornado; Lightning,2,0.0,1.0,3.2
+54789,Georgia-Pacific Brewton Mill,AL,Escambia County,1053,103.4,Wood/Wood Waste Biomass,31.077,-87.1116,America/Chicago,5,1,35,Tornado; Thunderstorm Wind; Lightning,1,0.0,1.0,0.6
+55138,Walton Discover Power Facility,AL,Lee County,1081,103.0,Natural Gas Fired Combustion Turbine,32.54098,-85.03888,America/New_York,11,28,96,Tornado; Lightning; Thunderstorm Wind,3,29.0,0.0,8.1
+38,Millers Ferry,AL,Wilcox County,1131,101.1,Conventional Hydroelectric,32.100881,-87.39977,America/Chicago,2,0,3,Tornado; Flash Flood,2,0.0,1.0,2.0
+13,Jordan Dam,AL,Elmore County,1051,100.0,Conventional Hydroelectric,32.6189,-86.2548,America/Chicago,9,10,28,Tornado; Thunderstorm Wind; Lightning,6,0.0,1.0,3.8
+63765,Black Bear Solar 1,AL,Montgomery County,1101,100.0,Solar Photovoltaic,32.196971,-86.32734,America/Chicago,5,2,10,Tornado; Thunderstorm Wind,6,0.0,1.0,2.8
+56018,AMEA Peaking,AL,Talladega County,1121,98.6,Natural Gas Fired Combustion Turbine,33.1661,-86.2825,America/Chicago,7,3,8,Tornado; Thunderstorm Wind; Lightning,2,0.0,1.0,1.2
+7698,General Electric Plastic,AL,Lowndes County,1085,97.0,Natural Gas Fired Combined Cycle,32.310226,-86.52542,America/Chicago,9,10,31,Tornado; Lightning,6,0.0,0.0,3.5
+19,Thurlow Dam,AL,Tallapoosa County,1123,91.0,Conventional Hydroelectric,32.535436,-85.88761,America/Chicago,7,2,12,Tornado; Thunderstorm Wind; Tropical Storm,5,0.0,1.0,3.8
+52140,International Paper Prattville Mill,AL,Autauga County,1001,89.8,Wood/Wood Waste Biomass,32.4187,-86.4718,America/Chicago,8,10,28,Tornado; Lightning; Thunderstorm Wind,7,0.0,1.0,4.0
+20,Weiss Dam,AL,Cherokee County,1019,87.6,Conventional Hydroelectric,34.172142,-85.75381,America/Chicago,11,8,40,Thunderstorm Wind; Tornado; Flash Flood,4,0.0,1.0,4.8
+10699,Georgia-Pacific Consr Prods LP-Naheola,AL,Choctaw County,1023,87.5,Wood/Wood Waste Biomass,32.2268,-88.0252,America/Chicago,7,1,13,Tornado; Thunderstorm Wind; Flash Flood,3,0.0,1.0,2.0
+6131,Jones Bluff,AL,Lowndes County,1085,82.0,Conventional Hydroelectric,32.324242,-86.78432,America/Chicago,7,10,26,Tornado; Lightning,2,0.0,0.0,3.4
+64469,Wing,AL,Covington County,1039,80.0,Solar Photovoltaic,31.007777,-86.59194,America/Chicago,3,2,1,Tornado; Flood; Lightning,1,0.0,1.0,2.8
+67957,East Atmore Solar,AL,Escambia County,1053,80.0,Solar Photovoltaic,31.020358,-87.35839,America/Chicago,6,2,35,Tornado; Thunderstorm Wind; Lightning,1,0.0,1.0,3.3
+68001,"Old Hayneville Solar, LLC",AL,Montgomery County,1101,80.0,Solar Photovoltaic,32.317562,-86.41123,America/Chicago,8,10,28,Tornado; Lightning; Thunderstorm Wind,6,0.0,1.0,2.7
+68669,Walker Springs II,AL,Clarke County,1025,80.0,Solar Photovoltaic,31.435022,-87.70473,America/Chicago,2,0,11,Thunderstorm Wind; High Wind,1,0.0,1.0,0.1
+68670,Walker Springs I,AL,Clarke County,1025,80.0,Solar Photovoltaic,31.435022,-87.70473,America/Chicago,2,0,11,Thunderstorm Wind; High Wind,1,0.0,1.0,0.1
+60583,LaFayette Solar Farm,AL,Chambers County,1017,79.2,Solar Photovoltaic,32.876313,-85.38821,America/Chicago,7,2,13,Tornado; Thunderstorm Wind; Tropical Storm,6,0.0,1.0,6.8
+54752,International Paper Pine Hill Mill,AL,Wilcox County,1131,77.4,Wood/Wood Waste Biomass,31.9698,-87.4806,America/Chicago,1,0,1,Flash Flood,1,0.0,1.0,0.0
+60058,"River Bend Solar, LLC (AL)",AL,Lauderdale County,1077,75.0,Solar Photovoltaic,34.831511,-87.8422,America/Chicago,21,7,24,Tornado; Thunderstorm Wind; Lightning,4,0.0,1.0,4.7
+11,H Neely Henry Dam,AL,Calhoun County,1015,72.9,Conventional Hydroelectric,33.7845,-86.0524,America/Chicago,7,6,39,Thunderstorm Wind; Tornado; Lightning,3,11.0,0.0,4.0
+54429,Alabama Pine Pulp,AL,Monroe County,1099,69.0,Wood/Wood Waste Biomass,31.5825,-87.4889,America/Chicago,1,0,1,High Wind,1,0.0,0.0,0.2
+2,Bankhead Dam,AL,Tuscaloosa County,1125,53.9,Conventional Hydroelectric,33.458665,-87.35682,America/Chicago,17,12,16,Tornado; Thunderstorm Wind; Flash Flood,6,0.0,1.0,4.5
+21,Yates Dam,AL,Elmore County,1051,50.5,Conventional Hydroelectric,32.5743,-85.8901,America/Chicago,7,2,12,Tornado; Thunderstorm Wind; Tropical Storm,5,0.0,1.0,3.5
+62449,Kimberly Clark Mobile - CHP Plant,AL,Mobile County,1097,50.0,Natural Gas Fired Combustion Turbine,30.737741,-88.04977,America/Chicago,9,11,8,Marine Thunderstorm Wind; Rip Current; Tornado,10,14.0,0.0,7.1
+10216,Alabama River Pulp,AL,Monroe County,1099,48.0,Wood/Wood Waste Biomass,31.5825,-87.4889,America/Chicago,1,0,1,High Wind,1,0.0,0.0,0.3
+54763,WestRock Demopolis Mill,AL,Marengo County,1091,47.4,Wood/Wood Waste Biomass,32.4541,-87.9759,America/Chicago,9,2,24,Tornado; Thunderstorm Wind; Winter Weather,4,0.0,1.0,2.6
+12,Holt Dam,AL,Tuscaloosa County,1125,46.9,Conventional Hydroelectric,33.2553,-87.4495,America/Chicago,10,7,7,Thunderstorm Wind; Flash Flood; Lightning,5,0.0,1.0,3.9
+55044,Packaging Corp. of America Jackson Mill,AL,Clarke County,1025,44.4,Natural Gas Steam Turbine,31.4894,-87.8989,America/Chicago,1,0,1,High Wind,2,0.0,1.0,1.5
+707,Goat Rock,AL,Harris County,13145,38.6,Conventional Hydroelectric,32.6096,-85.0795,America/New_York,13,28,106,Tornado; Lightning; Thunderstorm Wind,5,0.0,1.0,9.5
+67488,TAI Huntsville Solar Hybrid,AL,Madison County,1089,32.4,Solar Photovoltaic,34.829551,-86.63035,America/Chicago,19,11,23,Tornado; Thunderstorm Wind; Strong Wind,7,0.0,1.0,5.2
+59862,Fort Benning Solar Facility,AL,Russell County,1113,30.0,Solar Photovoltaic,32.30404,-84.98993,America/Chicago,8,26,95,Tornado; Lightning; Heat,1,0.0,1.0,8.0
+54216,U S Alliance Coosa Pines,AL,Talladega County,1121,25.9,Wood/Wood Waste Biomass,33.328107,-86.35683,America/Chicago,11,4,14,Tornado; Lightning; Thunderstorm Wind,3,0.0,1.0,2.0
+61924,"Cumblerland Land Holdings, LLC",AL,Limestone County,1083,14.7,Solar Photovoltaic,34.94974,-86.86805,America/Chicago,18,12,21,Tornado; Thunderstorm Wind; Strong Wind,7,0.0,1.0,3.1
+6150,Bellefonte,AL,Jackson County,1071,14.0,Petroleum Liquids,34.7092,-85.9278,America/Chicago,12,10,22,Tornado; Flash Flood; Thunderstorm Wind,6,0.0,1.0,6.7
+54550,W&T Onshore Treating Facility (OTF),AL,Mobile County,1097,12.0,Natural Gas Fired Combined Cycle,30.43203,-88.18241,America/Chicago,13,13,20,Lightning; Tornado; Marine Thunderstorm Wind,15,14.0,0.0,7.2
+61901,Redstone Arsenal Hybrid,AL,Madison County,1089,11.0,Solar Photovoltaic,34.610987,-86.61155,America/Chicago,20,14,23,Thunderstorm Wind; Strong Wind; Lightning,8,0.0,1.0,6.5
+60679,Fort Rucker Solar Array,AL,Dale County,1045,10.6,Solar Photovoltaic,31.331148,-85.73019,America/Chicago,8,8,11,Thunderstorm Wind; Tornado; Flood,5,0.0,1.0,5.1
+54985,Crestwood Dothan,AL,Houston County,1069,8.6,Petroleum Liquids,31.262356,-85.40274,America/Chicago,12,9,31,Tornado; Thunderstorm Wind; Rip Current,5,0.0,1.0,6.3
+60680,ANAD Solar Array,AL,Calhoun County,1015,7.4,Solar Photovoltaic,33.626728,-85.96948,America/Chicago,8,9,19,Tornado; Lightning; Flood,2,11.0,0.0,4.0
+55,Point A,AL,Covington County,1039,5.2,Conventional Hydroelectric,31.361146,-86.51831,America/Chicago,4,2,4,Lightning; Tornado; Thunderstorm Wind,1,0.0,1.0,1.0
+59710,Sand Valley Power Station,AL,DeKalb County,1049,4.8,Landfill Gas,34.343875,-85.8661,America/Chicago,17,9,44,Thunderstorm Wind; Tornado; Flash Flood,5,0.0,1.0,6.2
+7924,Albertville,AL,Marshall County,1095,4.0,Petroleum Liquids,34.363389,-86.22389,America/Chicago,19,12,35,Thunderstorm Wind; Tornado; Flash Flood,5,0.0,1.0,7.8
+56076,ABC Coke,AL,Jefferson County,1073,3.8,Natural Gas Steam Turbine,33.582793,-86.77987,America/Chicago,27,12,73,Tornado; Thunderstorm Wind; Flash Flood,14,29.0,0.0,7.9
+53,Gantt,AL,Covington County,1039,3.0,Conventional Hydroelectric,31.4033,-86.47947,America/Chicago,5,4,4,Lightning; Flood; Tornado,1,0.0,1.0,1.8
+58061,Decatur-Morgan Co LFG Recovery Project,AL,Morgan County,1103,1.6,Landfill Gas,34.623611,-87.10111,America/Chicago,12,5,13,Thunderstorm Wind; Tornado; Flash Flood,4,0.0,1.0,2.9

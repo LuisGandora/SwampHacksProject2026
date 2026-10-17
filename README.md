@@ -1,12 +1,10 @@
 # SwampHacksProject2026
 Our SwampHacks
 
+## Setup (virtual environment)
 
+Use one Python virtual environment (`.venv`) for the whole project, so everyone runs the same Python with the same packages. Without it, `python` can point at different installs: this project hit a `No module named 'psycopg'` error because `python` was 3.14 while the packages were installed for 3.13.
 
-<<<<<<< Updated upstream
-To install dependencies, run:
-python -m pip install -r requirements.txt
-=======
 ### One-time setup
 
 From the project root:
@@ -36,7 +34,7 @@ Python 3.13 is what the project is tested with. Any 3.12 or newer should work.
 
 ### Every new terminal
 
-Activate the environment first. Your prompt then starts with `'.ven(.venv)`, and plain `python` uses the project's packages:
+Activate the environment first. Your prompt then starts with `(.venv)`, and plain `python` uses the project's packages:
 
 ```powershell
 .venv\Scripts\Activate.ps1        # Windows
@@ -67,6 +65,8 @@ Open the Command Palette (Ctrl+Shift+P), choose **Python: Select Interpreter**, 
 | [db/](db/) | Tiger Data (TimescaleDB) schema and loaders | `python db/setup_db.py`, `python db/load_history.py` |
 | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Brief → feature checklist with status, demo steps and checks | (none) |
 
+> **Judging and deployment:** [docs/JUDGING.md](docs/JUDGING.md) (baseline slide, demo script, Q&A, hygiene checklist) · [docs/DEPLOY.md](docs/DEPLOY.md) (Render blueprint, one worker, separate demo instance).
+
 ## Hazard Index model
 
 [ml/hazard_model.py](ml/hazard_model.py). One row per site per day, 1.27M site-days from October 2021 to October 2026, with one XGBoost classifier per hazard category.
@@ -95,32 +95,92 @@ python -m ml.answer_key            # known-answer checks; exit code 1 if any fai
 
 ## Economic impact
 
-[scraper/economics.py](scraper/economics.py) collects the data and [ml/economic_impact.py](ml/economic_impact.py) runs the analysis:
+[scraper/economics.py](scraper/economics.py), [scraper/outages.py](scraper/outages.py) and [scraper/labor_costs.py](scraper/labor_costs.py) collect the data; [ml/economic_impact.py](ml/economic_impact.py) runs the analysis:
 
 ```powershell
 python scraper/economics.py        # EIA: plant → company and grid operator, monthly sales, daily demand
+python scraper/outages.py          # EAGLE-I outages, FL/GA/AL county-days (streams ~6 GB once, keeps a few MB)
+python scraper/labor_costs.py      # BLS wages x benefits -> loaded labor cost per hour by state
 python -m ml.economic_impact       # load into Tiger, weekly impact + correlations
 ```
 
-| Question | Data | Notes |
+Company data (crew trip logs, weekly sales, payroll) isn't public, so each gap has a **public stand-in**. Each stand-in is labeled as one in the API and UI, and is replaced the moment real data is loaded.
+
+| Need | What's used now | Source | Replace with |
+|---|---|---|---|
+| **Crew trips** (restoration workload) | **Customer-hours without power** in the counties that hold each operator's sites, per week | [EAGLE-I](https://figshare.com/articles/dataset/24237376) (ORNL), 15-minute county snapshots, 2021–2025 | `data/crew_trips.csv` (`trip_id, site_id, started_at, ended_at, crew_size, purpose, cost_usd`) |
+| **Weekly sales** | **Estimated weekly revenue** = weekly demand × that month's average retail price | EIA-930 daily demand × EIA-861M revenue ÷ MWh | company weekly sales (loader on request) |
+| **Monthly sales** | Retail revenue and MWh per utility | EIA-861M | (real data) |
+| **Labor cost** | Mean wage × benefits: **FL $58.33, GA $56.26, AL $56.65/hour** (US $63.19) | BLS OEWS 49-9051 (power-line installers and repairers) × BLS ECEC compensation ÷ wages (×1.43) | company payroll: `UPDATE economic_assumptions …` (BLS never overwrites a company value) |
+| **Weather delays** | Stop-work weather days × hours lost per hazard × crew size × state labor rate | site weather + labeled assumptions | delay hours from work orders |
+
+Correlations are reported raw and **deseasonalized**, meaning each series minus its same-month average. Summer heat and summer demand rise together anyway, so the useful question is whether an unusually hot or stormy week also had unusual demand, outages or revenue. Results (`GET /economics/correlations`):
+- **Weather drives crew workload:** weeks with more stop-work weather or storm events have more customer-hours without power at every operator. Deseasonalized r = **0.37–0.72**, all p < 10⁻⁶, 143–220 weeks each. Examples: Tampa Electric 0.71, Duke Florida 0.69, FPL 0.51, Southern Co 0.48.
+- **Unusually hot weeks raise demand** at all four large operators: r = 0.33–0.38, p < 10⁻⁶.
+- **Tampa Electric's unusually stormy weeks have lower demand:** r = −0.28, consistent with outages.
+- **Monthly sales** at FPL, Georgia Power and Alabama Power rise in hotter-than-normal months (r ≈ 0.29–0.31, n = 58).
+
+These are correlations, not proof of cause. The outage stand-in measures all restoration work in a county, not one company's crews.
+
+### Did weather disrupt a crew contract?
+
+**Hypothesis tested:** when a crew contract fails and a bad revenue quarter follows, a severe weather event (such as a tornado) near the work during the contract caused the disruption.
+
+```powershell
+python scraper/contract_data.py      # USAspending contracts, SEC quarterly revenue, OpenFEMA (no keys)
+python -m ml.contract_disruption     # load into Tiger, fit, attribute -> ml/models/contract_disruption.json
+```
+
+| Need | Public stand-in | Size |
 |---|---|---|
-| Does weather move the company's sales? | **EIA-861M** monthly retail revenue and MWh per utility (FPL, Georgia Power, Alabama Power, Duke Energy Florida…) | Utilities don't publish weekly sales |
-| …week by week? | **EIA-930** daily demand per grid operator (Southern Co, FPL, Duke Florida, Tampa Electric: 614 of the 694 sites) | Demand served is the closest public weekly measure of sales volume |
-| How much crew time does weather cost? | Stop-work weather days per site × hours lost per category × crew size × hourly cost | **Every factor is a labeled assumption** in `economic_assumptions`. Replace them with company numbers. |
-| Crew trips by power maintainers | `crew_trips` table, loaded from `data/crew_trips.csv` (`trip_id, site_id, started_at, ended_at, crew_size, purpose, cost_usd`) | **No public source exists.** Until a utility's trip logs are loaded, lost crew time is the proxy. Once loaded, weekly trips are correlated with weather automatically. |
+| Crew contracts and their failures | **USAspending.gov**: federal field-construction contracts performed in FL/GA/AL since FY2016. Covers utility and power lines, heavy civil, electrical and site work. Includes every change to each contract: terminations (default, cause, convenience, cancellation), change orders and end-date changes, with the county the work was in. | 7,647 contracts (7,049 fully observed); 2,395 disrupted (terminated, or 30+ days late not counting planned option years) |
+| Revenue by quarter | **SEC EDGAR XBRL**: 8 public line-crew and field contractors (Quanta, MasTec, MYR, Dycom, Primoris, EMCOR, Granite, Sterling) and 4 utility parents (NextEra, Southern, Duke, Tampa Electric) | 34–49 quarters each |
+| Storm damage | **OpenFEMA**: disaster declarations by county, and Public Assistance utility-repair projects | 3,430 declarations, 5,407 projects |
+| Weather near the work | NOAA Storm Events files in `data/raw`, by county; zone events such as hurricanes are mapped to their counties | 2015–2026 |
 
-Correlations are reported raw and **deseasonalized**, meaning each series minus its same-month average. Summer heat and summer demand rise together anyway, so the useful question is whether an unusually hot or stormy week also had unusual demand. Results (`GET /economics/correlations`):
-- **Unusually hot weeks raise demand at all four grid operators:** r = 0.33–0.38, p < 10⁻⁶, about 250 weeks each.
-- **Tampa Electric's unusually stormy weeks have lower demand:** r = −0.28, p = 7×10⁻⁶, consistent with outages.
-- **Monthly sales at FPL, Georgia Power and Alabama Power** rise in hotter-than-normal months (r ≈ 0.29–0.31).
+**Method** ([ml/contract_disruption.py](ml/contract_disruption.py)):
+1. Weather is counted during each contract's **originally planned** window. A late contract runs longer and would collect more storms *because* of the delay.
+2. A logistic model controls for planned length, size, type of work, agency, state, start year and season. It tests whether contracts exposed to each kind of weather were disrupted more often.
+3. **Evidence per contract.** A change document that names weather as the delay ("WEATHER TIME EXTENSION", "HURRICANE IAN IMPACTS") counts as **documented**. It's **documented + corroborated** when NOAA recorded that kind of storm in the county while the contract ran. A storm that merely overlapped is labeled **storm overlap only** and is never counted as the cause.
 
-These are correlations with small samples for the monthly series (n = 58), not proof of cause.
+**Results:**
+- **Overlap alone would mislead.** Raw numbers look like support: contracts with a tornado in their county were disrupted 44% of the time, vs 31% without. Most of that gap is contract length, because longer contracts see more storms *and* slip more. With the controls, no weather type significantly raises the odds of disruption (tornado odds ratio 1.12, 95% interval 0.98–1.27), and weather adds nothing to prediction (cross-validated AUC 0.704 with weather, 0.706 without).
+- **The original rule is wrong about 95% of the time.** Of 809 disrupted contracts with a tornado nearby, only **4.6%** say in their own documents that weather caused the delay. The rate for all disrupted contracts is 3.8%.
+- **91 disruptions are attributed to weather from the evidence.** 16 are documented + corroborated: 12 tropical, such as Hurricane Ian's landfall on 2022-09-28, and 4 flooding. 75 are documented as general weather delays.
+- **Revenue:** no company shows a consistent "storm, then bad quarter" pattern. For crew contractors, storms tend to come with **more** revenue (restoration work): Primoris, next quarter, Spearman 0.42, p = 0.01, one of 24 tests, so it may be chance. The public contractors hold almost none of these federal contracts (1), so a contract failure can't be traced to a company's revenue with public data.
+
+**What would make this definitive:** the utility's own crew contracts, with start and end dates, site, contractor, and outcome. With them, the same pipeline runs unchanged on real data. Load them in place of `data/field_contracts.csv` with the same columns.
+
+API: `GET /economics/contract-disruption` (summary), `GET /sites/{id}/contracts` (contracts in the site's county with their evidence). The site card shows them under **Economic impact**.
+
+**Restoration bounceback** (`python -m ml.bounceback`): is business above normal in the months after a storm? Three tests:
+- field contracts in the hit county
+- national crew contractors' revenue
+- the sites' utilities' revenue
+
+Not supported: no bounce in any of the 15 tests. An early "hail +31%" turned out to be the September fiscal-year-end spike in federal contract awards. The full process, data and results of both experiments are in [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md).
 
 ## AI safety report (on tap)
 
 `POST /sites/{id}/report` ([backend/reports.py](backend/reports.py)). Code gathers every fact and **decides go / caution / no-go**; Gemini only explains it. Each fact group has a source ID (`S1`–`S7`) that the report must cite, and the assumptions it relies on are listed. A **number audit** flags any number in Gemini's text that isn't in the facts (`verified: false`, with `unverified_numbers`). Gemini gets two retries per model, then the fallback model is tried, then a deterministic template report is used. Reports are cached for 30 minutes.
 
 Set `GEMINI_API_KEY`, and `GEMINI_MODEL` / `GEMINI_FALLBACK_MODEL`; check Google's current model names. Without a key, the template report is returned.
+
+## Compliance next steps (on tap)
+
+`POST /sites/{id}/compliance` ([backend/compliance.py](backend/compliance.py)) turns OSHA reports near a site, plus the site's open crew reports, into a prioritized action list for a supervisor.
+
+| Part | Decided by | Details |
+|---|---|---|
+| Which reports count | code | OSHA Severe Injury Reports tied to the site (within the crew-hazard radius), and crew reports open in the last 30 days |
+| Priority per category | code | points = 5 × open crew reports + OSHA reports in the latest 12 months of data + 3 × amputations or eye losses in 3 years. **High** if any open crew report or 15+ points, **medium** at 5+, otherwise **low**. |
+| Next steps and standards | code (playbook) | Per category, with the federal standard to check. For example, PPE → 29 CFR 1910.132, 1926.95, 1926.501–502, 1910.269(g). Heavy machinery → 1926.600–602, Subpart CC, 1926.453, 1910.178, 1910.147. Spills → 1910.22, 1926.25. Heat → General Duty Clause and the OSHA heat National Emphasis Program. |
+| Reporting deadlines | code | 29 CFR 1904.39: a fatality within 8 hours; a hospitalization, amputation or eye loss within 24 hours. Highlighted when a severe crew report is open. |
+| Explanation and order | Gemini (optional) | Uses only the facts and playbook, cites sources (O = OSHA, C = crew, P = playbook), passes the same number audit, and falls back to a template |
+
+OSHA time windows end at the **latest OSHA report on file** (currently Nov 30, 2025), not today, because the public data lags. Supervisors close the loop with `PATCH /crew-reports/{id}` (`resolved` or `dismissed`), which also clears the alert the report raised. This is guidance to act on, not legal advice.
+
+**To show actual citations instead of injuries:** the OSHA data here records *injuries*. Cited *violations* are in the Department of Labor's OSHA enforcement data (free key from [dataportal.dol.gov](https://dataportal.dol.gov)). With a key, they can be added as another source.
 
 ## Frontend
 
@@ -136,11 +196,18 @@ cd frontend; npm install; npm run dev          # terminal 2: open http://localho
 | **Hazard ranking** (the dashboard requirement) | All 694 plants ranked by Hazard Index, **Today or Tomorrow**. Band tiles (Critical / High / Moderate / Low / Stop work) double as filters. State filter and search. Each row shows its hazard bar, band label, top hazard and alert badges. Click a row to fly to the site. | `GET /sites?horizon=` |
 | Globe | Plants colored by band, pulsing red rings on stop-work sites, lightning from the last 30 min, your GPS location, a draft report pin. 🌎 returns to North America, ◎ fits all sites. | `/sites`, `/lightning/recent` |
 | Site card | Today and tomorrow scores, what drives the score (weather drivers), expected crew impact (labeled estimate), live alerts with all-clear countdowns, 48 h forecast chart (with a table view), 6 PM briefing, site history, economic impact, crew reports with photos | `/sites/{id}`, `/forecast`, `/briefings/{id}`, `/economics`, `/crew-reports` |
+| **Compliance** | Prioritized next steps from OSHA reports nearby and open crew reports, with the OSHA standards to check and reporting deadlines. Crew reports can be marked resolved or dismissed. | `POST /sites/{id}/compliance`, `PATCH /crew-reports/{id}` |
+| **Model accuracy** (📈 in the header) | Walk-forward backtest table: how well each model version predicted real outcomes | `GET /model/backtest` |
+| **LIVE / UNUSUAL badges** | **LIVE**: today's score was raised by an active alert or crew report (hover for why). **UNUSUAL**: in the top 10% of that site's normal range for the month. | `GET /sites` |
 | **AI safety report** | GO / CAUTION / NO-GO decided by code, hazards with source chips, actions, uncertainty, assumptions, number-audit badge, regenerate | `POST /sites/{id}/report` |
 | **Crew hazard report** | Category, description, severity, location (site / GPS / tap the map to pin), optional photo. **Web:** attach a photo. **Phone:** *Take photo* (camera) or *Choose from library*. Photos are shrunk to ≤1600 px JPEG on the device before upload. The site is alerted immediately. | `POST /uploads`, `POST /crew-reports` |
+| **Stop-work screen** | A full-width red banner with the all-clear countdown (big clock and progress bar) whenever a site is under stop work. It flashes "New strike: countdown restarted" when a strike pushes the all-clear back, and turns green ("ALL CLEAR: work may resume") when it runs out. It shows the selected site's alert, or the newest, and offers "+N more sites". Alerts poll every 8 s during a stop. | `GET /alerts/active` |
 | Live alerts | Every active alert, stop work first, with countdowns. New stop-work alerts show a toast and vibrate on phones; there's an optional desktop notification. Polls every 20 s. | `GET /alerts/active` |
+| **Hazard pins** (📍) | Past hazards for future crews: every crew report (faded once closed) and OSHA severe-injury reports within 50 mi of a site, last 3 years. Tap a pin for details and the photo. | `GET /hazard-pins` |
+| **Sign-in and notifications** (🔔) | Sign in with Auth0. Each user adds their own Discord or Slack channels and chooses stop work and/or warnings, crew reports, 6 PM briefings, and all sites or chosen ones. *Send test* checks the webhook. | `/me`, `/me/channels` |
+| **Offline crew reports** | With no signal, a report (with its photo) is saved on the phone and sent automatically when it's back online. The header shows "⏳ N QUEUED". Resending never makes a duplicate. | `POST /crew-reports` |
 | Sensor modes | STD / NVG / FLIR / CRT looks, after the reference project. They tint the data too, so use STD to read colors. | (none) |
-| Demo controls | With `PLANIT_DEV=1`: run the brief's scenario on a site, fake a lightning strike, clear the demo | `/dev/...` |
+| **▶ Demo** (header) and demo controls | With `PLANIT_DEV=1`: **▶ Demo** plays the brief's day on the selected site (or the top Florida one) with captions, in about 45 s. The steps are: crew arrives → heat, soft ground, gator report with photo → lightning stop work → a second strike restarts the countdown → ranking → 6 PM briefing. **■ Reset** removes the demo data. The site card also has the individual controls. | `/dev/...` |
 
 **Hazard colors** use the fixed status palette (green Low < 2.5, yellow Moderate < 5, orange High < 7.5, red Critical) and always come with a text label, never color alone.
 
@@ -490,12 +557,12 @@ python -m backend.test_backend         # parsing and threshold checks (no networ
 |---|---|---|
 | `DATABASE_URL` | everything (or put it in `.env`) | (none) |
 | `NWS_USER_AGENT` | NWS API etiquette: include a contact email | `PlanIT-Control/0.1 (SwampHacks 2026)` |
-| `NOTIFY_WEBHOOK_URL` | sending alerts and briefings to a Discord or Slack channel | not set, so nothing is sent |
-| `NOTIFY_LEVELS` | which alert levels are sent | `stop_work` (use `stop_work,warning` for everything) |
+| `AUTH0_DOMAIN`, `AUTH0_AUDIENCE` | sign-in (see [Sign-in and security](#sign-in-and-security)) | not set, so writes are refused (with `PLANIT_DEV=1`, a local "dev" user) |
+| `WEBHOOK_KEY` | encrypting users' Discord/Slack webhook URLs (API and worker need the same key) | not set, so channels can't be added |
 | `FIRMS_MAP_KEY` | wildfire detections. Get a free key at https://firms.modaps.eosdis.nasa.gov/api/area/ | not set, so the job is skipped |
 | `WILDLIFE_TAXA` | species to watch on iNaturalist, separated by `;` | alligator; cottonmouth; eastern diamondback |
 | `PLANIT_DEV` | `1` turns on the `/dev` demo endpoints. **Never on a public URL.** | off |
-| `CORS_ORIGINS` | the frontend origins allowed to call the API | `*` |
+| `CORS_ORIGINS` | the frontend origins allowed to call the API, comma separated | `http://localhost:5173,http://127.0.0.1:5173` |
 | `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL` | the on-tap AI report | not set, so the template report is used |
 
 ### Worker schedule
@@ -503,7 +570,7 @@ python -m backend.test_backend         # parsing and threshold checks (no networ
 | Job | How often | Source → table → alerts |
 |---|---|---|
 | `lightning` | every minute | GOES-19 satellite lightning mapper (GLM, AWS bucket `noaa-goes19`) → `lightning_strikes`. Stop work within 10 mi and a warning within 20 mi. The 30-minute all-clear restarts with each strike. |
-| `notify` | every minute | New alerts (stop work by default) and new briefings → your Discord or Slack webhook, each sent once |
+| `notify` | every minute | New alerts, crew reports and 6 PM briefings → each user's Discord or Slack channels, filtered by that channel's levels and sites, each sent once per channel (`notification_log`) |
 | `alerts` | every 2 min | NWS active alerts → `nws_alerts`. Site alerts last until the NWS warning expires. Storm-based warnings use their polygon; others use the site's NWS zone or county. |
 | `observations` | every 10 min | Latest NWS reading at each site's station → `weather_observations`. Raises alerts the moment the heat index, wind chill, gusts or visibility cross a category's threshold. It also gives the **flood rule from the brief**: 2 in or more of rain in the last 12 h raises a flood-risk warning (4 in is stop work), naming any river gauge nearby. |
 | `rivers` | every 15 min | NOAA river gauges (NWPS, about 1,500 in the region, one request) → `river_gauges`, `river_gauge_readings`. A gauge at action stage or worse, or forecast to flood, within 5 mi raises a flood warning. Minor flooding or worse within 1 mi is stop work. |
@@ -531,12 +598,41 @@ Run any job once with `python -m backend.worker <job> [<job> ...]`.
 | `GET /sites/{id}/hazard-events?category=lightning` | historical events tied to the site |
 | `GET /alerts/active?state=FL` | **Instant alerts**: `title`, `message`, `image_url`, location, `all_clear_seconds` for the countdown. Poll every 15–30 s. |
 | `GET /briefings/{id}?date=2026-10-18` | the 6 PM next-day briefing: `summary` text plus structured `content` (flags, forecast, NWS alerts, score) for the AI API to rewrite |
-| `POST /uploads` | multipart `file` (JPEG, PNG, WebP or HEIC, up to 10 MB) → `{url}`. Photos are saved in `uploads/` on the API server. |
-| `POST /crew-reports` | `{category, lat, lon, description, photo_url, reported_by, severity, site_id?}`. The nearest site within 10 mi is filled in when `site_id` is omitted. **The site gets a warning alert immediately**, open for 12 h, with the photo. |
+| `POST /uploads` 🔒 | multipart `file` (JPEG, PNG, WebP or HEIC, up to 10 MB, checked by its bytes, not its name) → `{url}`. Photos are saved in `uploads/` on the API server. |
+| `POST /crew-reports` 🔒 | `{category, lat, lon, description, photo_url, reported_by, severity, site_id?, report_id?, reported_at?}`. The nearest site within 10 mi is filled in when `site_id` is omitted. **The site gets a warning alert immediately**, open for 12 h, with the photo. `report_id` makes resending safe, and `reported_at` (within the last 24 h) keeps the time a queued report was made. |
 | `GET /crew-reports?site_id=&category=&status=open` | crew hazard reports |
-| `POST /sites/{id}/report?refresh=false` | **On-tap AI safety report** (see [AI safety report](#ai-safety-report-on-tap)) |
+| `GET /hazard-pins?days=1095` | crew reports and OSHA severe injuries within 50 mi of a site, for the map |
+| `GET /me` 🔒 | the signed-in user |
+| `GET /me/channels`, `POST /me/channels`, `DELETE /me/channels/{id}`, `POST /me/channels/{id}/test` 🔒 | your Discord/Slack channels: `{webhook_url, label, levels, site_ids, briefings, crew_reports}`. The URL is never returned. |
+| `POST /sites/{id}/report?refresh=false` 🔒 | **On-tap AI safety report** (see [AI safety report](#ai-safety-report-on-tap)) |
+| `POST /sites/{id}/compliance?refresh=false` 🔒 | **Compliance next steps** (see [Compliance](#compliance-next-steps-on-tap)) |
+| `PATCH /crew-reports/{id}` 🔒 | `{status: resolved | dismissed | open}`; closing also clears the alert the report raised |
+| `GET /model/backtest` | model test metrics and the walk-forward backtest |
 | `GET /sites/{id}/economics?weeks=26` | the site's company and grid operator, weekly weather impact and demand, correlations, assumptions |
 | `GET /economics/correlations?significant_only=true` | weather vs demand and sales correlations for every company |
+
+🔒 = needs sign-in (an Auth0 access token as `Authorization: Bearer …`) and is rate limited per user.
+
+### Sign-in and security
+
+| Layer | What's in place |
+|---|---|
+| **Who you are** | **Auth0** (OAuth 2.0 / OpenID Connect). The app gets an **RS256-signed JWT** access token. The API ([backend/auth.py](backend/auth.py)) checks its signature against the tenant's published keys, plus issuer, audience and expiry, before trusting anything in it. No passwords are stored here. |
+| **Users** | `app_users`, one row per Auth0 account, created on first sign-in. Name and email come from Auth0's `/userinfo`, not from the browser. A `role` column (`crew` / `supervisor`) is there for the crew vs supervisor views; it isn't enforced yet. Crew reports record who sent them (`user_id`) and who closed them (`resolved_by`). |
+| **Users' webhooks** | Stored **encrypted** (Fernet, `WEBHOOK_KEY`, which lives only in the app's environment). The API returns just the last 4 characters. Only `https://discord.com/api/webhooks/…` and `https://hooks.slack.com/services/…` are accepted, so the worker can't be pointed at internal addresses. Errors are logged without the URL. |
+| **In transit** | HTTPS (TLS 1.2+) everywhere it's deployed: Auth0, the Tiger database (TLS required) and the host's HTTPS endpoint (Render, Railway, Fly.io and cloudflared all terminate TLS). Tokens only travel over it. |
+| **Who can write** | Reads stay public (the dashboard). Every write (reports, uploads, AI calls, channels, demo endpoints) needs a valid token. |
+| **Abuse limits** | Per user and per minute: AI reports 10, uploads 20, other writes 60, test messages 5. Over the limit → 429. Uploads are checked by their bytes. CORS allows only the dashboard's origins. |
+| **Database** | `python -m db.create_api_role` creates `planit_api`, which can read everything but write only the six tables the API writes, and can't create, drop or truncate. Its URL goes in `.env.api` (git-ignored). Use it as the API host's `DATABASE_URL`; the worker keeps the admin URL. |
+
+**Set up Auth0 (about 10 minutes, free):**
+1. Sign up at [auth0.com](https://auth0.com) (the MLH partner link gives the hackathon offer).
+2. **Applications → APIs → Create API.** Name it Planet Control and set the identifier to `https://api.planet-control`. This identifier is the *audience*. Keep the signing algorithm RS256.
+3. **Applications → Create Application → Single Page Application.** Under Settings, set Allowed Callback URLs, Allowed Logout URLs and Allowed Web Origins to `http://localhost:5173` (plus your deployed URL). Turn on **Refresh Token Rotation** so phones stay signed in.
+4. Root `.env`: `AUTH0_DOMAIN=<tenant>.us.auth0.com` and `AUTH0_AUDIENCE=https://api.planet-control`. Generate a `WEBHOOK_KEY` with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+5. `frontend/.env`: `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENT_ID` (from the SPA's settings) and `VITE_AUTH0_AUDIENCE` (see [frontend/.env.example](frontend/.env.example)).
+
+Without the Auth0 settings, the app runs signed out. With `PLANIT_DEV=1`, the API uses a local "dev" user, so a laptop demo works offline from Auth0.
 
 ### Demo
 
@@ -552,7 +648,7 @@ Start the API with `$env:PLANIT_DEV = "1"` to turn on:
 
 ### Sharing the API with your team
 
-- **Quick (your laptop):** `cloudflared tunnel --url http://localhost:8000` prints a public `https://….trycloudflare.com` URL that forwards to your running API. It only works while your laptop and the tunnel are running. **Turn `PLANIT_DEV` off first**, because anyone with the URL can call the endpoints.
+- **Quick (your laptop):** `cloudflared tunnel --url http://localhost:8000` prints a public `https://….trycloudflare.com` URL that forwards to your running API. It only works while your laptop and the tunnel are running. **Turn `PLANIT_DEV` off and set the Auth0 variables first**, and add the tunnel's frontend URL to `CORS_ORIGINS` and to Auth0's allowed URLs.
 - **Always on (for judging):** deploy the API and the worker to a host such as Railway, Render or Fly.io, with the environment variables above. Run the API as a web service and the worker as a background worker, one copy each. Uploaded photos live on the API server's disk, so use a persistent volume, or move them to S3/R2.
 
 ### Notes
@@ -562,4 +658,3 @@ Start the API with `$env:PLANIT_DEV = "1"` to turn on:
 - Two stations (`AMG`, `NFJ`) don't publish current NWS observations, so about 20 sites have forecasts and alerts but no live readings.
 - An NWS warning that's cancelled early keeps its site alert until the original expiry time.
 - Forecasts and observations keep 30 days, NWS alerts 180 days, and lightning 90 days (compressed after 2), to stay within the free tier.
->>>>>>> Stashed changes
