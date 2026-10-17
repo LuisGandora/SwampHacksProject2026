@@ -11,6 +11,7 @@ import csv
 import datetime
 import json
 import math
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -28,6 +29,7 @@ MONTHS = ["january", "february", "march", "april", "may", "june", "july",
           "august", "september", "october", "november", "december"]
 OVERPASS = "https://overpass-api.de/api/interpreter"
 MATCH_KM = 2.0   # nearest-OSM fallback radius when no ref:US:EIA tag
+CORRECT_KM = 5.0  # EIA vs OSM further apart than this: resolve which one to trust (resolve_coordinates)
 REVIEW_KM = 1.0  # EIA vs OSM distance above this gets flagged for manual review
 
 
@@ -128,7 +130,35 @@ def match_osm(plants, osm):
             continue
         d = round(km(p["lat"], p["lon"], o["lat"], o["lon"]), 3)
         p.update(osm_id=o["osm_id"], osm_name=o["tags"].get("name", ""), osm_match=how,
-                 osm_distance_km=d, coord_check="ok" if d <= REVIEW_KM else "review")
+                 osm_distance_km=d, coord_check="ok" if d <= REVIEW_KM else "review",
+                 _osm=(o["lat"], o["lon"]))
+
+
+def same_name(a, b):
+    words = lambda s: {w for w in re.findall(r"[a-z]+", (s or "").lower()) if len(w) > 2} - {
+        "solar", "energy", "center", "llc", "plant", "power", "farm", "project", "the"}
+    return bool(words(a) & words(b))
+
+
+def resolve_coordinates(plants):
+    """EIA and OSM points far apart: decide which to trust, or flag the site as unresolved.
+
+    Switch to OSM when its plant is an outline traced from imagery (way/relation) with a matching name, or when
+    the EIA point falls outside the county EIA itself lists. Otherwise keep EIA and mark 'unresolved'.
+    Returns the plants whose coordinates changed (their county and time zone must be looked up again).
+    """
+    moved = []
+    for p in plants:
+        if p["coord_check"] != "review" or float(p["osm_distance_km"]) <= CORRECT_KM:
+            continue
+        traced = p["osm_id"].split("/")[0] in ("way", "relation")
+        if (traced and same_name(p["name"], p["osm_name"])) or p.get("county_matches_eia") is False:
+            p["lat"], p["lon"] = p["_osm"]
+            p.update(coord_source="osm", coord_check="corrected")
+            moved.append(p)
+        else:
+            p["coord_check"] = "unresolved"
+    return moved
 
 
 def add_county_and_tz(plants):
@@ -193,6 +223,10 @@ def main():
 
     print("Looking up county (FCC) and time zone...")
     add_county_and_tz(out)
+    moved = resolve_coordinates(out)
+    if moved:
+        print(f"Moved {len(moved)} sites to their OSM location: {', '.join(p['name'] for p in moved)}")
+        add_county_and_tz(moved)
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with open(args.out, "w", newline="", encoding="utf-8") as f:

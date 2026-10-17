@@ -7,3 +7,8 @@ apscheduler
 h5py
 numpy
 python-multipart
+google-genai
+pandas
+scikit-learn
+xgboost
+scipy

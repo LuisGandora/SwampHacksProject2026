@@ -98,17 +98,18 @@ def sync_forecasts(conn):
             continue
         temp, heat, chill = hourly(p.get("temperature")), hourly(p.get("heatIndex")), hourly(p.get("windChill"))
         gust, pop = hourly(p.get("windGust")), hourly(p.get("probabilityOfPrecipitation"))
+        wind = hourly(p.get("windSpeed"))
         rain, thunder = hourly(p.get("quantitativePrecipitation"), split=True), hourly(p.get("probabilityOfThunder"))
         vis, wx = hourly(p.get("visibility")), hourly(p.get("weather"))
         rows = [(site, dt.datetime.fromisoformat(p["updateTime"]), h, c_to_f(temp.get(h)), c_to_f(heat.get(h)),
                  c_to_f(chill.get(h)), pop.get(h), mm_to_in(rain.get(h)), kmh_to_mph(gust.get(h)), thunder.get(h),
-                 m_to_mi(vis.get(h)), describe(wx.get(h)))
+                 m_to_mi(vis.get(h)), describe(wx.get(h)), kmh_to_mph(wind.get(h)))
                 for site in grid["sites"] for h in hours if h in temp]
         conn.execute("DELETE FROM weather_forecasts WHERE site_id = ANY(%s) AND valid_at >= %s", (grid["sites"], now))
         conn.cursor().executemany(
             "INSERT INTO weather_forecasts (site_id, issued_at, valid_at, temp_f, heat_index_f, wind_chill_f, "
-            "precip_chance, precip_in, wind_gust_mph, thunder_chance, visibility_mi, short_forecast) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING", rows)
+            "precip_chance, precip_in, wind_gust_mph, thunder_chance, visibility_mi, short_forecast, wind_mph) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING", rows)
         conn.commit()
         written += len(rows)
         if n % 50 == 0:
