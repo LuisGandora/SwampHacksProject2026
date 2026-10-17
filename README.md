@@ -14,7 +14,7 @@ From the project root:
 py -3.13 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install -r backend/requirements.txt -r scraper/requirements.txt
+python -m pip install -r requirements.txt -r backend/requirements.txt -r scraper/requirements.txt
 ```
 
 If PowerShell refuses to run `Activate.ps1` ("running scripts is disabled on this system"), allow scripts for your user once, then activate again:
@@ -27,7 +27,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 python3.13 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -r backend/requirements.txt -r scraper/requirements.txt
+python -m pip install -r requirements.txt -r backend/requirements.txt -r scraper/requirements.txt
 ```
 
 Python 3.13 is what the project is tested with. Any 3.12 or newer should work.
@@ -51,7 +51,18 @@ Open the Command Palette (Ctrl+Shift+P), choose **Python: Select Interpreter**, 
 
 - **Database:** the connection string goes in `.env` in the project root, as `DATABASE_URL=...`. Get it from a teammate privately, or see [Database (Tiger Data)](#database-tiger-data).
 - **Git:** `.venv/` and `.env` are git-ignored. Never commit either one.
-- **New packages:** after installing a package, add it to the matching `requirements.txt` (`backend/` or `scraper/`) so teammates get it too.
+- **New packages:** after installing a package, add it to the matching `requirements.txt` (root for the ML model, `backend/` or `scraper/`) so teammates get it too.
+
+## Project layout
+
+| Folder or file | What it is | How to run |
+|---|---|---|
+| [frontend/](frontend/) | React (Vite) app: map, hazard index, crew reports, supervisor ranking | `cd frontend; npm install; npm run dev` |
+| [backend/](backend/) | Python FastAPI API and live-data worker (see [Backend](#backend-fastapi--live-data-worker)) | `python -m uvicorn backend.app:app --reload` and `python -m backend.worker` |
+| [hardzardModel.py](hardzardModel.py) | XGBoost Hazard Index model: trains on `data/plant_weather_summary.csv` and `data/plant_stations.csv`, writes `data/hazard_scores.csv` | `python hardzardModel.py` |
+| [scraper/](scraper/) | Data collection scripts (power plants, weather, OSHA, CDC) | see the sections below |
+| [db/](db/) | Tiger Data (TimescaleDB) schema and loaders | `python db/setup_db.py`, `python db/load_history.py` |
+| [main.cpp](main.cpp) | Earlier C++ (Crow) server prototype; the backend has moved to Python | see `setup.txt` |
 
 ## Power plant scraper
 
