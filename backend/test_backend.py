@@ -48,7 +48,7 @@ facts = {"site": {"name": "Plant A"}, "recommendation": {"value": "no_go", "rule
          "S1_hazard_scores": {"next_day": {"score": 8.2, "category_scores": {
              "severe_storm": {"score": 7.9, "drivers": [{"label": "rain that day"}]}, "_meta": {}}}}}
 r = template(facts)
-assert r["headline"] == "NO-GO: Plant A, hazard index 8.2/10 tomorrow" and len(r["hazards"]) == 2, r
+assert r["headline"] == "NO-GO: Plant A, hazard index 8.2/10" and len(r["hazards"]) == 2, r  # no "tomorrow": the index can be climatology
 assert any("30 minutes" in a for a in r["actions"]), r["actions"]  # lightning policy action included
 print("reports ok")
 
