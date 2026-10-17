@@ -60,7 +60,6 @@ export default function ReportModal({ site, categories, onClose }) {
               <span className="call-icon" aria-hidden="true">{call?.icon}</span>
               <div>
                 <strong>{call?.label}</strong>
-                <p className="small">Decided by code, not the AI: {r.recommendation.rule}</p>
               </div>
             </div>
 
