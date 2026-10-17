@@ -1,4 +1,4 @@
-// PlanIT Control API client. Set VITE_API_URL in frontend/.env to point at a tunnel or deployment.
+// Planet Control API client. Set VITE_API_URL in frontend/.env to point at a tunnel or deployment.
 export const API = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
 
 export class ApiError extends Error {
@@ -27,7 +27,7 @@ async function request(path, { method = "GET", json, form, timeout = 30000 } = {
   } catch (e) {
     if (e instanceof ApiError) throw e;
     if (e.name === "AbortError") throw new ApiError(0, "The request timed out.");
-    throw new ApiError(0, `Can't reach the PlanIT API at ${API}.`);
+    throw new ApiError(0, `Can't reach the Planet Control API at ${API}.`);
   } finally {
     clearTimeout(timer);
   }
