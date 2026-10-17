@@ -129,7 +129,15 @@ export default function App() {
           <div className="info">
             {selected ? (
               <>
-                <h2 className="city">{selected.name}</h2>
+                <div className="city-head">
+                  <h2 className="city">{selected.name}</h2>
+                  <span className="city-time">
+                    {now.toLocaleTimeString("en-US", {
+                      timeZone: selected.tz,
+                      timeZoneName: "short",
+                    })}
+                  </span>
+                </div>
                 {selected.info.map((line) => (
                   <p key={line} className="info-line">
                     {line}
