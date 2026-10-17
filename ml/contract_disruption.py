@@ -30,6 +30,7 @@ Public stand-ins: federal contracts are the same kind of field work as a utility
 """
 import datetime as dt
 import json
+import re
 from pathlib import Path
 
 import numpy as np
@@ -105,22 +106,53 @@ def zone_counties():
     return out
 
 
-def storm_days(conn):
-    """One row per (county fips, weather type, day) from NOAA Storm Events; zone events spread to the zone's counties."""
-    ev = pd.DataFrame(conn.execute(
-        "SELECT state, state_fips, cz_type, cz_fips, event_type, begin_time::date AS day FROM storm_events "
-        "WHERE state IN ('Florida', 'Georgia', 'Alabama')").fetchall())
+def county_names():
+    """{(state abbrev, lowercase county name): fips} from the zone-county file, for zone names like 'Coastal Lee'."""
+    path = max((DATA / "raw").glob("bp*.dbx"), key=lambda p: p.stat().st_mtime)
+    out = {}
+    for line in path.read_text("latin-1").splitlines():
+        f = line.split("|")
+        if len(f) >= 7:
+            out[(f[0], f[5].lower())] = f[6]
+    return out
+
+
+def zone_by_name(state, name, names):
+    """Counties named in a retired zone's name ('Coastal Collier', 'Metro Miami-Dade'), longest names first."""
+    text, found = re.sub(r"[^a-z ]", " ", name.lower()), []
+    for (st, county), fips in sorted(names.items(), key=lambda kv: -len(kv[0][1])):
+        key = re.sub(r"[^a-z ]", " ", county)
+        if st == state and re.search(rf"\b{key}\b", text):
+            found.append(fips)
+            text = text.replace(key, " ")
+    return found
+
+
+def storm_days(conn=None):
+    """One row per (county fips, weather type, local day), read straight from the NOAA Storm Events files in data/raw.
+    County events use their county code (no coordinates needed). Zone events (hurricanes, heat, winter storms) go to
+    the zone's counties; zones NWS has since renumbered are matched by the county named in the zone's name. (The
+    storm_events table in Tiger drops events it can't put on a map, which these county-level tests don't need.)"""
     kind = {t: k for k, types in WEATHER_TYPES.items() for t in types}
-    ev["kind"] = ev.event_type.map(kind)
-    ev = ev.dropna(subset=["kind"])
-    abbrev = {"Florida": "FL", "Georgia": "GA", "Alabama": "AL"}
-    zones = zone_counties()
-    rows = []
-    for e in ev.itertuples():
-        if e.cz_type == "C":
-            rows.append((f"{int(e.state_fips):02d}{int(e.cz_fips):03d}", e.kind, e.day))
-        else:
-            rows += [(fips, e.kind, e.day) for fips in zones.get((abbrev[e.state], f"{int(e.cz_fips):03d}"), [])]
+    abbrev = {"FLORIDA": "FL", "GEORGIA": "GA", "ALABAMA": "AL"}
+    zones, names = zone_counties(), county_names()
+    rows, unplaced = [], 0
+    for path in sorted((DATA / "raw").glob("StormEvents_details*_d20*.csv.gz")):
+        ev = pd.read_csv(path, low_memory=False, usecols=["STATE", "STATE_FIPS", "CZ_TYPE", "CZ_FIPS", "CZ_NAME",
+                                                           "EVENT_TYPE", "BEGIN_YEARMONTH", "BEGIN_DAY"])
+        ev = ev[ev.STATE.isin(list(abbrev)) & ev.EVENT_TYPE.isin(list(kind)) & (ev.BEGIN_YEARMONTH >= 201501)]
+        for e in ev.itertuples():
+            ym = int(e.BEGIN_YEARMONTH)
+            day = dt.date(ym // 100, ym % 100, int(e.BEGIN_DAY))
+            if e.CZ_TYPE == "C":
+                counties = [f"{int(e.STATE_FIPS):02d}{int(e.CZ_FIPS):03d}"]
+            else:
+                st = abbrev[e.STATE]
+                counties = zones.get((st, f"{int(e.CZ_FIPS):03d}")) or zone_by_name(st, str(e.CZ_NAME), names)
+            unplaced += not counties
+            rows += [(fips, kind[e.EVENT_TYPE], day) for fips in counties]
+    if unplaced:
+        print(f"  storm events: {unplaced} zone events could not be placed in a county")
     return pd.DataFrame(rows, columns=["county_fips", "kind", "day"]).drop_duplicates()
 
 
@@ -246,7 +278,7 @@ def main():
     with psycopg.connect(database_url(), row_factory=dict_row) as conn:
         c, fema, rev = load(conn)
         days = storm_days(conn)
-        data_end = pd.Timestamp(conn.execute("SELECT max(begin_time)::date AS d FROM storm_events").fetchone()["d"])
+        data_end = pd.Timestamp(days.day.max())  # end of the NOAA files in data/raw
 
         c["start"] = pd.to_datetime(c.start_date, errors="coerce")
         c["planned_end"] = pd.to_datetime(c.original_end_date, errors="coerce")

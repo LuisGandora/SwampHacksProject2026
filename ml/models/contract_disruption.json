@@ -1,152 +1,152 @@
 {
   "model_version": "contract-disruption-v1",
-  "computed_at": "2026-10-17T21:48:22+00:00",
-  "contracts": 7050,
-  "disrupted": 2396,
+  "computed_at": "2026-10-17T22:10:27+00:00",
+  "contracts": 7049,
+  "disrupted": 2395,
   "terminated": 93,
-  "slipped_30_days": 2332,
+  "slipped_30_days": 2331,
   "attributed_to_weather": 91,
   "attributed_by_weather": {
-    "unnamed": 79,
-    "tropical": 8,
+    "unnamed": 75,
+    "tropical": 12,
     "flood": 4
   },
   "evidence": {
-    "storm_overlap_only": 2178,
-    "none": 127,
-    "documented": 79,
-    "documented_and_corroborated": 12
+    "storm_overlap_only": 2208,
+    "none": 96,
+    "documented": 75,
+    "documented_and_corroborated": 16
   },
   "documented_weather_odds_ratios": {
     "tornado": {
-      "odds_ratio": 0.682,
-      "ci_low": 0.4039,
-      "ci_high": 1.1516,
-      "p_value": 0.1522
+      "odds_ratio": 0.669,
+      "ci_low": 0.3943,
+      "ci_high": 1.1351,
+      "p_value": 0.1362
     },
     "tropical": {
-      "odds_ratio": 1.1516,
-      "ci_low": 0.6743,
-      "ci_high": 1.9668,
-      "p_value": 0.6053
+      "odds_ratio": 1.281,
+      "ci_low": 0.7357,
+      "ci_high": 2.2305,
+      "p_value": 0.3814
     },
     "severe_wind": {
-      "odds_ratio": 0.3222,
-      "ci_low": 0.1809,
-      "ci_high": 0.5737,
+      "odds_ratio": 0.3198,
+      "ci_low": 0.1798,
+      "ci_high": 0.5688,
       "p_value": 0.0001
     },
     "hail": {
-      "odds_ratio": 1.5647,
-      "ci_low": 0.8922,
-      "ci_high": 2.7443,
-      "p_value": 0.1183
+      "odds_ratio": 1.5549,
+      "ci_low": 0.8872,
+      "ci_high": 2.7251,
+      "p_value": 0.1231
     },
     "flood": {
-      "odds_ratio": 0.4894,
-      "ci_low": 0.286,
-      "ci_high": 0.8374,
-      "p_value": 0.0091
+      "odds_ratio": 0.4814,
+      "ci_low": 0.2807,
+      "ci_high": 0.8253,
+      "p_value": 0.0079
     },
     "lightning": {
-      "odds_ratio": 1.244,
-      "ci_low": 0.6846,
-      "ci_high": 2.2604,
-      "p_value": 0.4737
+      "odds_ratio": 1.2646,
+      "ci_low": 0.6983,
+      "ci_high": 2.2905,
+      "p_value": 0.4385
     },
     "heat": {
-      "odds_ratio": 0.1221,
-      "ci_low": 0.0148,
-      "ci_high": 1.0044,
-      "p_value": 0.0505
+      "odds_ratio": 0.2465,
+      "ci_low": 0.055,
+      "ci_high": 1.1053,
+      "p_value": 0.0674
     },
     "winter": {
-      "odds_ratio": 0.4604,
-      "ci_low": 0.2049,
-      "ci_high": 1.0342,
-      "p_value": 0.0603
+      "odds_ratio": 0.5066,
+      "ci_low": 0.2431,
+      "ci_high": 1.0561,
+      "p_value": 0.0696
     },
     "fema_declaration": {
-      "odds_ratio": 0.9041,
-      "ci_low": 0.5269,
-      "ci_high": 1.5516,
-      "p_value": 0.7145
+      "odds_ratio": 0.8581,
+      "ci_low": 0.4856,
+      "ci_high": 1.5163,
+      "p_value": 0.5984
     }
   },
-  "documented_weather_cv_auc": 0.804,
+  "documented_weather_cv_auc": 0.798,
   "team_rule_check": {
-    "disrupted_with_tornado": 808,
+    "disrupted_with_tornado": 809,
     "of_those_documented_weather": 0.046,
     "documented_weather_rate_all_disrupted": 0.038
   },
   "exposed_share": {
     "tornado": 0.263,
-    "tropical": 0.266,
-    "severe_wind": 0.576,
+    "tropical": 0.308,
+    "severe_wind": 0.578,
     "hail": 0.294,
-    "flood": 0.412,
+    "flood": 0.418,
     "lightning": 0.172,
-    "heat": 0.028,
-    "winter": 0.08,
+    "heat": 0.031,
+    "winter": 0.092,
     "fema_declaration": 0.36
   },
-  "cv_auc_with_weather": 0.705,
+  "cv_auc_with_weather": 0.704,
   "cv_auc_controls_only": 0.706,
   "disruptive_weather": [],
   "weather_odds_ratios": {
     "tornado": {
-      "odds_ratio": 1.1204,
-      "ci_low": 0.9813,
-      "ci_high": 1.2793,
-      "p_value": 0.0927
+      "odds_ratio": 1.115,
+      "ci_low": 0.9764,
+      "ci_high": 1.2733,
+      "p_value": 0.108
     },
     "tropical": {
-      "odds_ratio": 0.8811,
-      "ci_low": 0.7621,
-      "ci_high": 1.0186,
-      "p_value": 0.087
+      "odds_ratio": 1.0505,
+      "ci_low": 0.908,
+      "ci_high": 1.2154,
+      "p_value": 0.5075
     },
     "severe_wind": {
-      "odds_ratio": 0.9992,
-      "ci_low": 0.8742,
-      "ci_high": 1.1421,
-      "p_value": 0.9904
+      "odds_ratio": 0.9987,
+      "ci_low": 0.8735,
+      "ci_high": 1.1418,
+      "p_value": 0.985
     },
     "hail": {
-      "odds_ratio": 1.0248,
-      "ci_low": 0.8917,
-      "ci_high": 1.1776,
-      "p_value": 0.7301
+      "odds_ratio": 1.0232,
+      "ci_low": 0.8905,
+      "ci_high": 1.1757,
+      "p_value": 0.7461
     },
     "flood": {
-      "odds_ratio": 0.932,
-      "ci_low": 0.8211,
-      "ci_high": 1.0578,
-      "p_value": 0.2758
+      "odds_ratio": 0.9355,
+      "ci_low": 0.8241,
+      "ci_high": 1.0619,
+      "p_value": 0.3025
     },
     "lightning": {
-      "odds_ratio": 0.8682,
-      "ci_low": 0.7396,
-      "ci_high": 1.0192,
-      "p_value": 0.084
+      "odds_ratio": 0.8649,
+      "ci_low": 0.7367,
+      "ci_high": 1.0155,
+      "p_value": 0.0763
     },
     "heat": {
-      "odds_ratio": 1.0533,
-      "ci_low": 0.7616,
-      "ci_high": 1.4566,
-      "p_value": 0.7537
+      "odds_ratio": 1.1798,
+      "ci_low": 0.8686,
+      "ci_high": 1.6026,
+      "p_value": 0.29
     },
     "winter": {
-      "odds_ratio": 0.9045,
-      "ci_low": 0.7434,
-      "ci_high": 1.1005,
-      "p_value": 0.3158
+      "odds_ratio": 0.869,
+      "ci_low": 0.7217,
+      "ci_high": 1.0463,
+      "p_value": 0.1383
     },
     "fema_declaration": {
-      "odds_ratio": 1.0955,
-      "ci_low": 0.9546,
-      "ci_high": 1.2572,
-      "p_value": 0.194
+      "odds_ratio": 1.0125,
+      "ci_low": 0.8768,
+      "ci_high": 1.1692,
+      "p_value": 0.8657
     }
   },
   "text_check": {
@@ -162,22 +162,22 @@
       "company": "MasTec",
       "kind": "contractor",
       "quarters": 46,
-      "spearman_same_quarter": 0.237,
-      "p_same_quarter": 0.1129,
-      "spearman_next_quarter": 0.286,
-      "p_next_quarter": 0.0567,
-      "bad_quarter_rate_after_stormy": 0.077,
-      "bad_quarter_rate_after_calm": 0.333,
+      "spearman_same_quarter": 0.25,
+      "p_same_quarter": 0.0939,
+      "spearman_next_quarter": 0.278,
+      "p_next_quarter": 0.0646,
+      "bad_quarter_rate_after_stormy": 0.083,
+      "bad_quarter_rate_after_calm": 0.324,
       "contracts_held": 0
     },
     {
       "company": "Dycom Industries",
       "kind": "contractor",
       "quarters": 44,
-      "spearman_same_quarter": -0.12,
-      "p_same_quarter": 0.4364,
-      "spearman_next_quarter": -0.1,
-      "p_next_quarter": 0.5235,
+      "spearman_same_quarter": -0.098,
+      "p_same_quarter": 0.5263,
+      "spearman_next_quarter": -0.081,
+      "p_next_quarter": 0.6055,
       "bad_quarter_rate_after_stormy": 0.273,
       "bad_quarter_rate_after_calm": 0.242,
       "contracts_held": 0
@@ -186,22 +186,22 @@
       "company": "Southern Company",
       "kind": "utility",
       "quarters": 45,
-      "spearman_same_quarter": 0.211,
-      "p_same_quarter": 0.1637,
-      "spearman_next_quarter": 0.127,
-      "p_next_quarter": 0.4104,
-      "bad_quarter_rate_after_stormy": 0.286,
-      "bad_quarter_rate_after_calm": 0.258,
+      "spearman_same_quarter": 0.224,
+      "p_same_quarter": 0.1386,
+      "spearman_next_quarter": 0.133,
+      "p_next_quarter": 0.391,
+      "bad_quarter_rate_after_stormy": 0.333,
+      "bad_quarter_rate_after_calm": 0.242,
       "contracts_held": null
     },
     {
       "company": "Tampa Electric",
       "kind": "utility",
       "quarters": 38,
-      "spearman_same_quarter": -0.015,
-      "p_same_quarter": 0.9287,
-      "spearman_next_quarter": -0.015,
-      "p_next_quarter": 0.9294,
+      "spearman_same_quarter": 0.006,
+      "p_same_quarter": 0.9705,
+      "spearman_next_quarter": -0.007,
+      "p_next_quarter": 0.9683,
       "bad_quarter_rate_after_stormy": 0.444,
       "bad_quarter_rate_after_calm": 0.207,
       "contracts_held": null
@@ -210,82 +210,82 @@
       "company": "EMCOR Group",
       "kind": "contractor",
       "quarters": 46,
-      "spearman_same_quarter": -0.26,
-      "p_same_quarter": 0.0806,
-      "spearman_next_quarter": -0.156,
-      "p_next_quarter": 0.3067,
-      "bad_quarter_rate_after_stormy": 0.385,
-      "bad_quarter_rate_after_calm": 0.212,
+      "spearman_same_quarter": -0.25,
+      "p_same_quarter": 0.0943,
+      "spearman_next_quarter": -0.157,
+      "p_next_quarter": 0.302,
+      "bad_quarter_rate_after_stormy": 0.333,
+      "bad_quarter_rate_after_calm": 0.235,
       "contracts_held": 0
     },
     {
       "company": "MYR Group",
       "kind": "contractor",
       "quarters": 34,
-      "spearman_same_quarter": -0.164,
-      "p_same_quarter": 0.3546,
-      "spearman_next_quarter": -0.003,
-      "p_next_quarter": 0.986,
-      "bad_quarter_rate_after_stormy": 0.444,
-      "bad_quarter_rate_after_calm": 0.2,
+      "spearman_same_quarter": -0.134,
+      "p_same_quarter": 0.4514,
+      "spearman_next_quarter": 0.02,
+      "p_next_quarter": 0.9118,
+      "bad_quarter_rate_after_stormy": 0.3,
+      "bad_quarter_rate_after_calm": 0.25,
       "contracts_held": 0
     },
     {
       "company": "NextEra Energy",
       "kind": "utility",
       "quarters": 45,
-      "spearman_same_quarter": -0.096,
-      "p_same_quarter": 0.5296,
-      "spearman_next_quarter": 0.02,
-      "p_next_quarter": 0.898,
-      "bad_quarter_rate_after_stormy": 0.167,
-      "bad_quarter_rate_after_calm": 0.303,
+      "spearman_same_quarter": -0.131,
+      "p_same_quarter": 0.3905,
+      "spearman_next_quarter": 0.041,
+      "p_next_quarter": 0.7924,
+      "bad_quarter_rate_after_stormy": 0.231,
+      "bad_quarter_rate_after_calm": 0.281,
       "contracts_held": null
     },
     {
       "company": "Granite Construction",
       "kind": "contractor",
       "quarters": 46,
-      "spearman_same_quarter": -0.161,
-      "p_same_quarter": 0.2841,
-      "spearman_next_quarter": -0.224,
-      "p_next_quarter": 0.1398,
-      "bad_quarter_rate_after_stormy": 0.308,
-      "bad_quarter_rate_after_calm": 0.242,
+      "spearman_same_quarter": -0.17,
+      "p_same_quarter": 0.2596,
+      "spearman_next_quarter": -0.219,
+      "p_next_quarter": 0.1475,
+      "bad_quarter_rate_after_stormy": 0.333,
+      "bad_quarter_rate_after_calm": 0.235,
       "contracts_held": 0
     },
     {
       "company": "Sterling Infrastructure",
       "kind": "contractor",
       "quarters": 46,
-      "spearman_same_quarter": 0.083,
-      "p_same_quarter": 0.5833,
-      "spearman_next_quarter": -0.046,
-      "p_next_quarter": 0.7639,
-      "bad_quarter_rate_after_stormy": 0.231,
-      "bad_quarter_rate_after_calm": 0.273,
+      "spearman_same_quarter": 0.08,
+      "p_same_quarter": 0.5977,
+      "spearman_next_quarter": -0.036,
+      "p_next_quarter": 0.8142,
+      "bad_quarter_rate_after_stormy": 0.167,
+      "bad_quarter_rate_after_calm": 0.294,
       "contracts_held": 1
     },
     {
       "company": "Quanta Services",
       "kind": "contractor",
       "quarters": 34,
-      "spearman_same_quarter": -0.184,
-      "p_same_quarter": 0.2972,
-      "spearman_next_quarter": -0.104,
-      "p_next_quarter": 0.5642,
-      "bad_quarter_rate_after_stormy": 0.222,
-      "bad_quarter_rate_after_calm": 0.28,
+      "spearman_same_quarter": -0.187,
+      "p_same_quarter": 0.2887,
+      "spearman_next_quarter": -0.114,
+      "p_next_quarter": 0.527,
+      "bad_quarter_rate_after_stormy": 0.3,
+      "bad_quarter_rate_after_calm": 0.25,
       "contracts_held": 0
     },
     {
       "company": "Duke Energy",
       "kind": "utility",
       "quarters": 45,
-      "spearman_same_quarter": 0.007,
-      "p_same_quarter": 0.9619,
-      "spearman_next_quarter": 0.191,
-      "p_next_quarter": 0.2141,
+      "spearman_same_quarter": -0.009,
+      "p_same_quarter": 0.955,
+      "spearman_next_quarter": 0.195,
+      "p_next_quarter": 0.2046,
       "bad_quarter_rate_after_stormy": 0.083,
       "bad_quarter_rate_after_calm": 0.333,
       "contracts_held": null
@@ -294,12 +294,12 @@
       "company": "Primoris Services",
       "kind": "contractor",
       "quarters": 34,
-      "spearman_same_quarter": 0.317,
-      "p_same_quarter": 0.068,
-      "spearman_next_quarter": 0.434,
-      "p_next_quarter": 0.0117,
-      "bad_quarter_rate_after_stormy": 0.111,
-      "bad_quarter_rate_after_calm": 0.32,
+      "spearman_same_quarter": 0.314,
+      "p_same_quarter": 0.0701,
+      "spearman_next_quarter": 0.423,
+      "p_next_quarter": 0.0143,
+      "bad_quarter_rate_after_stormy": 0.1,
+      "bad_quarter_rate_after_calm": 0.333,
       "contracts_held": 0
     }
   ],

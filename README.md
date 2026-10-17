@@ -131,10 +131,10 @@ python -m ml.contract_disruption     # load into Tiger, fit, attribute -> ml/mod
 
 | Need | Public stand-in | Size |
 |---|---|---|
-| Crew contracts and their failures | **USAspending.gov**: federal field-construction contracts performed in FL/GA/AL since FY2016. Covers utility and power lines, heavy civil, electrical and site work. Includes every change to each contract: terminations (default, cause, convenience, cancellation), change orders and end-date changes, with the county the work was in. | 7,647 contracts (7,050 fully observed); 2,396 disrupted (terminated, or 30+ days late not counting planned option years) |
+| Crew contracts and their failures | **USAspending.gov**: federal field-construction contracts performed in FL/GA/AL since FY2016. Covers utility and power lines, heavy civil, electrical and site work. Includes every change to each contract: terminations (default, cause, convenience, cancellation), change orders and end-date changes, with the county the work was in. | 7,647 contracts (7,049 fully observed); 2,395 disrupted (terminated, or 30+ days late not counting planned option years) |
 | Revenue by quarter | **SEC EDGAR XBRL**: 8 public line-crew and field contractors (Quanta, MasTec, MYR, Dycom, Primoris, EMCOR, Granite, Sterling) and 4 utility parents (NextEra, Southern, Duke, Tampa Electric) | 34–49 quarters each |
-| Storm damage | **OpenFEMA**: disaster declarations by county, and Public Assistance utility-repair projects | 3,508 declarations, 5,407 projects |
-| Weather near the work | NOAA Storm Events, by county; zone events such as hurricanes are mapped to their counties | 2015–2026 |
+| Storm damage | **OpenFEMA**: disaster declarations by county, and Public Assistance utility-repair projects | 3,430 declarations, 5,407 projects |
+| Weather near the work | NOAA Storm Events files in `data/raw`, by county; zone events such as hurricanes are mapped to their counties | 2015–2026 |
 
 **Method** ([ml/contract_disruption.py](ml/contract_disruption.py)):
 1. Weather is counted during each contract's **originally planned** window. A late contract runs longer and would collect more storms *because* of the delay.
@@ -142,10 +142,10 @@ python -m ml.contract_disruption     # load into Tiger, fit, attribute -> ml/mod
 3. **Evidence per contract.** A change document that names weather as the delay ("WEATHER TIME EXTENSION", "HURRICANE IAN IMPACTS") counts as **documented**. It's **documented + corroborated** when NOAA recorded that kind of storm in the county while the contract ran. A storm that merely overlapped is labeled **storm overlap only** and is never counted as the cause.
 
 **Results:**
-- **Overlap alone would mislead.** Raw numbers look like support: contracts with a tornado in their county were disrupted 44% of the time, vs 31% without. Most of that gap is contract length, because longer contracts see more storms *and* slip more. With the controls, no weather type significantly raises the odds of disruption (tornado odds ratio 1.12, 95% interval 0.98–1.28), and weather adds nothing to prediction (cross-validated AUC 0.705 with weather, 0.706 without).
-- **The original rule is wrong about 95% of the time.** Of 808 disrupted contracts with a tornado nearby, only **4.6%** say in their own documents that weather caused the delay. The rate for all disrupted contracts is 3.8%.
-- **91 disruptions are attributed to weather from the evidence.** 12 are documented + corroborated: 8 tropical, such as Hurricane Ian's landfall on 2022-09-28, and 4 flooding. 79 are documented as general weather delays.
-- **Revenue:** no company shows a consistent "storm, then bad quarter" pattern. For crew contractors, storms tend to come with **more** revenue (restoration work): Primoris, next quarter, Spearman 0.43, p = 0.01, one of 24 tests, so it may be chance. The public contractors hold almost none of these federal contracts (1), so a contract failure can't be traced to a company's revenue with public data.
+- **Overlap alone would mislead.** Raw numbers look like support: contracts with a tornado in their county were disrupted 44% of the time, vs 31% without. Most of that gap is contract length, because longer contracts see more storms *and* slip more. With the controls, no weather type significantly raises the odds of disruption (tornado odds ratio 1.12, 95% interval 0.98–1.27), and weather adds nothing to prediction (cross-validated AUC 0.704 with weather, 0.706 without).
+- **The original rule is wrong about 95% of the time.** Of 809 disrupted contracts with a tornado nearby, only **4.6%** say in their own documents that weather caused the delay. The rate for all disrupted contracts is 3.8%.
+- **91 disruptions are attributed to weather from the evidence.** 16 are documented + corroborated: 12 tropical, such as Hurricane Ian's landfall on 2022-09-28, and 4 flooding. 75 are documented as general weather delays.
+- **Revenue:** no company shows a consistent "storm, then bad quarter" pattern. For crew contractors, storms tend to come with **more** revenue (restoration work): Primoris, next quarter, Spearman 0.42, p = 0.01, one of 24 tests, so it may be chance. The public contractors hold almost none of these federal contracts (1), so a contract failure can't be traced to a company's revenue with public data.
 
 **What would make this definitive:** the utility's own crew contracts, with start and end dates, site, contractor, and outcome. With them, the same pipeline runs unchanged on real data. Load them in place of `data/field_contracts.csv` with the same columns.
 
