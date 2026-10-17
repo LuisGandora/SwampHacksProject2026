@@ -1,13 +1,39 @@
+<<<<<<< Updated upstream
 import { useState, useEffect } from "react";
 import { CITIES, MAP_SIZE, latLonToPixel } from "./data.js";
+=======
+import { useCallback, useEffect, useRef, useState } from "react";
+import { API, api } from "./api.js";
+import AlertsPanel from "./components/AlertsPanel.jsx";
+import CrewReportForm from "./components/CrewReportForm.jsx";
+import GlobeMap from "./components/GlobeMap.jsx";
+import RankingPanel from "./components/RankingPanel.jsx";
+import ReportModal from "./components/ReportModal.jsx";
+import SiteCard from "./components/SiteCard.jsx";
+import { categoryLabel } from "./hazard.js";
+import Landing from "./components/landing.jsx";
+import { sitesWithin } from "./geo.js";
+>>>>>>> Stashed changes
 
 // Green (safe) -> Yellow-ish (in the middle) ->  red (big hazard) for a 0-10 index.
 const hazardColor = (v) => `hsl(${120 - v * 12}, 70%, 42%)`;
 
 export default function App() {
   const [me, setMe] = useState(null);
+<<<<<<< Updated upstream
   const [locError, setLocError] = useState("");
   const [now, setNow] = useState(new Date());
+=======
+  const [sensor, setSensor] = useState("normal");
+  const [aiSite, setAiSite] = useState(null);
+  const [toasts, setToasts] = useState([]);
+  const [tab, setTab] = useState("rank");
+  const [notifyOn, setNotifyOn] = useState(() => "Notification" in window && Notification.permission === "granted");
+  const [refreshKey, setRefreshKey] = useState(0);
+  const seenAlerts = useRef(null);
+  const globe = useRef(null);
+  const [focus, setFocus] = useState(null); // null = landing page still showing
+>>>>>>> Stashed changes
 
   useEffect(() => {
   if (!navigator.geolocation) {
@@ -66,7 +92,24 @@ export default function App() {
       prev.map((c) => (c.name === selectedName ? { ...c, hazard: value } : c))
     );
 
+  const visibleSites = sitesWithin(sites, focus);
+  const globeRef = useRef(null);
+
+  const handleLandingDone = (f) => {
+    setFocus(f);
+    if (f.all) {
+      globeRef.current?.flyHome();
+    } else {
+      setMe({ lat: f.lat, lon: f.lon });
+      globeRef.current?.flyRadius(f.lon, f.lat, f.radius);
+    }
+  };
+
+// ...
+<Landing sites={sites} onDone={handleLandingDone} />
+
   return (
+<<<<<<< Updated upstream
     <div className="page">
       <header className="header">
         <h1 className="title">Plan It By Planet</h1>
@@ -86,6 +129,39 @@ export default function App() {
             "0 - 10"
           )}
         </p>
+=======
+    <div className="app">
+      <GlobeMap ref={globe} sites={visibleSites} focus={focus} lightning={lightning} selectedId={selectedId} onSelect={select}
+                pinMode={pinMode} pin={pin} onPin={(p) => { setPin(p); setPinMode(false); setTab("site"); }}
+                me={me} sensor={sensor} />
+      {sensor === "crt" && <div className="scanlines" aria-hidden="true" />}
+
+      <header className="hud">
+        <div className="brand">
+          <span className="brand-mark" aria-hidden="true">◎</span>
+          <div>
+            <h1>PLANET CONTROL</h1>
+            <p className="mono small">FIELD HAZARD OPS · FL / GA / AL</p>
+          </div>
+        </div>
+        <div className="hud-stats mono small">
+          <span className={online ? "ok" : "warn"}>● {online ? "LIVE" : "OFFLINE"}</span>
+          <span>{sites.length} SITES</span>
+          <span className="stop">{counts.stop} STOP</span>
+          <span className="warn">{counts.warn} WARN</span>
+          <span className="hide-sm">⚡ {lightning.length}/30m</span>
+          <span className="hide-sm">UTC {now.toISOString().slice(11, 19)}</span>
+        </div>
+        <div className="hud-controls">
+          <div className="seg" role="group" aria-label="Sensor mode">
+            {SENSORS.map(([k, label]) => (
+              <button key={k} className={sensor === k ? "on" : ""} onClick={() => setSensor(k)}>{label}</button>
+            ))}
+          </div>
+          <button onClick={() => globe.current?.flyHome()} title="North America" aria-label="Show North America">🌎</button>
+          <button onClick={() => globe.current?.flySites()} title="All sites" aria-label="Show all sites">◎<span className="hide-sm"> Sites</span></button>
+          <button onClick={() => { setFocus(null); globeRef.current?.flyHome(); }}>Change location</button></div>
+>>>>>>> Stashed changes
       </header>
 
       <main className="layout">
@@ -207,6 +283,7 @@ export default function App() {
               CREW REPORT BUTTON
             </button>
 
+<<<<<<< Updated upstream
             {reportOpen && selected && (
               <form className="report-form" onSubmit={submitReport}>
                 <p>New report for {selected.name}</p>
@@ -230,6 +307,17 @@ export default function App() {
           </div>
         </aside>
       </main>
+=======
+      <div className="toasts" aria-live="polite">
+        {toasts.map((t) => <div key={t.id} className={`toast toast--${t.kind}`}>{t.text}</div>)}
+      </div>
+
+      {!focus && (
+          <div className="landing-overlay">
+            <Landing sites={sites} onDone={handleLandingDone} />
+          </div>
+        )}
+>>>>>>> Stashed changes
     </div>
   );
 }
