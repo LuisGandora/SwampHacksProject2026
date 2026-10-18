@@ -270,8 +270,6 @@ export default function App() {
   const inViewIds = new Set(visibleSites.map((s) => s.site_id));
   const viewAlerts = focus && !focus.all ? alerts.filter((a) => inViewIds.has(a.site_id)) : alerts;
   inView.current = (a) => !focus || focus.all || inViewIds.has(a.site_id);
-  const dataNoticeKey = [...activeErrors.map(([n]) => n), ...feedProblems.map((f) => `${f.name}:${f.status}`),
-                         oldStatus ? "old" : ""].join("|");
   const counts = { stop: viewAlerts.filter((a) => a.level === "stop_work").length, warn: viewAlerts.filter((a) => a.level === "warning").length };
   const feedProblems = (feedStatus?.feeds || []).filter((f) => f.status !== "current");
   const activeErrors = Object.entries(dataErrors).filter(([name, message]) => message
@@ -282,6 +280,8 @@ export default function App() {
     && feedStatus?.feeds?.find((f) => f.name === "alerts")?.status === "current";
   const online = health && !apiError && !activeErrors.length && !feedProblems.length && alertsReliable;
   const oldStatus = feedStatus && now - new Date(feedStatus.checked_at) > 90000;
+  const dataNoticeKey = [...activeErrors.map(([n]) => n), ...feedProblems.map((f) => `${f.name}:${f.status}`),
+                         oldStatus ? "old" : ""].join("|");
 
   // The landing page lets the user focus on an area (GPS or a dropped pin + radius). Until they choose, focus is
   // null and the Landing overlay is shown; after that the globe and ranking only show the in-range sites.
