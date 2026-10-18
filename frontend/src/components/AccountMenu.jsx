@@ -4,7 +4,7 @@ import { AUTH0 } from "../auth.js";
 import { categoryLabel } from "../hazard.js";
 
 // Account popup from the avatar: who you are, password reset, your saved locations and the reports you've sent.
-export default function AccountMenu({ auth, categories, saved, onSavedChange, onGoTo, onClose, identity, onIdentity }) {
+export default function AccountMenu({ auth, categories, saved, onSavedChange, onGoTo, onClose, identity, onIdentity, onBriefing }) {
   const [me, setMe] = useState(null);
   const [reports, setReports] = useState(null);
   const [msg, setMsg] = useState("");
@@ -78,6 +78,9 @@ export default function AccountMenu({ auth, categories, saved, onSavedChange, on
         {passwordAccount
           ? <button onClick={resetPassword}>🔑 Reset password</button>
           : <span className="small muted">You sign in with {(u.sub || "").split("|")[0].replace("-oauth2", "") || "a linked account"}: change your password there.</span>}
+        {identity === "supervisor" && onBriefing && (
+          <button onClick={onBriefing} title="The briefing written at 6 PM, replayed until the next one">📋 Replay 6 PM briefing</button>
+        )}
         <button className="ghost" onClick={auth.logout}>Sign out</button>
       </div>
       {msg && <p className="small">{msg}</p>}

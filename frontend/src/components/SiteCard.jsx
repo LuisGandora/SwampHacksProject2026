@@ -65,6 +65,15 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
           </p>
           <p className={`small ${coordCls}`}>{coordText}</p>
           {detail?.fema_flood_zone && <p className={`small ${detail.fema_sfha ? "warn" : "muted"}`}>{floodZoneText(detail)}</p>}
+          {detail?.levee?.leveed_area_system && (
+            <p className={`small ${/Non-Accredited/.test(detail.levee.levee_accreditation || "") ? "warn" : "muted"}`}>
+              🧱 Behind the {detail.levee.leveed_area_system} levee ({detail.levee.levee_accreditation || "accreditation unknown"}
+              {detail.levee.overtopping_chance_per_year ? `, ${(Number(detail.levee.overtopping_chance_per_year) * 100).toPrecision(2)}% chance a year of overtopping` : ""})
+            </p>
+          )}
+          {detail?.levee && !detail.levee.leveed_area_system && detail.levee.nearest_levee_mi != null && (
+            <p className="small muted">🧱 Levee {detail.levee.nearest_levee_mi} mi away ({detail.levee.nearest_levee}, National Levee Database)</p>
+          )}
         </div>
         <div className="card-head-actions">
           <button className={`icon-btn star ${saved ? "on" : ""}`} onClick={onToggleSave} aria-pressed={!!saved}
@@ -182,7 +191,7 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
             <div><dt>Lightning ≤10 mi</dt><dd>{p.lightning_events ?? 0}</dd></div>
             <div><dt>Heat-warning days/yr</dt><dd>{p.heat_warn_days_per_year ?? "–"}</dd></div>
             <div><dt>Outdoor storm deaths</dt><dd>{p.storm_fatalities_crew_relevant ?? 0}</dd></div>
-            <div><dt>OSHA PPE reports ≤50 mi</dt><dd>{p.ppe_osha_reports ?? 0}</dd></div>
+            <div><dt title="Within 20 mi, or any distance for a power utility or power-line contractor">OSHA PPE reports ≤20 mi</dt><dd>{p.ppe_osha_reports ?? 0}</dd></div>
             <div><dt>County weather deaths</dt><dd>{(p.cdc_county_suppressed && p.cdc_county_weather_deaths == null) || (p.cdc_county_weather_deaths > 0 && p.cdc_county_weather_deaths < 10) ? "<10" : p.cdc_county_weather_deaths ?? "–"}</dd></div>
           </dl>
           <p className="small muted">NOAA Storm Events, OSHA, CDC WONDER, within each hazard's radius.</p>

@@ -54,3 +54,8 @@ export const NWS_COLORS = {
 };
 export const NWS_OTHER = "#9aa0a6";
 export const NWS_COLOR_EXPRESSION = ["match", ["get", "event"], ...Object.entries(NWS_COLORS).flat(), NWS_OTHER];
+
+// Under each AI answer: when it was written and until when it's replayed (next 6 PM), or that it's an offline copy.
+export const replayNote = (d) => d.offline ? "Offline: showing the copy saved on this device"
+  : `Written ${new Date(d.created_at).toLocaleString([], { dateStyle: "short", timeStyle: "short" })}`
+    + (d.refreshes_at ? ` · replayed until ${new Date(d.refreshes_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}` : "");

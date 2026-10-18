@@ -111,7 +111,7 @@ export default function Landing({ sites = [], auth, place, setPlace, flyTo, onDo
           {!saved?.length ? <li className="muted small">No saved locations yet. Use ☆ Save on a place or ☆ on a site card.</li>
             : saved.map((l) => (
               <li key={l.location_id}>
-                <button className="link" onClick={() => onDone({ lat: l.lat, lon: l.lon, radius: Number(l.radius_mi) })}>
+                <button className="link" onClick={() => onDone({ lat: l.lat, lon: l.lon, radius: Number(l.radius_mi), label: l.name })}>
                   📌 {l.name}</button>
                 <span className="muted small"> {l.plants} plants · {Number(l.radius_mi)} mi</span>
               </li>

@@ -430,3 +430,45 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
 .identity-chip { font: 600 10px var(--mono); letter-spacing: .06em; padding: 2px 6px; border-radius: 4px;
                  background: rgba(12, 163, 12, .18); color: #7ee07e; }
 .identity-chip.sup { background: rgba(95, 211, 255, .18); color: var(--accent); }
+
+/* ---------- supervisor plan ---------- */
+.plan-tabs { margin: 8px 0 10px; }
+.plan-list { padding-left: 20px; display: grid; gap: 10px; margin: 6px 0; }
+.plan-list p { margin: 2px 0; overflow-wrap: anywhere; }
+.plan-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.plan-grid { max-height: 420px; }
+.plan-grid td.wrap { white-space: normal; text-align: left; min-width: 140px; }
+.plan-grid th { text-align: left; }
+.plan-grid td { white-space: nowrap; }
+
+/* ---------- briefing screen (on start, and supervisors' 6 PM) ---------- */
+.briefing-screen { position: fixed; inset: 0; z-index: 40; overflow-y: auto; background: rgba(5, 7, 10, .94);
+                   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 24px 16px; }
+.briefing-inner { width: min(1100px, 100%); margin: 0 auto; display: grid; gap: 10px; }
+.briefing-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px;
+                 border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.briefing-head h2 { font-size: 24px; max-width: 720px; }
+.briefing-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.briefing-summary { font-size: 16px; color: var(--text-2); max-width: 900px; }
+.briefing-cols { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; }
+.crew-msg { display: grid; gap: 6px; padding: 10px; margin-bottom: 10px; background: var(--surface-2);
+            border: 1px solid var(--line); border-radius: 8px; }
+.crew-msg textarea { width: 100%; resize: vertical; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+.briefing-areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.briefing-areas p { overflow-wrap: anywhere; }
+.briefing-plants { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 4px; }
+.briefing-plants li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+@media (max-width: 760px) {
+  .briefing-cols { grid-template-columns: 1fr; }
+  .briefing-head h2 { font-size: 19px; }
+}
+
+/* ---------- economics (Plan) ---------- */
+.econ-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin: 8px 0; }
+.econ-tiles .tile { gap: 4px; padding: 10px 12px; }
+.econ-findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; }
+.econ-findings p { overflow-wrap: anywhere; }
+.econ-assumptions { margin-top: 12px; }
+.econ-assumptions summary { cursor: pointer; font-weight: 600; }
+.assume-edit { display: inline-flex; gap: 6px; align-items: center; }
+.assume-edit input { width: 90px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; }
