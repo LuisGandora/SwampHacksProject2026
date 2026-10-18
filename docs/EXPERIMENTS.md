@@ -6,6 +6,7 @@ Each experiment records the hypothesis, the data, the method, what went wrong al
 |---|---|---|---|
 | 1 | A severe weather event (such as a tornado) near a failed crew contract caused the failure, and a bad revenue quarter follows | **Not supported as stated.** A storm overlapping a failure is not evidence. 91 failures are attributable from the contracts' own records. | [ml/models/contract_disruption.json](../ml/models/contract_disruption.json) |
 | 2 | After a weather impact, business bounces back above normal because of restoration work | **Not supported.** There is no bounce in any of the 15 tests. One apparent hail effect was a fiscal-year artifact. | [ml/models/bounceback.json](../ml/models/bounceback.json) |
+| 3 | Weather at the sites shows up in the companies' economics: crew workload, sales, and crew time lost | **Workload and sales supported** (r = 0.37–0.72; degree days lift sales fit to R² 0.85–0.98). Crew time lost is an estimate (~$18.7M over 5 years); real crew dispatch logging has started. | [EXPERIMENT_ECONOMIC_IMPACT.md](EXPERIMENT_ECONOMIC_IMPACT.md) |
 
 ## Data (shared by both experiments)
 

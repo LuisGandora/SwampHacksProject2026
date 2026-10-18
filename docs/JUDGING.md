@@ -37,8 +37,9 @@ Run it from the **demo instance** ([DEPLOY.md](DEPLOY.md)), signed in as a super
 3. **Lightning 4 mi away:** the full-width STOP WORK screen and its 30-minute all-clear. A second strike resets it to 30:00.
 4. **Phone:** report a hazard with the camera. With no signal it queues, then sends when back online.
 5. **Supervisor:** the ranking puts the site on top (live floor 8). The alert arrives in the team's Discord or Slack. The 🛰 AI safety report gives GO / CAUTION / NO-GO with sources cited.
-6. **6 PM briefing:** tomorrow's briefing for the site.
-7. **■ Reset.**
+6. **📋 Plan:** where to focus first. Act now (what to do and bring), This week (heat, storm, rain and wind days, floodplain and levee sites flagged before rain), Invest (yearly weather loss per site, a fix and its payback; fix costs are labeled assumptions).
+7. **6 PM briefing:** tomorrow's briefing for the site.
+8. **■ Reset.**
 
 ## Questions to prepare for
 

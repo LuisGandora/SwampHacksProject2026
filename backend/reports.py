@@ -18,7 +18,7 @@ import time
 
 from pydantic import BaseModel
 
-from backend.briefings import ALERTS, FORECAST, to_json
+from backend.briefings import ALERTS, FORECAST, LAST_6PM, to_json
 
 MAIN_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
 FALLBACK_MODEL = os.environ.get("GEMINI_FALLBACK_MODEL", "gemini-3.8-flash")
@@ -248,21 +248,24 @@ def ask_gemini(system, facts_json, schema):
 
 
 def cached(conn, site_id, kind):
-    # Cache persists: the newest report per (site, kind) is reused until "Regenerate" forces a refresh
-    # (or a future 6 PM local clear wipes the day's reports). Avoids an LLM call on every plant tap.
-    return conn.execute("SELECT * FROM site_reports WHERE site_id = %s AND kind = %s "
-                        "ORDER BY created_at DESC LIMIT 1", (site_id, kind)).fetchone()
+    # The newest report per (site, kind) is replayed until the next 6 PM at the site (when the next briefing is
+    # delivered), or until "Regenerate" forces a refresh. Avoids an LLM call on every plant tap.
+    return conn.execute(f"SELECT r.*, {LAST_6PM.format(tz='s.timezone')} + interval '1 day' AS refreshes_at "
+                        "FROM site_reports r JOIN sites s USING (site_id) WHERE r.site_id = %s AND r.kind = %s "
+                        f"AND r.created_at >= {LAST_6PM.format(tz='s.timezone')} "
+                        "ORDER BY r.created_at DESC LIMIT 1", (site_id, kind)).fetchone()
 
 
 def save(conn, site_id, kind, generator, facts_json, report, errors, unverified):
     return conn.execute(
         "INSERT INTO site_reports (site_id, kind, generator, facts, report, verified, unverified_numbers, errors) "
-        "VALUES (%s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s) RETURNING *",
-        (site_id, kind, generator, facts_json, to_json(report), not unverified, unverified, errors)).fetchone()
+        "VALUES (%s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s) RETURNING *, "
+        f"(SELECT {LAST_6PM.format(tz='timezone')} + interval '1 day' FROM sites WHERE site_id = %s) AS refreshes_at",
+        (site_id, kind, generator, facts_json, to_json(report), not unverified, unverified, errors, site_id)).fetchone()
 
 
 def generate(conn, site_id, refresh=False):
-    # Cache persists (see cached()): the newest safety report is reused until "Regenerate" forces a refresh.
+    # Replayed until the next 6 PM at the site (see cached()), or until "Regenerate" forces a refresh.
     if not refresh and (hit := cached(conn, site_id, "safety")):
         return hit
     facts = gather(conn, site_id)

@@ -33,6 +33,9 @@ IEM = "https://mesonet.agron.iastate.edu/cgi-bin/request/daily.py"
 FIELDS = {"max_temp_f": "max_temp_f", "min_temp_f": "min_temp_f", "max_heat_index_f": "max_feel",
           "max_dewpoint_f": "max_dewpoint_f", "min_rh": "min_rh", "avg_rh": "avg_rh", "precip_in": "precip_in",
           "max_gust_kt": "max_wind_gust_kts", "max_wind_kt": "max_wind_speed_kts"}
+# Some ASOS stations (EUF, BCR, ...) report "sustained wind" of 200-959 kt for days with no gust: sensor errors. Real
+# sustained wind can't beat the gust at the same station, so over 87 kt (100 mph) without a gust at least as high is blanked.
+BAD_WIND = "UPDATE weather_daily SET max_wind_kt = NULL WHERE max_wind_kt > 87 AND (max_gust_kt IS NULL OR max_gust_kt < max_wind_kt)"
 
 
 def sync(conn, days=7):
@@ -52,4 +55,5 @@ def sync(conn, days=7):
     conn.cursor().executemany(
         f"INSERT INTO weather_daily (station_id, day, {cols}) VALUES (%s, %s, {', '.join(['%s'] * len(FIELDS))}) "
         f"ON CONFLICT (station_id, day) DO UPDATE SET " + ", ".join(f"{c} = EXCLUDED.{c}" for c in FIELDS), rows)
+    conn.execute(BAD_WIND + " AND day >= %s", (start,))
     return f"{len(rows)} station-days upserted for {start} to {end}"

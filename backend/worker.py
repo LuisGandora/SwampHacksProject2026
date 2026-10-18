@@ -4,7 +4,7 @@
     python -m backend.worker alerts points   # run named jobs once and exit
 
 Schedule (see main): lightning and notifications every minute, NWS alerts every 2 min, station observations
-every 10 min, river gauges and fires every 15 min, wildlife every 30 min, forecasts hourly, 6 PM briefings
+every 10 min, river gauges, tides, fires and crew dispatches (utility outage maps) every 15 min, wildlife every 30 min, forecasts hourly, 6 PM briefings
 every 15 min, site grid lookups daily (only sites not looked up yet).
 """
 import datetime as dt
@@ -13,7 +13,7 @@ import time
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from backend import briefings, daily_weather, fires, lightning, notify, nws, observations, rivers, wildlife
+from backend import briefings, crew_dispatch, daily_weather, fires, lightning, notify, nws, observations, rivers, tides, wildlife
 from ml import hazard_model
 from backend.db import connection, pool
 
@@ -23,6 +23,8 @@ JOBS = {
     "forecasts": nws.sync_forecasts,
     "observations": observations.sync,
     "rivers": rivers.sync,
+    "tides": tides.sync,
+    "crew_dispatch": crew_dispatch.sync,
     "lightning": lightning.sync,
     "wildlife": wildlife.sync,
     "fires": fires.sync,
@@ -56,6 +58,8 @@ def main():
     s.add_job(run, "interval", minutes=2, args=["alerts"], next_run_time=now)
     s.add_job(run, "interval", minutes=10, args=["observations"], next_run_time=now)
     s.add_job(run, "interval", minutes=15, args=["rivers"], next_run_time=now)
+    s.add_job(run, "interval", minutes=15, args=["tides"], next_run_time=now)
+    s.add_job(run, "interval", minutes=15, args=["crew_dispatch"], next_run_time=now + dt.timedelta(minutes=3))
     s.add_job(run, "interval", minutes=15, args=["fires"], next_run_time=now)
     s.add_job(run, "interval", minutes=30, args=["wildlife"], next_run_time=now)
     s.add_job(run, "cron", minute=5, args=["forecasts"], next_run_time=now + dt.timedelta(minutes=1))

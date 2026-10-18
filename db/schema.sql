@@ -463,6 +463,23 @@ CREATE TABLE IF NOT EXISTS location_briefings (
     sent_at         timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (location_id, briefing_date)
 );
+-- Your briefing (backend/team_briefing.py): Gemini text across your starting area and saved locations, with crew
+-- messages drafted for a supervisor's channels. Cached 2 h per identity, kind and starting point.
+CREATE TABLE IF NOT EXISTS user_briefings (
+    briefing_id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id             uuid NOT NULL REFERENCES app_users ON DELETE CASCADE,
+    identity            text NOT NULL CHECK (identity IN ('crew', 'supervisor')),
+    kind                text NOT NULL CHECK (kind IN ('start', '6pm')),
+    focus               jsonb NOT NULL,                  -- lat, lon, radius_mi, label (null lat = all sites)
+    created_at          timestamptz NOT NULL DEFAULT now(),
+    generator           text NOT NULL,                   -- gemini:<model> or template
+    facts               jsonb NOT NULL,                  -- exactly what the model was given
+    report              jsonb NOT NULL,
+    verified            boolean NOT NULL,                -- false when the model wrote numbers not in the facts
+    unverified_numbers  text[],
+    errors              text[]
+);
+CREATE INDEX IF NOT EXISTS user_briefings_user_idx ON user_briefings (user_id, identity, kind, created_at DESC);
 ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS user_id     uuid REFERENCES app_users;
 ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS resolved_by uuid REFERENCES app_users;
 ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS reported_as text CHECK (reported_as IN ('crew', 'supervisor'));
@@ -621,6 +638,9 @@ CREATE TABLE IF NOT EXISTS site_score_climatology (      -- each site's normal H
 -- ===========================================================================================================
 -- Site <-> hazard ties: every historical event within its category's history_radius_mi of a site.
 -- Rebuilt by refresh_site_hazard_events(), so changing a radius and calling it re-ties every site.
+-- Crew-type reports (PPE, machinery, slips, OSHA inspections) count for a site only within 20 mi, because nothing
+-- else ties them to the plant, unless they are tied to it: an OSHA report from a power utility or power-line
+-- contractor (NAICS 2211xx / 237130) keeps the category's full radius, and so does a crew report filed for the site.
 -- ===========================================================================================================
 CREATE TABLE IF NOT EXISTS site_hazard_events (
     site_id             bigint NOT NULL REFERENCES sites,
@@ -658,13 +678,17 @@ BEGIN
                    unnest(r.crew_categories || CASE WHEN r.weather_category IS NULL THEN '{}'::text[]
                                                     ELSE ARRAY[r.weather_category] END) AS cat) o
       JOIN hazard_categories c ON c.category = o.category
-      JOIN sites s ON ST_DWithin(o.geog, s.geog, c.history_radius_mi * 1609.344);
+      JOIN sites s ON ST_DWithin(o.geog, s.geog, 1609.344 * CASE
+                WHEN c.kind = 'crew' AND NOT coalesce(o.naics LIKE '2211%' OR o.naics = '237130', false)
+                THEN least(c.history_radius_mi, 20) ELSE c.history_radius_mi END);
     INSERT INTO site_hazard_events
     SELECT s.site_id, r.category, 'crew_report', r.report_id::text, r.reported_at,
            round((ST_Distance(r.geog, s.geog) / 1609.344)::numeric, 2), 0, 0, NULL, 'point'
       FROM crew_reports r
       JOIN hazard_categories c ON c.category = r.category
-      JOIN sites s ON ST_DWithin(r.geog, s.geog, c.history_radius_mi * 1609.344);
+      JOIN sites s ON ST_DWithin(r.geog, s.geog, 1609.344 * CASE
+                WHEN c.kind = 'crew' AND r.site_id IS DISTINCT FROM s.site_id
+                THEN least(c.history_radius_mi, 20) ELSE c.history_radius_mi END);
     -- compress history right away instead of waiting for the policy job (keeps the free tier's storage low)
     PERFORM compress_chunk(ch, if_not_compressed => true)
        FROM show_chunks('site_hazard_events', older_than => INTERVAL '30 days') ch;
@@ -842,6 +866,81 @@ CREATE TABLE IF NOT EXISTS fema_utility_projects (       -- Public Assistance, d
     PRIMARY KEY (disaster_number, pw_number)
 );
 
+-- NOAA Tides & Currents water-level stations near the sites (backend/tides.py). Levels are in station datum (STND),
+-- the same datum NOAA publishes its flood levels in, so a reading compares directly with minor/moderate/major.
+CREATE TABLE IF NOT EXISTS tide_stations (
+    station_id      text PRIMARY KEY,
+    name            text,
+    state           text,
+    geog            geography(Point, 4326) NOT NULL,
+    mhhw_ft         numeric,                             -- mean higher high water (a normal high tide)
+    minor_ft        numeric,                             -- NOAA (NOS) flood levels
+    moderate_ft     numeric,
+    major_ft        numeric,
+    updated_at      timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS tide_readings (
+    station_id      text NOT NULL REFERENCES tide_stations ON DELETE CASCADE,
+    observed_at     timestamptz NOT NULL,
+    level_ft        numeric NOT NULL,
+    PRIMARY KEY (station_id, observed_at)
+);
+INSERT INTO hazard_categories (category, label, kind, metric, unit, warn_radius_mi, stop_radius_mi, history_radius_mi,
+                               window_minutes, notes)
+VALUES ('tidal_flooding', 'Coastal (tidal) flooding', 'environmental', 'water_level_ft', 'ft', 10, 10, 10, 60,
+        'A NOAA Tides & Currents station within 10 mi at or above its minor flood level: warning; moderate: stop work.')
+ON CONFLICT (category) DO NOTHING;
+
+-- USACE National Levee Database near the sites (scraper/levees.py, db/load_levees.py).
+CREATE TABLE IF NOT EXISTS levee_features (
+    feature_id      bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    kind            text NOT NULL CHECK (kind IN ('leveed_area', 'levee_line', 'borehole')),
+    system_id       text,
+    system_name     text,
+    props           jsonb NOT NULL DEFAULT '{}',
+    geog            geography NOT NULL
+);
+CREATE INDEX IF NOT EXISTS levee_features_geog_idx ON levee_features USING gist (geog);
+CREATE OR REPLACE VIEW site_levees AS                 -- per site: behind a levee? how good is it? how close is one?
+SELECT s.site_id, la.system_name AS leveed_area_system,
+       la.props ->> 'FEMA_ACCREDITATION_RATING' AS levee_accreditation,
+       (la.props ->> 'OVERTOPPING_AEP') AS overtopping_chance_per_year,
+       (la.props ->> 'PEOPLE') AS people_behind_levee, la.props ->> 'PRIMARY_FLOOD_SOURCE' AS levee_flood_source,
+       ll.system_name AS nearest_levee, round(ll.miles::numeric, 1) AS nearest_levee_mi, bh.n AS soil_borings_5mi
+  FROM sites s
+  LEFT JOIN LATERAL (SELECT system_name, props FROM levee_features f
+                      WHERE f.kind = 'leveed_area' AND ST_Covers(f.geog, s.geog) LIMIT 1) la ON true
+  LEFT JOIN LATERAL (SELECT system_name, ST_Distance(f.geog, s.geog) / 1609.344 AS miles FROM levee_features f
+                      WHERE f.kind = 'levee_line' AND ST_DWithin(f.geog, s.geog, 16093)
+                      ORDER BY f.geog <-> s.geog LIMIT 1) ll ON true
+  LEFT JOIN LATERAL (SELECT count(*) AS n FROM levee_features f
+                      WHERE f.kind = 'borehole' AND ST_DWithin(f.geog, s.geog, 8047)) bh ON true;
+
+-- Investment planning (backend/plan.py): a fix per hazard with its cost and how much of the lost crew time it
+-- avoids. All labeled ASSUMPTION until a utility's real project costs replace them (edit these rows).
+INSERT INTO economic_assumptions (key, value, unit, note) VALUES
+('mitigation_cost_lightning', 45000, 'USD', 'ASSUMPTION: site lightning-prediction system + hardened crew shelter'),
+('mitigation_reduction_lightning', 0.25, 'share of lost time avoided', 'ASSUMPTION: earlier warning, shorter stand-downs'),
+('mitigation_cost_extreme_heat', 25000, 'USD', 'ASSUMPTION: permanent shade structures + cooling station'),
+('mitigation_reduction_extreme_heat', 0.40, 'share of lost time avoided', 'ASSUMPTION: shade/cooling plus early shifts'),
+('mitigation_cost_flooding', 120000, 'USD', 'ASSUMPTION: drainage, elevated equipment pad, gravel access road'),
+('mitigation_reduction_flooding', 0.50, 'share of lost time avoided', 'ASSUMPTION'),
+('mitigation_cost_tidal_flooding', 150000, 'USD', 'ASSUMPTION: elevated pads and removable flood barriers'),
+('mitigation_reduction_tidal_flooding', 0.50, 'share of lost time avoided', 'ASSUMPTION'),
+('mitigation_cost_soil_saturation', 60000, 'USD', 'ASSUMPTION: crane mats + stabilized gravel access'),
+('mitigation_reduction_soil_saturation', 0.50, 'share of lost time avoided', 'ASSUMPTION'),
+('mitigation_cost_severe_storm', 40000, 'USD', 'ASSUMPTION: storm shelter + equipment tie-down points'),
+('mitigation_reduction_severe_storm', 0.25, 'share of lost time avoided', 'ASSUMPTION'),
+('mitigation_cost_tropical', 75000, 'USD', 'ASSUMPTION: hurricane prep kit + secured laydown yard'),
+('mitigation_reduction_tropical', 0.20, 'share of lost time avoided', 'ASSUMPTION'),
+('mitigation_cost_high_wind', 10000, 'USD', 'ASSUMPTION: on-site anemometer + wind-rated lift plan'),
+('mitigation_reduction_high_wind', 0.30, 'share of lost time avoided', 'ASSUMPTION'),
+('mitigation_cost_extreme_cold', 15000, 'USD', 'ASSUMPTION: heated warm-up shelter'),
+('mitigation_reduction_extreme_cold', 0.30, 'share of lost time avoided', 'ASSUMPTION'),
+('mitigation_cost_dense_fog', 8000, 'USD', 'ASSUMPTION: site lighting + spotter program'),
+('mitigation_reduction_dense_fog', 0.30, 'share of lost time avoided', 'ASSUMPTION')
+ON CONFLICT (key) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS weather_bounceback (          -- ml/bounceback.py: does business rise after a storm?
     scope           text NOT NULL,                       -- county_field_contracts / national_contractor_revenue / ...
     weather_kind    text NOT NULL,
@@ -856,6 +955,54 @@ CREATE TABLE IF NOT EXISTS weather_bounceback (          -- ml/bounceback.py: do
     model_version   text,
     computed_at     timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (scope, weather_kind, outcome)
+);
+
+-- Real crew dispatches from utilities' public outage maps (backend/crew_dispatch.py, worker job "crew_dispatch").
+-- One row per outage near a site, with when the utility marked a crew assigned / on site and when power came back.
+CREATE TABLE IF NOT EXISTS crew_dispatch (
+    incident_id     bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    utility         text NOT NULL,
+    geog            geography(Point, 4326) NOT NULL,
+    site_id         bigint REFERENCES sites,             -- nearest site (within 25 mi)
+    site_miles      numeric,
+    first_seen      timestamptz NOT NULL,
+    last_seen       timestamptz NOT NULL,
+    assigned_at     timestamptz,                         -- first poll whose status said a crew was assigned
+    on_site_at      timestamptz,                         -- first poll whose status said the crew was on site
+    cleared_at      timestamptz,                         -- gone from the map (restored)
+    customers_max   int,
+    cause           text,
+    last_comment    text
+);
+CREATE INDEX IF NOT EXISTS crew_dispatch_open_idx ON crew_dispatch (utility) WHERE cleared_at IS NULL;
+CREATE INDEX IF NOT EXISTS crew_dispatch_geog_idx ON crew_dispatch USING gist (geog);
+CREATE INDEX IF NOT EXISTS crew_dispatch_site_idx ON crew_dispatch (site_id, first_seen);
+
+-- Weather measured in real sales (ml/weather_sales.py): degree-day model of EIA-861M monthly sales per utility.
+CREATE TABLE IF NOT EXISTS weather_sales_model (
+    utility_id          bigint NOT NULL,
+    state               char(2) NOT NULL,
+    utility_name        text,
+    months              int,
+    r2                  numeric,                         -- sales ~ trend + days + CDD + HDD
+    r2_without_weather  numeric,                         -- sales ~ trend + days
+    mwh_per_cdd         numeric,
+    mwh_per_hdd         numeric,
+    first_month         date,
+    last_month          date,
+    PRIMARY KEY (utility_id, state)
+);
+CREATE TABLE IF NOT EXISTS weather_sales_effect (
+    utility_id          bigint NOT NULL,
+    state               char(2) NOT NULL,
+    utility_name        text,
+    month               date NOT NULL,
+    sales_mwh           numeric,                         -- real (EIA-861M)
+    cdd                 numeric,
+    hdd                 numeric,
+    weather_mwh         numeric,                         -- sales above (+) or below (-) a normal-weather month
+    weather_revenue_usd numeric,                         -- weather_mwh x that month's average retail price
+    PRIMARY KEY (utility_id, state, month)
 );
 
 CREATE TABLE IF NOT EXISTS economic_correlations (

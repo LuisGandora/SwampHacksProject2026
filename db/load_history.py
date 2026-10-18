@@ -195,7 +195,10 @@ def load_weather(conn):
                     "max_temp_f", "min_temp_f", "max_feel", "max_dewpoint_f", "min_rh", "avg_rh", "precip_in",
                     "max_wind_gust_kts", "max_wind_speed_kts"))))
                 n += 1
-    print(f"  weather_daily: {n}")
+    # sensor errors: sustained wind over 87 kt with no gust at least as high (same rule as backend/daily_weather.py)
+    bad = conn.execute("UPDATE weather_daily SET max_wind_kt = NULL WHERE max_wind_kt > 87 "
+                       "AND (max_gust_kt IS NULL OR max_gust_kt < max_wind_kt)").rowcount
+    print(f"  weather_daily: {n} ({bad} impossible wind readings blanked)")
 
 
 def main():

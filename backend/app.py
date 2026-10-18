@@ -22,7 +22,7 @@ from pydantic import BaseModel, Field
 from db.setup_db import load_env
 load_env()  # read .env (GEMINI_API_KEY, GEMINI_MODEL, ...) into os.environ before reports/briefings read them
 
-from backend import briefings, compliance, lightning, notify, nws, observations, reports, scenario
+from backend import briefings, compliance, lightning, notify, nws, observations, plan, reports, scenario, team_briefing
 from backend.auth import current_user, rate_limit, require_supervisor
 from backend.db import connection
 
@@ -155,7 +155,8 @@ def site(site_id: int):
     if profile:
         profile[0].pop("geog")
         profile[0] = reports.cdc_safe(profile[0])
-    return {**s, "risk_profile": profile[0] if profile else None,
+    levee = next(iter(many("SELECT * FROM site_levees WHERE site_id = %s", (site_id,))), None)
+    return {**s, "risk_profile": profile[0] if profile else None, "levee": levee,
             "active_alerts": many("SELECT * FROM active_site_alerts WHERE site_id = %s ORDER BY level DESC, started_at",
                                   (site_id,)),
             "latest_score": next(iter(many("SELECT * FROM hazard_scores WHERE site_id = %s "
@@ -192,6 +193,17 @@ SELECT count(*) FILTER (WHERE d <= 10) AS within_10_mi, count(*) FILTER (WHERE d
                l.observed_at AS t
           FROM lightning_strikes l JOIN sites s ON s.site_id = %s
          WHERE l.observed_at > now() - interval '30 minutes' AND ST_DWithin(l.geog, s.geog, 100 * 1609.344)) n
+"""
+
+
+TIDE_NEAR = """
+SELECT t.station_id, t.name, round((ST_Distance(t.geog, s.geog) / 1609.344)::numeric, 1) AS miles, r.observed_at,
+       round(r.level_ft - t.mhhw_ft, 2) AS above_high_tide_ft, round(t.minor_ft - t.mhhw_ft, 2) AS minor_flood_above_high_tide_ft,
+       r.level_ft >= t.minor_ft AS flooding
+  FROM sites s JOIN tide_stations t ON ST_DWithin(t.geog, s.geog, 15 * 1609.344)
+  LEFT JOIN LATERAL (SELECT level_ft, observed_at FROM tide_readings WHERE station_id = t.station_id
+                      ORDER BY observed_at DESC LIMIT 1) r ON true
+ WHERE s.site_id = %s ORDER BY t.geog <-> s.geog LIMIT 1
 """
 
 
@@ -243,11 +255,13 @@ def site_weather(site_id: int, refresh: bool = False):
         bolt = conn.execute(LIGHTNING_NEAR, (site_id,)).fetchone()
         latest = conn.execute("SELECT * FROM weather_observations WHERE site_id = %s AND source LIKE 'nws:%%' "
                               "ORDER BY observed_at DESC LIMIT 1", (site_id,)).fetchone()
+        coast = conn.execute(TIDE_NEAR, (site_id,)).fetchone()
     if bolt["nearest_mi"] is not None:
         bolt["direction"] = COMPASS[round(float(bolt["bearing_deg"]) / 22.5) % 16]
     return {"site_id": site_id, "timezone": s["timezone"], "station": s["weather_station_id"], "latest_reading": latest,
             "forecast_issued_at": future[0]["issued_at"] if future else None,
-            "past_hours": past, "next_hours": future, "daily": daily(past, future, s["timezone"]), "lightning": bolt}
+            "past_hours": past, "next_hours": future, "daily": daily(past, future, s["timezone"]), "lightning": bolt,
+            "coast": coast}
 
 
 @app.get("/sites/{site_id}/hazard-events")
@@ -341,6 +355,43 @@ def delete_crew_report(report_id: uuid.UUID, user=Depends(rate_limit("write", 60
         conn.execute("DELETE FROM crew_reports WHERE report_id = %s", (report_id,))
     if r["photo_url"] and "/uploads/" in r["photo_url"]:  # our own upload: just the file name, never a path
         (UPLOADS / Path(r["photo_url"].rsplit("/", 1)[-1]).name).unlink(missing_ok=True)
+
+
+@app.get("/plan/{horizon}")
+def supervisor_plan(horizon: Literal["now", "week", "invest", "economics"], limit: int = Query(50, le=700),
+                    site_ids: str | None = Query(None, max_length=8000, description="comma-separated: only these sites")):
+    """Where to focus attention and resources first: now (action queue with actions and resources), week (7-day
+    forecast outlook with what to schedule or stage), invest (sites by yearly weather loss, with a fix and payback;
+    fix costs are labeled assumptions), economics (region-wide money view: this week's crew-hours and dollars at
+    risk, yearly loss by utility, weather in real sales, real crew dispatches, findings, assumptions)."""
+    only = {int(x) for x in site_ids.split(",") if x.strip().isdigit()} if site_ids else None
+    with connection() as conn:
+        return {"now": lambda: plan.now(conn, limit, only), "week": lambda: plan.week(conn, only),
+                "invest": lambda: plan.invest(conn, limit, only), "economics": lambda: plan.economics(conn, only)}[horizon]()
+
+
+class Assumption(BaseModel):
+    value: float = Field(ge=0, le=1_000_000)
+
+
+ASSUMPTION_LIMITS = {"crew_size": (1, 50), "shift_hours": (1, 24)}  # hours_lost_* <= 24, mitigation_reduction_* <= 1
+
+
+@app.put("/economics/assumptions/{key}")
+def set_assumption(key: str, a: Assumption, user=Depends(require_supervisor)):
+    """Replace one economic assumption with your company's number (supervisors). The note records who and when;
+    the BLS loader never overwrites it. Invest, Economics, the week's at-risk dollars and briefings use it at once."""
+    lo, hi = ASSUMPTION_LIMITS.get(key, (0, 24 if key.startswith("hours_lost_") else 1 if key.startswith(
+        "mitigation_reduction_") else 1_000_000))
+    if not lo <= a.value <= hi:
+        raise HTTPException(422, f"{key} must be between {lo} and {hi}.")
+    with connection() as conn:
+        row = conn.execute("UPDATE economic_assumptions SET value = %s, note = %s WHERE key = %s RETURNING *",
+                           (a.value, f"COMPANY: set by {user.get('email') or user.get('name') or 'a supervisor'} "
+                                     f"on {dt.date.today()}", key)).fetchone()
+    if row is None:
+        raise HTTPException(404, "No such assumption")
+    return row
 
 
 @app.get("/model/backtest")
@@ -579,6 +630,25 @@ def location_briefing_now(location_id: int, user=Depends(rate_limit("ai", 10))):
         return {"briefing_date": day["d"], "summary": briefings.save_location_briefing(conn, location_id, day["d"])}
 
 
+class BriefingRequest(BaseModel):
+    kind: Literal["start", "6pm"] = "start"
+    lat: float | None = Field(None, ge=-90, le=90)     # null = all sites
+    lon: float | None = Field(None, ge=-180, le=180)
+    radius_mi: float = Field(50, ge=1, le=300)
+    label: str | None = Field(None, max_length=80)
+    refresh: bool = False                               # "Run again": skip the 2 h cache
+
+
+@app.post("/me/briefing")
+def my_briefing(b: BriefingRequest, user=Depends(rate_limit("ai", 10))):
+    """Your briefing across your starting area and saved locations (Gemini, template fallback). For a supervisor
+    identity it includes a drafted crew message per Discord/Slack channel; nothing is sent until you press Send."""
+    if (b.lat is None) != (b.lon is None):
+        raise HTTPException(422, "Give both lat and lon, or neither for all sites.")
+    with connection() as conn:
+        return team_briefing.generate(conn, user, b.model_dump())
+
+
 CHANNEL_COLS = ("channel_id, kind, label, webhook_hint, levels, site_ids, briefings, crew_reports, created_at, "
                 "last_sent_at, last_error")
 
@@ -644,6 +714,20 @@ def test_channel(channel_id: int, user=Depends(rate_limit("test", 5))):
     """Send a hello message to the channel now, to check the webhook works."""
     with connection() as conn:
         error = notify.send_test(conn, own_channel(conn, channel_id, user))
+    if error:
+        raise HTTPException(502, f"The webhook didn't accept the message ({error}). Check the URL in Discord/Slack.")
+    return {"sent": True}
+
+
+class Message(BaseModel):
+    text: str = Field(min_length=1, max_length=notify.MAX_CHARS)
+
+
+@app.post("/me/channels/{channel_id}/send")
+def send_to_channel(channel_id: int, m: Message, user=Depends(rate_limit("send", 10))):
+    """Post a message (e.g. a briefing's drafted crew message, after you've read it) to one of your channels."""
+    with connection() as conn:
+        error = notify.send_test(conn, own_channel(conn, channel_id, user), m.text.strip())
     if error:
         raise HTTPException(502, f"The webhook didn't accept the message ({error}). Check the URL in Discord/Slack.")
     return {"sent": True}

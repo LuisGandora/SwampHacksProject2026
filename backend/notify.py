@@ -72,7 +72,8 @@ def chunks(lines, limit=MAX_CHARS):
 
 def post(url, text):
     # Slack's markup uses *bold*, Discord's **bold**
-    body = {"content": text} if webhook_kind(url) == "discord" else {"text": text.replace("**", "*")}
+    body = ({"content": text, "allowed_mentions": {"parse": []}} if webhook_kind(url) == "discord"  # no mass pings
+            else {"text": text.replace("**", "*")})
     client.post(url, json=body).raise_for_status()
 
 
@@ -158,11 +159,10 @@ def sync(conn):
     return f"sent {total} items to {len(channels)} channels"
 
 
-def send_test(conn, channel):
-    """Post a hello message to one channel right now; returns None or an error string."""
+def send_test(conn, channel, text="✅ Planet Control is connected. Alerts for your sites will appear here."):
+    """Post a message to one channel right now (a hello by default); returns None or an error string."""
     try:
-        post(fernet().decrypt(channel["webhook_encrypted"].encode()).decode(),
-             "✅ Planet Control is connected. Alerts for your sites will appear here.")
+        post(fernet().decrypt(channel["webhook_encrypted"].encode()).decode(), text)
         return None
     except (httpx.HTTPError, InvalidToken) as e:
         conn.execute("UPDATE notification_channels SET last_error = %s WHERE channel_id = %s",

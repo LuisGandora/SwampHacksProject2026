@@ -1,0 +1,58 @@
+# DigitalOcean App Platform spec (cloud.digitalocean.com -> Apps -> Create App -> import this file, or
+# `doctl apps create --spec .do/app.yaml`). See docs/DEPLOY.md before applying it.
+# Public stack: API + exactly ONE worker + the dashboard. Secrets are typed in the dashboard (type: SECRET, no value
+# here), never committed. Each service gets an https URL like https://planet-control-xxxxx.ondigitalocean.app.
+name: planet-control
+region: nyc
+services:
+  - name: api
+    github: { repo: LuisGandora/SwampHacksProject2026, branch: main, deploy_on_push: true }
+    environment_slug: python
+    build_command: pip install -r backend/requirements.txt
+    # --proxy-headers: DigitalOcean ends TLS in front of the app; without it, photo URLs come out as http:// and
+    # browsers block them on the https dashboard. --root-path /api: the API is served under /api (below), so links
+    # it builds (photo URLs) keep the prefix.
+    run_command: uvicorn backend.app:app --host 0.0.0.0 --port 8080 --proxy-headers --forwarded-allow-ips="*" --root-path /api
+    http_port: 8080
+    instance_size_slug: apps-s-1vcpu-1gb
+    instance_count: 1
+    routes: [{ path: /api, preserve_path_prefix: false }]
+    health_check: { http_path: /health }
+    envs:
+      - { key: DATABASE_URL, scope: RUN_TIME, type: SECRET }        # least-privilege planit_api URL (.env.api)
+      - { key: AUTH0_DOMAIN, scope: RUN_TIME }
+      - { key: AUTH0_AUDIENCE, scope: RUN_TIME }
+      - { key: WEBHOOK_KEY, scope: RUN_TIME, type: SECRET }          # same key as the worker
+      - { key: GEMINI_API_KEY, scope: RUN_TIME, type: SECRET }
+      - { key: NWS_USER_AGENT, scope: RUN_TIME }
+      - { key: SUPERVISOR_EMAILS, scope: RUN_TIME }
+      - { key: CORS_ORIGINS, scope: RUN_TIME, value: "${APP_URL}" }  # the dashboard is served from the same app URL
+
+workers:
+  - name: worker                     # exactly one: two would double-send alerts and briefings
+    github: { repo: LuisGandora/SwampHacksProject2026, branch: main, deploy_on_push: true }
+    environment_slug: python
+    build_command: pip install -r backend/requirements.txt
+    run_command: python -m backend.worker
+    instance_size_slug: apps-s-1vcpu-1gb
+    instance_count: 1
+    envs:
+      - { key: DATABASE_URL, scope: RUN_TIME, type: SECRET }        # admin URL (.env): writes forecasts, alerts, scores
+      - { key: WEBHOOK_KEY, scope: RUN_TIME, type: SECRET }
+      - { key: GEMINI_API_KEY, scope: RUN_TIME, type: SECRET }
+      - { key: NWS_USER_AGENT, scope: RUN_TIME }
+      - { key: FIRMS_MAP_KEY, scope: RUN_TIME, type: SECRET }
+
+static_sites:
+  - name: dashboard
+    github: { repo: LuisGandora/SwampHacksProject2026, branch: main, deploy_on_push: true }
+    source_dir: frontend
+    build_command: npm ci && npm run build
+    output_dir: dist
+    catchall_document: index.html     # single-page app: every path serves the dashboard
+    routes: [{ path: / }]
+    envs:
+      - { key: VITE_API_URL, scope: BUILD_TIME, value: "${APP_URL}/api" }
+      - { key: VITE_AUTH0_DOMAIN, scope: BUILD_TIME }
+      - { key: VITE_AUTH0_CLIENT_ID, scope: BUILD_TIME }
+      - { key: VITE_AUTH0_AUDIENCE, scope: BUILD_TIME }
