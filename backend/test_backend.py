@@ -212,6 +212,8 @@ assert _cd.status({"comments": "Personnel have been assigned to evaluate the out
 assert _cd.status({"comments": "An outage has been reported in your area. We are working to determine a restoration time."}) \
     == (False, False, None)
 assert _cd.polyline_point("_p~iF~ps|U") == (38.5, -120.2)       # Google's documented example
+assert _cd.status({"cause": {"EN-US": "Pending", "orig": "UNKNOWN"},                 # JEA: text per language
+                   "crew_status": {"EN-US": "A troubleshooter is in the area to evaluate the outage.", "orig": "WORKING"}})     == (True, True, "Pending")
 assert _cd.quadkey(0.1, 0.1, 2) == "12"                                   # NE tile, then its lower-left child
 from backend.plan import at_risk as _risk
 _a = {"crew_size": 4, "shift_hours": 10, "hours_lost_extreme_heat": 3, "hours_lost_lightning": 2, "hours_lost_flooding": 6,

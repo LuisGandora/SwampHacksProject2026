@@ -30,7 +30,8 @@ GONE_AFTER = dt.timedelta(minutes=45)   # an outage missing from the map this lo
 client = httpx.Client(timeout=20, headers={"User-Agent": "PlanetControl/0.1 (SwampHacks 2026)"})
 
 ASSIGNED = re.compile(r"assigned|dispatched|en route|on the way|crew is responding", re.I)
-ON_SITE = re.compile(r"on site|on-site|onsite|repairing|making repairs|working to repair", re.I)
+ON_SITE = re.compile(r"on site|on-site|onsite|repairing|making repairs|working to repair|in the area to (?:evaluate|repair)"
+                     r"|working", re.I)
 CAUSE = re.compile(r"cause of the outage is (?:an? )?([^.]+)\.", re.I)
 
 
@@ -57,10 +58,19 @@ def polyline_point(s):
     return out[0], out[1]
 
 
+def english(v):
+    """Some maps (JEA) send text per language, {"EN-US": "...", "es-US": "...", "orig": "WORKING"}: keep English + code."""
+    if isinstance(v, dict):
+        return " ".join(str(x) for x in (v.get("EN-US") or next(iter(v.values()), None), v.get("orig")) if x)
+    return v
+
+
 def status(desc):
     """(assigned, on_site, cause) from the outage's crew_status field and the utility's status text."""
-    text = " ".join(str(desc.get(k) or "") for k in ("crew_status", "comments"))
-    cause = desc.get("cause") or (m.group(1).strip() if (m := CAUSE.search(text)) else None)
+    text = " ".join(str(english(desc.get(k)) or "") for k in ("crew_status", "comments"))
+    cause = desc.get("cause")
+    cause = (english(cause.get("EN-US") if isinstance(cause, dict) else cause)
+             or (m.group(1).strip() if (m := CAUSE.search(text)) else None))
     on_site = bool(ON_SITE.search(text))
     return on_site or bool(ASSIGNED.search(text)) or bool(desc.get("crew_icon")), on_site, cause
 
@@ -134,7 +144,7 @@ def sync(conn):
             assigned, on_site, cause = status(desc)
             conn.execute(UPSERT, {"utility": utility, "lat": lat, "lon": lon, "radius": RADIUS_MI, "cust": cust,
                                   "assigned": assigned, "on_site": on_site, "cause": cause and cause[:120],
-                                  "comment": (desc.get("comments") or "")[:300] or None})
+                                  "comment": str(english(desc.get("comments")) or english(desc.get("crew_status")) or "")[:300] or None})
         seen += len(found)
         polled.append(utility)
     trips = conn.execute(CLOSE, (GONE_AFTER, polled)).rowcount  # a map that failed can't close its outages

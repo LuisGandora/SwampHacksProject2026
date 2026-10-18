@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Bell, ClipboardList, Compass, FlaskConical, Globe, Layers, LineChart, LocateFixed, Play, Square } from "lucide-react";
 import { api, setActiveRole, setCacheUser, setTokenGetter } from "./api.js";
 import { useAuth } from "./auth.js";
 import { flush, queued } from "./offlineQueue.js";
@@ -72,6 +73,10 @@ export default function App() {
   const [notifyOpen, setNotifyOpen] = useState(false);
   const [showPins, setShowPins] = useState(false);
   const [radar, setRadar] = useState(false);
+  const [basemap, setBasemapState] = useState(() => {   // "dark" (CARTO) or "satellite" (Esri), remembered here
+    try { return localStorage.getItem("planit.basemap") || "dark"; } catch { return "dark"; }
+  });
+  const setBasemap = (b) => { setBasemapState(b); try { localStorage.setItem("planit.basemap", b); } catch { /* private mode */ } };
   const [warnOn, setWarnOn] = useState(false);
   const [warnings, setWarnings] = useState(null);
   const [layersOpen, setLayersOpen] = useState(false);
@@ -293,7 +298,7 @@ export default function App() {
                 }}
                 pinMode={!focus || pinMode} pin={focus ? pin : landingPlace}
                 onPin={(p) => focus ? (setPin(p), setPinMode(false), setTab("site")) : setLandingPlace({ ...p, label: "Dropped pin" })}
-                pins={showPins ? pins : null} warnings={warnOn ? warnings : null} radar={radar} me={me} sensor={sensor} />
+                pins={showPins ? pins : null} warnings={warnOn ? warnings : null} radar={radar} me={me} sensor={sensor} basemap={basemap} />
       {sensor === "crt" && <div className="scanlines" aria-hidden="true" />}
 
       <header className="hud">
@@ -325,15 +330,15 @@ export default function App() {
           </div>
           <button className={radar || warnOn || showPins ? "on" : ""} onClick={() => setLayersOpen((v) => !v)}
                   aria-pressed={layersOpen} title="Map layers (radar, NWS warnings, hazard pins) and legend">
-            🗺<span className="hide-sm"> Layers</span></button>
+            <Layers className="ico" aria-hidden="true" /><span className="hide-sm"> Layers</span></button>
           {health?.dev && (
-            <button onClick={demo ? resetDemo : runDemo} title="Play the brief's story">{demo ? "■ Reset" : "▶ Demo"}</button>
+            <button onClick={demo ? resetDemo : runDemo} title="Play the brief's story">{demo ? <><Square className="ico" aria-hidden="true" /> Reset</> : <><Play className="ico" aria-hidden="true" /> Demo</>}</button>
           )}
           {auth.enabled && !auth.isAuthenticated ? (
             <button className="primary" onClick={auth.login} disabled={auth.isLoading}>Sign in</button>
           ) : (
             <>
-              <button onClick={() => setNotifyOpen(true)} title="Discord / Slack notifications" aria-label="Notifications">🔔</button>
+              <button onClick={() => setNotifyOpen(true)} title="Discord / Slack notifications" aria-label="Notifications"><Bell className="ico" aria-hidden="true" /></button>
               {auth.enabled && (
                 <button onClick={() => setAccountOpen((v) => !v)}
                         title={`Signed in as ${auth.user?.name || auth.user?.email}, acting as ${identity || "crew"}`}
@@ -346,16 +351,16 @@ export default function App() {
               )}
               {health?.dev && canBrief && focus && (  // debugging only: hidden unless PLANIT_DEV=1 (never on the public site)
                 <button className="small" onClick={() => setBriefing({ kind: now.getHours() >= 18 ? "6pm" : "start" })}
-                        title="Debug: open the briefing now (demo mode only)">🧪<span className="hide-sm"> Briefing</span></button>
+                        title="Debug: open the briefing now (demo mode only)"><FlaskConical className="ico" aria-hidden="true" /><span className="hide-sm"> Briefing</span></button>
               )}
             </>
           )}
-          <button className="primary" onClick={() => setPlanOpen(true)} title="Where to focus attention and resources first">📋<span className="hide-sm"> Plan</span></button>
-          <button onClick={() => setModelOpen(true)} title="Model accuracy (backtest)" aria-label="Model accuracy">📈<span className="hide-sm"> Model</span></button>
-          <button onClick={() => globe.current?.flyHome()} title="North America" aria-label="Show North America">🌎</button>
-          <button onClick={() => globe.current?.flySites()} title="All sites" aria-label="Show all sites">◎<span className="hide-sm"> Sites</span></button>
+          <button className="primary" onClick={() => setPlanOpen(true)} title="Where to focus attention and resources first"><ClipboardList className="ico" aria-hidden="true" /><span className="hide-sm"> Plan</span></button>
+          <button onClick={() => setModelOpen(true)} title="Model accuracy (backtest)" aria-label="Model accuracy"><LineChart className="ico" aria-hidden="true" /><span className="hide-sm"> Model</span></button>
+          <button onClick={() => globe.current?.flyHome()} title="North America" aria-label="Show North America"><Globe className="ico" aria-hidden="true" /></button>
+          <button onClick={() => globe.current?.flySites()} title="All sites" aria-label="Show all sites"><LocateFixed className="ico" aria-hidden="true" /><span className="hide-sm"> Sites</span></button>
           <button onClick={() => { setReopened(true); setFocus(null); globe.current?.flyHome(); }}
-                  title="Change your position, or show all sites" aria-label="Change location">🧭<span className="hide-sm"> Location</span></button>
+                  title="Change your position, or show all sites" aria-label="Change location"><Compass className="ico" aria-hidden="true" /><span className="hide-sm"> Location</span></button>
         </div>
       </header>
 
@@ -381,6 +386,7 @@ export default function App() {
       <StopWorkBanner alerts={viewAlerts} selectedId={selectedId} now={now} categories={categories} onSelect={select} reliable={alertsReliable} />
       {layersOpen && (
         <MapLayers layers={{ radar, warnings: warnOn, pins: showPins }} setLayer={setLayer} pinCount={pins.length}
+                   basemap={basemap} setBasemap={setBasemap}
                    warnings={warnings} onClose={() => setLayersOpen(false)} />
       )}
       {demo && (

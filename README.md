@@ -1,5 +1,5 @@
-# SwampHacksProject2026
-Our SwampHacks
+# Plan It By The Planet (Planet Control)
+SwampHacks 2026, Sperry Tech brief. Live weather and hazard intelligence for power-plant crews: instant stop-work alerts, a 6 PM briefing, and a plan for where to send crews and money first. Live at **https://plan-it-by-the-planet.us**.
 
 ## Setup (virtual environment)
 
@@ -65,17 +65,19 @@ Open the Command Palette (Ctrl+Shift+P), choose **Python: Select Interpreter**, 
 | [db/](db/) | Tiger Data (TimescaleDB) schema and loaders | `python db/setup_db.py`, `python db/load_history.py` |
 | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Brief → feature checklist with status, demo steps and checks | (none) |
 
-> **Judging and deployment:** [docs/JUDGING.md](docs/JUDGING.md) (baseline slide, demo script, Q&A, hygiene checklist) · [docs/DEPLOY.md](docs/DEPLOY.md) (Render blueprint, one worker, separate demo instance).
+| [deploy/vultr/setup.sh](deploy/vultr/setup.sh) | One-command server setup (Ubuntu + Caddy https + API + one worker) | `bash setup.sh <domain>` on the server |
+
+> **Judging and deployment:** [docs/JUDGING.md](docs/JUDGING.md) (baseline slide, demo script, Q&A, hygiene checklist) · [docs/DEPLOY.md](docs/DEPLOY.md) (the Vultr server we run on; Render and DigitalOcean configs are kept as alternatives).
 
 ## Hazard Index model
 
-[ml/hazard_model.py](ml/hazard_model.py). One row per site per day, 1.27M site-days from October 2021 to October 2026, with one XGBoost classifier per hazard category.
+[ml/hazard_model.py](ml/hazard_model.py) (version `site-day-xgb-v3`). One row per site per day: 1.11M site-days with a stored day-ahead forecast, October 2021 to October 2026. One XGBoost classifier per hazard category (severe storm, tropical, flooding, lightning, extreme heat, extreme cold, high wind), plus one for severe outcomes.
 
 | | |
 |---|---|
-| **Label** | Did a recorded hazard happen near the site that day? A NOAA storm event, or an OSHA heat/cold/lightning injury, within the category's radius (the `site_hazard_events` ties). |
-| **Features** | Only what a forecast can also give us: high and low temperature, heat index, rain that day, rain over the previous 6 days, wind gusts, season, location. The same model therefore scores tomorrow from the NWS forecast. |
-| **Score** | **Hazard Index = 10 × P(at least one hazard)**. So 7/10 means about a 70% chance, and the answer key checks the probabilities are calibrated. Each category also gets a score and its top weather drivers. |
+| **Label** | Did a recorded hazard happen near the site that day? A NOAA storm event, or an OSHA heat/cold/lightning injury, within the category's radius (the `site_hazard_events` ties). **Severe**: an event that killed or injured someone, did $1M+ damage, or an OSHA weather injury to a worker. |
+| **Features** | Only what's known by 6 PM the day before, so training matches scoring: the day-ahead forecast at the site's station (high and low, heat index, hours at heat index 103°F or more, rain amount and chance, thunder chance, gusts, wind; `scraper/past_forecasts.py`), NWS watches and warnings issued by then (`scraper/nws_warning_history.py`), rain over the previous 6 days, season and location. |
+| **Score** | `P_any = 1 − Π(1 − p_category)`, then **Hazard Index = 10 × [1 − (1 − P_any) × (1 − P_severe)^4]**. A severe outcome counts 4× an ordinary hazard event (a stated weight), so the index is **not a direct probability**. Each category also gets a score and its top weather drivers (SHAP contributions). Today's index is raised by active alerts, see the LIVE badge below. |
 | **Economic link** | Each score carries the expected crew-hours lost and their cost: probability × hours lost per category × crew size × cost, using the labeled `economic_assumptions`. |
 | **Split** | Trained on 2021–2024, tested on 2025–2026. Never a random split, because one storm hits many sites on the same day. |
 
@@ -115,7 +117,7 @@ Company data (crew trip logs, weekly sales, payroll) isn't public, so each gap h
 | **Weather delays** | Stop-work weather days × hours lost per hazard × crew size × state labor rate | site weather + labeled assumptions | delay hours from work orders |
 
 Correlations are reported raw and **deseasonalized**, meaning each series minus its same-month average. Summer heat and summer demand rise together anyway, so the useful question is whether an unusually hot or stormy week also had unusual demand, outages or revenue. Results (`GET /economics/correlations`):
-- **Weather drives crew workload:** weeks with more stop-work weather or storm events have more customer-hours without power at every operator. Deseasonalized r = **0.37–0.72**, all p < 10⁻⁶, 143–220 weeks each. Examples: Tampa Electric 0.71, Duke Florida 0.69, FPL 0.51, Southern Co 0.48.
+- **Weather drives crew workload:** weeks with more stop-work weather have more customer-hours without power. Deseasonalized, 143–220 weeks each: Tampa Electric r = 0.71, Duke Energy Florida 0.69, FPL 0.51, Southern Co 0.50 (storm events vs outages reach 0.72 at Seminole Electric), all p < 10⁻¹². Smaller operators run 0.25–0.40; 11 of 13 are significant at p < 0.001.
 - **Unusually hot weeks raise demand** at all four large operators: r = 0.33–0.38, p < 10⁻⁶.
 - **Tampa Electric's unusually stormy weeks have lower demand:** r = −0.28, consistent with outages.
 - **Monthly sales** at FPL, Georgia Power and Alabama Power rise in hotter-than-normal months (r ≈ 0.29–0.31, n = 58).
@@ -167,7 +169,7 @@ Not supported: no bounce in any of the 15 tests. An early "hail +31%" turned out
 
 ## AI safety report (on tap)
 
-`POST /sites/{id}/report` ([backend/reports.py](backend/reports.py)). Code gathers every fact and **decides go / caution / no-go**; Gemini only explains it. Each fact group has a source ID (`S1`–`S7`) that the report must cite, and the assumptions it relies on are listed. A **number audit** flags any number in Gemini's text that isn't in the facts (`verified: false`, with `unverified_numbers`). Gemini gets two retries per model, then the fallback model is tried, then a deterministic template report is used. Reports are cached for 30 minutes.
+`POST /sites/{id}/report` ([backend/reports.py](backend/reports.py)). Code gathers every fact and **decides go / caution / no-go**; Gemini only explains it. Each fact group has a source ID (`S1`–`S7`) that the report must cite, and the assumptions it relies on are listed. A **number audit** flags any number in Gemini's text that isn't in the facts (`verified: false`, with `unverified_numbers`). Gemini gets two retries per model, then the fallback model is tried, then a deterministic template report is used. Reports are kept until the next 6 PM at the site (when the next briefing goes out) and replayed until then; **Regenerate** writes a new one.
 
 Set `GEMINI_API_KEY`, and `GEMINI_MODEL` / `GEMINI_FALLBACK_MODEL`; check Google's current model names. Without a key, the template report is returned.
 
@@ -189,7 +191,7 @@ OSHA time windows end at the **latest OSHA report on file** (currently Nov 30, 2
 
 ## Frontend
 
-[frontend/](frontend/) is a React (Vite) app on a **MapLibre GL globe** with keyless Esri satellite imagery, styled after an ops-room HUD. It opens on North America and is wired to every backend endpoint.
+[frontend/](frontend/) is a React (Vite) app on a **MapLibre GL globe**, styled after an ops-room HUD with Lucide icons and Inter / JetBrains Mono type. The basemap is **CARTO Dark Matter** (keyless) by default, with **Esri satellite imagery** as a switch in Layers. It opens on North America and is wired to every backend endpoint.
 
 ```powershell
 python -m uvicorn backend.app:app --reload     # terminal 1: API (add $env:PLANIT_DEV="1" for demo controls)
@@ -201,23 +203,23 @@ cd frontend; npm install; npm run dev          # terminal 2: open http://localho
 | **Hazard ranking** (the dashboard requirement) | All 694 plants ranked by Hazard Index, **Today or Tomorrow**. Band tiles (Critical / High / Moderate / Low / Stop work) double as filters. State filter and search. Each row shows its hazard bar, band label, top hazard and alert badges. Click a row to fly to the site. | `GET /sites?horizon=` |
 | **Your briefing** (supervisors, 6 PM) | Full-screen briefing across your current area and every saved location (of the identity you're acting as), written by Gemini from computed facts (numbers checked; template fallback). Pops up for supervisors at **6 PM local** once a day, and is **replayed** (Account → 📋 Replay 6 PM briefing) until the next 6 PM, when the next request writes a fresh one. Supervisors get a **drafted crew message per Discord/Slack channel**: edit, then Send. **↻ Run again** rebuilds it now. Debugging: 🧪 Briefing next to the identity chip, shown only in demo mode (`PLANIT_DEV=1`). | `POST /me/briefing`, `POST /me/channels/{id}/send` |
 | **AI answers are replayed** | The AI safety report, Compliance and the briefing are each kept until the next 6 PM at the site, then rewritten on the next open; Regenerate / Run again forces it. The browser keeps the last copy of each, shown (marked offline) when the API can't be reached. | server: `site_reports`, `user_briefings`; browser: `planit.ai.*` in localStorage |
-| **Supervisor plan** (📋 Plan in the header) | Where to focus attention and resources first, for the sites in view. **Economics**: crew-hours and dollars at risk this week, yearly weather loss by utility, weather in real sales, real crew dispatches, the experiments' findings, and the assumptions panel (supervisors edit; `PUT /economics/assumptions/{key}`). This week also shows at-risk crew-hours and dollars per site. **Act now**: sites with alerts or a high live score, with what to do and what to bring. **This week**: a 7-day grid of heat ☀️, storm ⚡, heavy-rain 🌧 and wind 💨 days, plus what to schedule or stage ahead (floodplain 🌊 and levee 🧱 sites flagged before heavy rain). **Invest**: sites ranked by crew time lost to weather in a typical year, the costliest hazard, a suggested fix, its cost and payback (fix costs are labeled assumptions in `economic_assumptions`). | `GET /plan/{now,week,invest}` |
-| Globe | Plants colored by band, pulsing red rings on stop-work sites, lightning from the last 30 min, your GPS location, a draft report pin. 🌎 returns to North America, ◎ fits all sites. | `/sites`, `/lightning/recent` |
-| Site card | Today and tomorrow scores, what drives the score (weather drivers), expected crew impact (labeled estimate), live alerts with all-clear countdowns, 48 h forecast chart (with a table view), 6 PM briefing, site history, economic impact, crew reports with photos | `/sites/{id}`, `/forecast`, `/briefings/{id}`, `/economics`, `/crew-reports` |
+| **Supervisor plan** (Plan in the header) | Where to focus attention and resources first, for the sites in view. **Economics**: crew-hours and dollars at risk this week, yearly weather loss by utility, weather in real sales, real crew dispatches, the experiments' findings, and the assumptions panel (supervisors edit; `PUT /economics/assumptions/{key}`). This week also shows at-risk crew-hours and dollars per site. **Act now**: sites with alerts or a high live score, with what to do and what to bring. **This week**: a 7-day grid of heat ☀️, storm ⚡, heavy-rain 🌧 and wind 💨 days, plus what to schedule or stage ahead (floodplain 🌊 and levee 🧱 sites flagged before heavy rain). **Invest**: sites ranked by crew time lost to weather in a typical year, the costliest hazard, a suggested fix, its cost and payback (fix costs are labeled assumptions in `economic_assumptions`). | `GET /plan/{now,week,invest,economics}` |
+| Globe | Plants colored by band, pulsing red rings on stop-work sites, lightning from the last 30 min, your GPS location, a draft report pin. The globe button returns to North America, **Sites** fits all sites, **Location** picks a new area. Sites outside FL/GA/AL (once loaded) carry a **LIVE ONLY** badge: live data, no model score. | `/sites`, `/lightning/recent` |
+| Site card | Today and tomorrow scores (flagged if a score isn't for today or tomorrow), what drives the score (weather drivers), expected crew impact (labeled estimate), live alerts with their timing, 48 h forecast chart (with a table view), 6 PM briefing, site history, economic impact, crew reports with photos | `/sites/{id}`, `/forecast`, `/briefings/{id}`, `/economics`, `/crew-reports` |
 | **Compliance** | Prioritized next steps from OSHA reports nearby and open crew reports, with the OSHA standards to check and reporting deadlines. Crew reports can be marked resolved or dismissed. | `POST /sites/{id}/compliance`, `PATCH /crew-reports/{id}` |
-| **Model accuracy** (📈 in the header) | Walk-forward backtest table: how well each model version predicted real outcomes | `GET /model/backtest` |
+| **Model accuracy** (Model in the header) | Walk-forward backtest table: how well each model version predicted real outcomes | `GET /model/backtest` |
 | **Weather scanner** (site card) | Right now at the site's station; the past 7 days measured and the next 7 days forecast, as one chart with a measured/forecast divider; a daily table (high/low, rain, gust, thunder); nearest lightning in the last 30 min with distance, direction and counts within 10/20 mi. Opening a site pulls fresh NWS data if it's stale (and back-fills the week); the worker refreshes each site at 6 PM local, right before its briefing. | `GET /sites/{id}/weather` |
-| **LIVE / UNUSUAL badges** | **LIVE**: today's score was raised by an active alert or crew report (hover for why). The floor is graded by proximity and intensity: stop work 8–10 (lightning at the site 10, at the 10-mi edge 8), warnings 5–7 (from the warn to the stop threshold, e.g. 2 → 4 in of overnight rain). **UNUSUAL**: in the top 10% of that site's normal range for the month. | `GET /sites` |
+| **LIVE / UNUSUAL badges** | **LIVE**: today's score was raised by an active alert or crew report (hover for why). The floor is graded by proximity and intensity: stop work 8–10 (lightning at the site 10, at the 10-mi edge 8), warnings 5–7 (from the warn to the stop threshold, e.g. 2 → 4 in of overnight rain), an open crew report 4, a river at action stage 3.5. **UNUSUAL**: in the top 10% of that site's normal range for the month. | `GET /sites` |
 | **AI safety report** | GO / CAUTION / NO-GO decided by code, hazards with source chips, actions, uncertainty, assumptions, number-audit badge, regenerate | `POST /sites/{id}/report` |
 | **Crew hazard report** | Category, description, severity, location (site / GPS / tap the map to pin), optional photo. **Web:** attach a photo. **Phone:** *Take photo* (camera) or *Choose from library*. Photos are shrunk to ≤1600 px JPEG on the device before upload. The site is alerted immediately. | `POST /uploads`, `POST /crew-reports` |
-| **Stop-work screen** | A full-width red banner with the all-clear countdown (big clock and progress bar) whenever a site is under stop work. It flashes "New strike: countdown restarted" when a strike pushes the all-clear back, and turns green ("ALL CLEAR: work may resume") when it runs out. It shows the selected site's alert, or the newest, and offers "+N more sites". Alerts poll every 8 s during a stop. | `GET /alerts/active` |
-| Live alerts | Every active alert, stop work first, with countdowns. New stop-work alerts show a toast and vibrate on phones; there's an optional desktop notification. Polls every 20 s. | `GET /alerts/active` |
-| **🗺 Layers and legend** | Switch on 🌧 **radar** (live NEXRAD mosaic from Iowa Environmental Mesonet, refreshed every 5 min), ⚠ **NWS warnings** (storm-based warning polygons shaded in NWS colors; county/zone alerts as rings at each site they cover; tap for details) and 📍 **hazard pins**. The legend explains every icon on the map and lists the warning types active right now, with counts. | `GET /nws-alerts/map`, IEM radar tiles |
-| **Hazard pins** (in 🗺 Layers) | Past hazards for future crews: every crew report (faded once closed) and OSHA severe-injury reports within 50 mi of a site, last 3 years. Tap a pin for details and the photo. | `GET /hazard-pins` |
-| **Sign-in and notifications** (🔔) | Sign in with Auth0. Each user adds their own Discord or Slack channels and chooses stop work and/or warnings, crew reports, 6 PM briefings, and all sites or chosen ones. *Send test* checks the webhook. | `/me`, `/me/channels` |
+| **Stop-work screen** | A full-width red banner whenever a site in your area is under stop work. For lightning it shows the all-clear countdown (big clock and progress bar) and flashes "New strike: countdown restarted" when a strike pushes it back; other stop-work alerts show **Active until** their end time. When the countdown ends it says "Countdown ended — verify current conditions before resuming", and only if live data is current; otherwise "Awaiting fresh data". It shows the selected site's alert, or the newest, and offers "+N more sites". Alerts poll every 8 s during a stop. | `GET /alerts/active`, `GET /data-status` |
+| Live alerts | Active alerts for the sites in your area (all sites if you chose all), stop work first. Lightning shows its all-clear countdown, other alerts **Active until** a time. New stop-work alerts show a toast and vibrate on phones; there's an optional desktop notification. Polls every 20 s. The header says **DATA UNVERIFIED** (and the panel warns that no alerts doesn't mean safe) when the lightning or alert feeds aren't current. | `GET /alerts/active`, `GET /data-status` |
+| **Layers and legend** | Switch the basemap (**Dark map** / **Satellite**, remembered on the device). Switch on **radar** (live NEXRAD mosaic from Iowa Environmental Mesonet, refreshed every 5 min), ⚠ **NWS warnings** (storm-based warning polygons shaded in NWS colors; county/zone alerts as rings at each site they cover; tap for details) and **hazard pins**. The legend explains every icon on the map and lists the warning types active right now, with counts. | `GET /nws-alerts/map`, IEM radar tiles |
+| **Hazard pins** (in Layers) | Past hazards for future crews: every crew report (faded once closed) and OSHA severe-injury reports within 50 mi of a site, last 3 years. Tap a pin for details and the photo. | `GET /hazard-pins` |
+| **Sign-in and notifications** (bell) | Sign in with Auth0, then pick **Crew** or **Supervisor** (each identity keeps its own saved locations, channels and reports; supervisor powers need approval). Each user adds their own Discord or Slack channels and chooses stop work and/or warnings, crew reports, 6 PM briefings, and all sites or chosen ones. *Send test* checks the webhook. | `/me`, `/me/channels` |
 | **Offline crew reports** | With no signal, a report (with its photo) is saved on the phone and sent automatically when it's back online. The header shows "⏳ N QUEUED". Resending never makes a duplicate. | `POST /crew-reports` |
-| Sensor modes | STD / NVG / FLIR / CRT looks, after the reference project. They tint the data too, so use STD to read colors. | (none) |
-| **▶ Demo** (header) and demo controls | With `PLANIT_DEV=1`: **▶ Demo** plays the brief's day on the selected site (or the top Florida one) with captions, in about 45 s. The steps are: crew arrives → heat, soft ground, gator report with photo → lightning stop work → a second strike restarts the countdown → ranking → 6 PM briefing. **■ Reset** removes the demo data. The site card also has the individual controls. | `/dev/...` |
+| Sensor modes | STD / NVG / FLIR / CRT looks (standard, night vision, thermal, old monitor), after the reference project. Hidden on phones and mid-size screens to keep the header to one row. They tint the data too, so use STD to read colors. | (none) |
+| **Demo** (header) and demo controls | With `PLANIT_DEV=1`: **Demo** plays the brief's day on the selected site (or the top Florida one) with captions, in about 45 s. The steps are: crew arrives → heat, soft ground, gator report with photo → lightning stop work → a second strike restarts the countdown → ranking → 6 PM briefing. **Reset** removes the demo data. The site card also has the individual controls. | `/dev/...` |
 
 **Hazard colors** use the fixed status palette (green Low < 2.5, yellow Moderate < 5, orange High < 7.5, red Critical) and always come with a text label, never color alone.
 
@@ -513,14 +515,15 @@ Every radius, threshold and countdown is a row in `hazard_categories`, so you ca
 | `extreme_heat` | heat index 103°F | 115°F | at site | 25 mi | |
 | `extreme_cold` | wind chill ≤ 32°F | ≤ 15°F | at site | 25 mi | |
 | `flooding` | 2 in overnight rain | 4 in | gauge or warning within 5 / 1 mi | 10 mi | |
-| `high_wind` | gust 20 mph | 28 mph (aerial lift limit) | at site | 25 mi | 30 min, restarts |
+| `high_wind` | sustained wind 20 mph | 28 mph (aerial lift limit) | at site | 25 mi | 30 min, restarts |
 | `severe_storm` | NWS warning | NWS warning | 25 / 10 mi | 25 mi | 30 min, restarts |
 | `tropical` | NWS watch/warning | NWS warning | 100 / 50 mi | 50 mi | |
 | `wildfire` | satellite detection | detection | 10 / 2 mi | 10 mi | |
 | `soil_saturation` | 4 in of rain in 7 days | 8 in | at site | | |
 | `dense_fog` | visibility 1 mi | 0.25 mi | at site | 10 mi | |
-| `wildlife` | sighting | sighting | 1 / 0.1 mi | 2 mi | |
-| `coastal` | (history only) | | | 5 mi | |
+| `wildlife` | sighting (wild, research-grade iNaturalist records from the last 3 days) | sighting | 1 / 0.1 mi | 2 mi | |
+| `tidal_flooding` | NOAA tide gauge at its minor flood level | moderate flood level | 10 mi | 10 mi | |
+| `coastal` | NWS High Surf Advisory | High Surf Warning | the alert's zone | 5 mi | |
 | `ppe`, `heavy_machinery`, `slip_trip`, `osha_inspection` | (crew categories) | | | 50 mi, but 20 mi for reports with no tie to the plant (see below) | |
 
 For example, to widen the lightning stop-work radius to 15 miles:
@@ -536,13 +539,17 @@ UPDATE hazard_categories SET stop_radius_mi = 15 WHERE category = 'lightning';
 | Sites | `sites` (power plants), `weather_stations`, `hazard_categories` |
 | History | `storm_events` (NOAA details), `storm_event_locations`, `storm_fatalities` (one row per person, with `crew_relevant` for outdoor, heavy-equipment, vehicle and under-tree deaths), `weather_fatalities` (CDC by county), `osha_injuries`, `weather_daily` |
 | Live feeds | `lightning_strikes`, `weather_observations`, `weather_forecasts`, `nws_alerts`, `river_gauges`, `river_gauge_readings`, `fire_detections`, `wildlife_sightings` |
-| App | `crew_reports`, `site_alerts`, `hazard_scores` (ML 0–10), `daily_briefings` |
+| Live feeds (continued) | `tide_stations`, `tide_readings`, `crew_dispatch` (utility outage maps), `worker_runs` (each job's last success, for `/data-status`) |
+| Flood exposure | `levee_features` + view `site_levees`; FEMA zone columns on `sites` |
+| App | `crew_reports`, `site_alerts`, `hazard_scores` (ML 0–10), `daily_briefings`, `site_reports` (AI reports) |
+| Users | `app_users`, `notification_channels`, `notification_log`, `saved_locations`, `location_briefings`, `user_briefings` |
+| Economics | `economic_assumptions`, `economic_weekly`, `economic_correlations`, `utility_monthly_sales`, `ba_daily_demand`, `county_outages_daily`, `crew_trips`, `weather_sales_model`, `weather_sales_effect`, `field_contracts`, `contract_weather_attribution`, `weather_bounceback`, `company_quarterly_revenue` |
 | Ties | `site_hazard_events` (table), `site_weather_days` (view) |
 
 - **Event ties:** `site_hazard_events` has one row per site, category and event, from NOAA storm events, OSHA reports and crew reports. Each row includes the distance in miles, deaths, injuries and damage. An event is tied to a site when it's within that category's `history_radius_mi`. Crew-type reports (PPE, machinery, slips, OSHA inspections) have no other link to a plant, so they count only within **20 mi**, unless they are linked: an OSHA report from a power utility or power-line contractor (NAICS 2211xx or 237130), or a crew report filed for that site. After changing a radius, run `SELECT refresh_site_hazard_events();` and then refresh the profile.
 - **Weather-day ties:** `site_weather_days` lists each day the site's station crossed a category's warn or stop threshold, labeled `warning` or `stop_work`. It covers extreme heat (max heat index), extreme cold (minimum temperature, standing in for wind chill), flooding (daily rain), high wind (peak gust) and soil saturation (7-day rain total). It's a view, so threshold edits apply immediately.
 
-- **Time-series:** the time-based tables are TimescaleDB hypertables. Lightning strikes, live observations and gauge readings are compressed after a few days, and lightning strikes are deleted after 90 days.
+- **Time-series:** the time-based tables are TimescaleDB hypertables. Lightning strikes are compressed after 2 days and deleted after 90; history tables are compressed after 30 days; forecasts and observations are kept 8 days (`schema.sql`; the live database keeps 30 until `db.load_live_sites` shortens it).
 - **Alerts:** `raise_site_alert(site_id, category, level, at, value)` opens an alert, or extends an open alert for the same site and category, restarting its all-clear countdown if the category says to. `active_site_alerts` lists open alerts with the time remaining.
 - **Risk profile:** `site_risk_profile` is a materialized view with one row per site and a set of columns per category. Examples are `lightning_events`, `lightning_deaths`, `heat_warn_days_per_year`, `flood_events`, `heavy_rain_days_per_year`, `severe_storm_injuries`, `tropical_deaths`, `storm_fatalities_crew_relevant`, `cdc_county_weather_deaths`, `ppe_osha_reports` and `machinery_osha_reports`. It's built from `site_hazard_events` and the station weather. Run `REFRESH MATERIALIZED VIEW site_risk_profile` after loading data or changing a range.
 
@@ -576,7 +583,7 @@ python -m backend.test_backend         # parsing and threshold checks (no networ
 | `WILDLIFE_TAXA` | species to watch on iNaturalist, separated by `;` | alligator; cottonmouth; eastern diamondback |
 | `PLANIT_DEV` | `1` turns on the `/dev` demo endpoints. **Never on a public URL.** | off |
 | `CORS_ORIGINS` | the frontend origins allowed to call the API, comma separated | `http://localhost:5173,http://127.0.0.1:5173` |
-| `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL` | the on-tap AI report | not set, so the template report is used |
+| `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL` | the AI safety report, compliance next steps and the supervisor briefing | not set, so the template versions are used |
 
 ### Worker schedule
 
@@ -584,18 +591,18 @@ python -m backend.test_backend         # parsing and threshold checks (no networ
 |---|---|---|
 | `lightning` | every minute | GOES-19 satellite lightning mapper (GLM, AWS bucket `noaa-goes19`) → `lightning_strikes`. Stop work within 10 mi and a warning within 20 mi. The 30-minute all-clear restarts with each strike. |
 | `notify` | every minute | New alerts, crew reports and 6 PM briefings → each user's Discord or Slack channels, filtered by that channel's levels and sites, each sent once per channel (`notification_log`) |
-| `alerts` | every 2 min | NWS active alerts → `nws_alerts`. Site alerts last until the NWS warning expires. Storm-based warnings use their polygon; others use the site's NWS zone or county. |
-| `observations` | every 10 min | Latest NWS reading at each site's station → `weather_observations`. Raises alerts the moment the heat index, wind chill, gusts or visibility cross a category's threshold. It also gives the **flood rule from the brief**: 2 in or more of rain in the last 12 h raises a flood-risk warning (4 in is stop work), naming any river gauge nearby. |
-| `rivers` | every 15 min | NOAA river gauges (NWPS, about 1,500 in the region, one request) → `river_gauges`, `river_gauge_readings`. A gauge at action stage or worse, or forecast to flood, within 5 mi raises a flood warning. Minor flooding or worse within 1 mi is stop work. |
+| `alerts` | every 2 min | NWS active alerts → `nws_alerts`. Site alerts last until the NWS warning expires. Storm-based warnings use their polygon; others use the site's NWS zone or county. A cancellation notice ends the alerts it cancels; it never raises a warning. |
+| `observations` | every 10 min | Latest NWS reading at each site's station → `weather_observations` (a silent station falls back to the nearest one still reporting, see Limitations). Raises alerts the moment the heat index, wind chill, gusts or visibility cross a category's threshold. It also gives the **flood rule from the brief**: 2 in or more of rain in the last 12 h raises a flood-risk warning (4 in is stop work), naming any river gauge nearby. |
+| `rivers` | every 15 min | NOAA river gauges (NWPS, about 1,500 in the region, one request) → `river_gauges`, `river_gauge_readings`. A gauge at action stage or worse, or forecast to flood, within 5 mi raises a flood warning. Minor flooding or worse within 1 mi is stop work. A coastal gauge reading more than 6 ft above high tide with no tropical or coastal flood warning out is treated as a sensor fault. |
 | `fires` | every 15 min | NASA FIRMS satellite fire detections (needs `FIRMS_MAP_KEY`) → `fire_detections`. A warning within 10 mi, stop work within 2 mi. |
-| `wildlife` | every 30 min | iNaturalist sightings from the last 7 days, with photos → `wildlife_sightings`. A warning within 1 mi, with the photo on the alert. |
-| `forecasts` | hourly (at :05) | NWS hourly forecast for the next 48 h → `weather_forecasts`: temperature, heat index, wind chill, gusts, rain, chance of rain and thunder, visibility |
-| `briefings` | every 15 min | Tomorrow's briefing for each site where it's 6:00–6:15 PM local time → `daily_briefings` |
+| `wildlife` | every 30 min | iNaturalist sightings from the last 3 days, with photos → `wildlife_sightings`: wild animals only (no zoo or aquarium animals) and not unverified "casual" records. A warning within 1 mi, with the photo on the alert. |
+| `forecasts` | hourly (at :05) | NWS hourly forecast for the next 7 days → `weather_forecasts`: temperature, heat index, wind chill, gusts, rain, chance of rain and thunder, visibility |
+| `briefings` | every 15 min | Tomorrow's briefing for each site and saved location where it's 6:00–6:15 PM local time → `daily_briefings`, `location_briefings` (it refreshes those sites' forecasts and readings first) |
 | `points` | daily | NWS grid and zones for any new site |
-| `scores` | hourly (at :20) | Hazard model scores for today and tomorrow → `hazard_scores` (needs a trained model: `python -m ml.hazard_model train`) |
+| `scores` | hourly (at :20) | Hazard model scores for today and tomorrow → `hazard_scores`, for the FL/GA/AL study area only (`coverage = 'full'`; needs a trained model: `python -m ml.hazard_model train`) |
 | `daily_weather` | daily (11:30 UTC) | Last 7 days of IEM station summaries → `weather_daily`, so the model's inputs stay current. Impossible wind readings (over 87 kt sustained with no gust at least as high) are blanked. |
 | `crew_dispatch` | every 15 min | Utilities' public outage maps (KUBRA StormCenter) → `crew_dispatch`: each outage within 25 mi of a site, when a crew was assigned and on site (the utility's own status text), the cause, and when power came back. Finished outages with a crew become `crew_trips` (`source = 'outage_map'`). |
-| `tides` | every 15 min | NOAA Tides & Currents: latest water level at FL/GA/AL tide stations → `tide_readings` (stations and NOAA flood levels refreshed daily → `tide_stations`). Minor flooding within 10 mi → warning, moderate or worse → stop work. |
+| `tides` | every 15 min | NOAA Tides & Currents: latest water level at the tide stations in every state with sites → `tide_readings` (stations and NOAA flood levels refreshed daily → `tide_stations`). Minor flooding within 10 mi → warning, moderate or worse → stop work. |
 
 Every threshold, radius and NWS alert name is stored as data in `hazard_categories`. That includes which NWS alerts mean a warning and which mean stop work (`nws_warn_events`, `nws_stop_events`).
 
@@ -635,6 +642,15 @@ Limitations:
 | `GET /model/backtest` | model test metrics and the walk-forward backtest |
 | `GET /sites/{id}/economics?weeks=26` | the site's company and grid operator, weekly weather impact and demand, correlations, assumptions |
 | `GET /economics/correlations?significant_only=true` | weather vs demand and sales correlations for every company |
+| `GET /economics/contract-disruption`, `GET /sites/{id}/contracts` | the contract-disruption experiment, and contracts in the site's county with their evidence |
+| `PUT /economics/assumptions/{key}` 🔒 | replace one economic assumption with your company's number (approved supervisors) |
+| `GET /plan/{now,week,invest,economics}?site_ids=` | the supervisor Plan view (see [Frontend](#frontend)) |
+| `GET /lightning/recent?minutes=30` | strikes for the map |
+| `DELETE /crew-reports/{id}` 🔒 | delete your own report (supervisors: any report); clears its alert |
+| `GET /me/reports` 🔒 | reports you sent, as the identity you're using |
+| `GET /me/locations`, `POST /me/locations`, `DELETE /me/locations/{id}`, `POST /me/locations/{id}/briefing` 🔒 | saved locations (each gets a 6 PM briefing for plants in its radius) |
+| `POST /me/briefing` 🔒 | your Gemini briefing across your area and saved locations (`kind`: `start` or `6pm`), replayed until the next 6 PM unless `refresh` |
+| `POST /me/channels/{id}/send` 🔒 | post a message (e.g. a drafted crew message) to one of your channels |
 
 🔒 = needs sign-in (an Auth0 access token as `Authorization: Bearer …`) and is rate limited per user.
 
@@ -643,12 +659,12 @@ Limitations:
 | Layer | What's in place |
 |---|---|
 | **Who you are** | **Auth0** (OAuth 2.0 / OpenID Connect). The app gets an **RS256-signed JWT** access token. The API ([backend/auth.py](backend/auth.py)) checks its signature against the tenant's published keys, plus issuer, audience and expiry, before trusting anything in it. No passwords are stored here. |
-| **Users** | `app_users`, one row per Auth0 account, created on first sign-in. Name and email come from Auth0's `/userinfo`, not from the browser. A `role` column (`crew` / `supervisor`) is there for the crew vs supervisor views; it isn't enforced yet. Crew reports record who sent them (`user_id`) and who closed them (`resolved_by`). |
+| **Users** | `app_users`, one row per Auth0 account, created on first sign-in. Name and email come from Auth0's `/userinfo`, not from the browser. Anyone can act as **Crew** or **Supervisor** (the `X-Planit-Role` header; each identity has its own saved locations, channels and reports). Supervisor *powers* (deleting others' reports, editing assumptions, demo endpoints) need approval: `app_users.role = 'supervisor'` or `SUPERVISOR_EMAILS`. Crew reports record who sent them (`user_id`) and who closed them (`resolved_by`). |
 | **Users' webhooks** | Stored **encrypted** (Fernet, `WEBHOOK_KEY`, which lives only in the app's environment). The API returns just the last 4 characters. Only `https://discord.com/api/webhooks/…` and `https://hooks.slack.com/services/…` are accepted, so the worker can't be pointed at internal addresses. Errors are logged without the URL. |
-| **In transit** | HTTPS (TLS 1.2+) everywhere it's deployed: Auth0, the Tiger database (TLS required) and the host's HTTPS endpoint (Render, Railway, Fly.io and cloudflared all terminate TLS). Tokens only travel over it. |
+| **In transit** | HTTPS (TLS 1.2+) everywhere it's deployed: Auth0, the Tiger database (TLS required) and the site itself (Caddy on our Vultr server, with an automatic Let's Encrypt certificate). Tokens only travel over it. |
 | **Who can write** | Reads stay public (the dashboard). Every write (reports, uploads, AI calls, channels, demo endpoints) needs a valid token. |
 | **Abuse limits** | Per user and per minute: AI reports 10, uploads 20, other writes 60, test messages 5. Over the limit → 429. Uploads are checked by their bytes. CORS allows only the dashboard's origins. |
-| **Database** | `python -m db.create_api_role` creates `planit_api`, which can read everything but write only the six tables the API writes, and can't create, drop or truncate. Its URL goes in `.env.api` (git-ignored). Use it as the API host's `DATABASE_URL`; the worker keeps the admin URL. |
+| **Database** | `python -m db.create_api_role` creates `planit_api`, which can read everything but write only the tables the API writes (reports, alerts, AI reports, users and their channels, saved locations, briefings, economic assumptions, and the weather a site card refreshes), and can't create, drop or truncate. Its URL goes in `.env.api` (git-ignored). Use it as the API host's `DATABASE_URL`; the worker keeps the admin URL. |
 
 **Set up Auth0 (about 10 minutes, free):**
 1. Sign up at [auth0.com](https://auth0.com) (the MLH partner link gives the hackathon offer).
@@ -674,14 +690,14 @@ Start the API with `$env:PLANIT_DEV = "1"` to turn on:
 ### Sharing the API with your team
 
 - **Quick (your laptop):** `cloudflared tunnel --url http://localhost:8000` prints a public `https://….trycloudflare.com` URL that forwards to your running API. It only works while your laptop and the tunnel are running. **Turn `PLANIT_DEV` off and set the Auth0 variables first**, and add the tunnel's frontend URL to `CORS_ORIGINS` and to Auth0's allowed URLs.
-- **Always on (for judging):** deploy the API and the worker to a host such as Railway, Render or Fly.io, with the environment variables above. Run the API as a web service and the worker as a background worker, one copy each. Uploaded photos live on the API server's disk, so use a persistent volume, or move them to S3/R2.
+- **Always on (what we run):** one Vultr server set up by [deploy/vultr/setup.sh](deploy/vultr/setup.sh): Caddy (https), the API and exactly one worker as services, photos on the server's disk. Re-run the script to update after pushing to `main`. See [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ### Notes
 
 - The dashboard ranks by `hazard_scores` (written hourly by the `scores` job). On calm days most scores are near 0, so active alerts decide the order.
 - GLM locates lightning to roughly 8 km (about 5 mi). That's coarse for a 10-mile rule, but it's the best free real-time source.
-- Two stations (`AMG`, `NFJ`) don't publish current NWS observations, so about 20 sites have forecasts and alerts but no live readings.
+- Two stations (`AMG`, `NFJ`) don't publish current NWS observations; their sites get readings from the nearest station that does (labeled with that station).
 - NWS cancellation messages expire their referenced warnings, regardless of feed order. Alert expiry is not a safety all-clear.
-- Forecasts and observations keep 30 days, NWS alerts 180 days, and lightning 90 days (compressed after 2), to stay within the free tier.
+- Forecasts and observations keep 8 days (30 in the live database until `db.load_live_sites` runs), NWS alerts 180 days, and lightning 90 days (compressed after 2), to stay within the free tier.
 
 Alert/report consistency changes and validation commands: [dashboard feedback follow-up](docs/ALERT_CONSISTENCY.md).

@@ -1,3 +1,4 @@
+import { CloudRain, MapPin, TriangleAlert } from "lucide-react";
 import { BANDS, NO_SCORE, NWS_COLORS, NWS_OTHER } from "../hazard.js";
 import { PIN_COLORS } from "./GlobeMap.jsx";
 
@@ -6,7 +7,7 @@ const RADAR_SCALE = ["#04e9e7", "#019ff4", "#0300f4", "#02fd02", "#01c501", "#00
                      "#fd9500", "#fd0000", "#d40000", "#bc0000", "#f800fd"];
 
 // Map layer switches plus a legend for every icon currently on the map. Every swatch has a text label.
-export default function MapLayers({ layers, setLayer, pinCount, warnings, onClose }) {
+export default function MapLayers({ layers, setLayer, pinCount, warnings, onClose, basemap, setBasemap }) {
   const events = Object.entries((warnings?.features || []).reduce((acc, f) => {
     acc[f.properties.event] = (acc[f.properties.event] || 0) + 1;
     return acc;
@@ -24,10 +25,15 @@ export default function MapLayers({ layers, setLayer, pinCount, warnings, onClos
         <h3>Layers</h3>
         <button className="icon-btn" onClick={onClose} aria-label="Close layers">✕</button>
       </header>
+      <div className="seg basemap-seg" role="group" aria-label="Basemap">
+        {[["dark", "Dark map"], ["satellite", "Satellite"]].map(([k, label]) => (
+          <button key={k} className={basemap === k ? "on" : ""} aria-pressed={basemap === k} onClick={() => setBasemap(k)}>{label}</button>
+        ))}
+      </div>
       <div className="layer-toggles">
-        {toggle("radar", "🌧 Radar", "live, every 5 min")}
-        {toggle("warnings", "⚠ NWS warnings", "active now")}
-        {toggle("pins", "📍 Hazard pins", "past reports")}
+        {toggle("radar", <><CloudRain className="ico" aria-hidden="true" /> Radar</>, "live, every 5 min")}
+        {toggle("warnings", <><TriangleAlert className="ico" aria-hidden="true" /> NWS warnings</>, "active now")}
+        {toggle("pins", <><MapPin className="ico" aria-hidden="true" /> Hazard pins</>, "past reports")}
       </div>
 
       <h4>Sites</h4>
