@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { sitesWithin } from "../geo.js";
 
 // Intro: (1) optional sign-in, (2) where you're starting from: search a place or site, use GPS, or tap the globe
@@ -9,6 +9,8 @@ export default function Landing({ sites = [], auth, place, setPlace, flyTo, onDo
   const [query, setQuery] = useState("");
   const [results, setResults] = useState(null);
   const [status, setStatus] = useState("");
+  // Coming back from Auth0, the sign-in finishes after the first render: move on once it does.
+  useEffect(() => { if (auth.isAuthenticated) setStep("where"); }, [auth.isAuthenticated]);
 
   const choose = (p) => { setPlace(p); setResults(null); flyTo(p.lon, p.lat); };
 
@@ -49,8 +51,10 @@ export default function Landing({ sites = [], auth, place, setPlace, flyTo, onDo
         Georgia and Alabama.</p>
       <p className="small muted">Signing in lets you send crew reports and get alerts in your team's Discord or Slack.
         You can look around without it.</p>
+      {auth.error && <p className="error small" role="alert">Sign-in failed: {auth.error.message}</p>}
       <div className="landing-actions">
-        <button className="landing-go" onClick={auth.login} disabled={auth.isLoading}>Sign in</button>
+        <button className="landing-go" onClick={auth.login} disabled={auth.isLoading}>
+          {auth.isLoading ? "Checking sign-in…" : "Sign in"}</button>
         <button className="landing-skip" onClick={() => setStep("where")}>Continue without signing in</button>
       </div>
     </div>
