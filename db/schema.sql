@@ -957,6 +957,16 @@ CREATE TABLE IF NOT EXISTS weather_bounceback (          -- ml/bounceback.py: do
     PRIMARY KEY (scope, weather_kind, outcome)
 );
 
+-- Each worker job's last run (backend/worker.py), so GET /data-status can tell the dashboard whether live data is
+-- current. A job that hasn't succeeded within a few of its intervals is "stale"; one whose last run failed is "failing".
+CREATE TABLE IF NOT EXISTS worker_runs (
+    job             text PRIMARY KEY,
+    last_run_at     timestamptz NOT NULL,
+    last_success_at timestamptz,
+    last_error      text,
+    detail          text
+);
+
 -- Real crew dispatches from utilities' public outage maps (backend/crew_dispatch.py, worker job "crew_dispatch").
 -- One row per outage near a site, with when the utility marked a crew assigned / on site and when power came back.
 CREATE TABLE IF NOT EXISTS crew_dispatch (

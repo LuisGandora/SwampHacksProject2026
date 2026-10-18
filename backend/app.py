@@ -10,6 +10,7 @@ write to the shared database, so keep PLANIT_DEV off on the public URL and run d
 import datetime as dt
 import json
 import os
+import time
 import uuid
 from pathlib import Path
 from typing import Literal
@@ -104,6 +105,7 @@ def sites(state: str | None = None, horizon: Literal["now", "next_day"] = "next_
                CASE WHEN %(horizon)s = 'now' THEN greatest(h.score, f.floor) ELSE h.score END AS score,
                h.score AS model_score, %(horizon)s AS horizon, h.scored_for, h.category_scores,
                greatest(n.score, f.floor) AS score_now, t.score AS score_next_day,
+               n.scored_for AS score_now_for, t.scored_for AS score_next_day_for,
                f.floor AS live_floor, f.reason AS live_floor_reason,
                (h.category_scores -> '_meta' ->> 'percentile_for_site_month')::numeric AS percentile,
                (h.category_scores -> '_meta' ->> 'p_severe')::numeric AS p_severe,
@@ -119,6 +121,51 @@ def sites(state: str | None = None, horizon: Literal["now", "next_day"] = "next_
          WHERE %(state)s::text IS NULL OR s.state = upper(%(state)s)
          ORDER BY score DESC NULLS LAST, stop_work_alerts DESC, warning_alerts DESC, s.capacity_mw DESC NULLS LAST
          LIMIT %(limit)s""", {"state": state, "horizon": horizon, "limit": limit})
+
+
+FEEDS = {  # worker job -> minutes it may go without a success before its data counts as stale (about 3 runs)
+    "lightning": 5, "alerts": 8, "observations": 30, "rivers": 45, "tides": 45, "forecasts": 150, "scores": 150,
+    "notify": 5, "briefings": 45, "crew_dispatch": 60,   # daily_weather (nightly model input) is not a live feed
+}
+COVERAGE = """
+SELECT count(*) AS sites,
+       count(*) FILTER (WHERE o.last_obs > now() - interval '2 hours') AS observations_current,
+       count(*) FILTER (WHERE fc.issued > now() - interval '3 hours') AS forecasts_current,
+       count(*) FILTER (WHERE fc.future) AS forecasts_available,
+       count(*) FILTER (WHERE o.days_7 >= 6) AS rain_week_ready,
+       count(*) FILTER (WHERE s.weather_station_mi > 10) AS nearby_station_sites
+  FROM sites s
+  LEFT JOIN (SELECT site_id, max(observed_at) AS last_obs,
+                    count(DISTINCT observed_at::date) FILTER (WHERE observed_at > now() - interval '7 days') AS days_7
+               FROM weather_observations WHERE observed_at > now() - interval '7 days' GROUP BY 1) o USING (site_id)
+  LEFT JOIN (SELECT site_id, max(issued_at) AS issued, bool_or(valid_at > now()) AS future
+               FROM weather_forecasts WHERE valid_at > now() - interval '1 day' GROUP BY 1) fc USING (site_id)
+"""
+_status_cache = {}
+
+
+@app.get("/data-status")
+def data_status():
+    """Is the live data current? Each worker feed: current / stale (no success within ~3 runs) / failing (last run
+    errored) / never run, plus how many sites have recent readings, forecasts and a week of rain history. The
+    dashboard only trusts "no alerts" and all-clear countdowns while lightning and alerts are current."""
+    hit = _status_cache.get("v")
+    if hit and time.monotonic() - hit[0] < 15:  # polled every 30 s by every open dashboard: share one answer
+        return hit[1]
+    with connection() as conn:
+        runs = {r["job"]: r for r in conn.execute("SELECT *, now() AS checked_at FROM worker_runs").fetchall()}
+        checked = conn.execute("SELECT now() AS t").fetchone()["t"]
+        coverage = conn.execute(COVERAGE).fetchone()
+    feeds = []
+    for job, minutes in FEEDS.items():
+        r = runs.get(job)
+        ok = r and r["last_success_at"] and checked - r["last_success_at"] < dt.timedelta(minutes=minutes)
+        status = "never run" if not r else "failing" if r["last_error"] else "current" if ok else "stale"
+        feeds.append({"name": job, "status": status, "last_success": r and r["last_success_at"],
+                      "detail": r and (r["last_error"] or (None if ok else "the worker hasn't updated this feed recently"))})
+    out = {"checked_at": checked, "feeds": feeds, "coverage": coverage}
+    _status_cache["v"] = (time.monotonic(), out)
+    return out
 
 
 @app.get("/nws-alerts/map")

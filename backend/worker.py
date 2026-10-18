@@ -35,10 +35,22 @@ JOBS = {
 }
 
 
+RECORD = ("INSERT INTO worker_runs (job, last_run_at, last_success_at, last_error, detail) VALUES (%s, now(), {ok}, %s, %s) "
+          "ON CONFLICT (job) DO UPDATE SET last_run_at = now(), last_error = EXCLUDED.last_error, detail = EXCLUDED.detail"
+          "{keep}")
+
+
 def run(name):
+    """Run one job and record the outcome in worker_runs (GET /data-status reads it)."""
     t = time.time()
-    with connection() as conn:
-        result = JOBS[name](conn)
+    try:
+        with connection() as conn:
+            result = JOBS[name](conn)
+            conn.execute(RECORD.format(ok="now()", keep=", last_success_at = now()"), (name, None, str(result)[:300]))
+    except Exception as e:
+        with connection() as conn:  # a fresh connection: the job's transaction was rolled back
+            conn.execute(RECORD.format(ok="NULL", keep=""), (name, f"{type(e).__name__}: {str(e)[:200]}", None))
+        raise
     print(f"[{dt.datetime.now():%H:%M:%S}] {name}: {result} ({time.time() - t:.0f}s)", flush=True)
     return result
 

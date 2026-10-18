@@ -67,6 +67,7 @@ async function request(path, { method = "GET", json, form, timeout = 30000 } = {
 
 export const api = {
   health: () => request("/health"),
+  dataStatus: () => request("/data-status"),
   categories: () => request("/hazard-categories"),
   sites: (horizon) => request(`/sites?horizon=${horizon}&limit=1000`),
   site: (id) => request(`/sites/${id}`),
