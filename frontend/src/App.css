@@ -40,7 +40,7 @@ code { font-family: var(--mono); background: var(--surface-3); padding: 1px 5px;
         overflow-y: auto; z-index: 2; pointer-events: none; scrollbar-width: thin; }
 .dock > * { pointer-events: auto; }
 .dock--left { left: 16px; }
-.dock--right { right: 60px; }
+.dock--right { right: 16px; }
 .tabs { display: none; }
 
 .panel { background: var(--surface); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -323,41 +323,29 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
 .landing-intro { margin: 0 0 28px; font-size: 1.1rem; }
 .landing-status { margin: 8px 0 0; color: #fdfdfd; opacity: 50%;}
 
-.switch-row { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; font-size: 1.15rem; }
-.switch-row input { position: absolute; opacity: 0; }
-.switch { width: 48px; height: 26px; border-radius: 13px; background: #fcfbfb; position: relative; transition: background .15s; }
-.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .15s; }
-.switch-row input:checked + .switch { background: #1a56db; }
-.switch-row input:checked + .switch::after { transform: translateX(22px); }
-.switch-row input:focus-visible + .switch { outline: 3px solid #1a56db; outline-offset: 2px; }
 
-.pin-section { margin-top: 24px; }
-.pin-map { position: relative; max-width: 420px; background: #fff; cursor: crosshair; }
-.pin-map img { width: 100%; display: block; }
-.drop-pin { position: absolute; width: 18px; height: 18px; transform: translate(-50%, -50%); border-radius: 50%; background: #dc2626; border: 3px solid #fff; box-shadow: 0 0 0 2px #dc2626; pointer-events: none; }
 
 .radius-section { margin-top: 28px; display: flex; flex-direction: column; gap: 8px; }
 .radius-section input[type="range"] { width: 100%; }
 
 .landing-actions { margin-top: 32px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-.landing-go { font: inherit; font-weight: 600; padding: 12px 24px; background: var(--ink); color: #fff; border: 0; cursor: pointer; }
+.landing-go { font: inherit; font-weight: 600; padding: 10px 22px; background: #0f4c6b; color: #fff; border: 1px solid var(--accent); border-radius: 8px; cursor: pointer; }
 .landing-go:disabled { opacity: .4; cursor: not-allowed; }
 .landing-skip { font: inherit; background: none; border: 0; text-decoration: underline; cursor: pointer; }
 
-.landing-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  overflow-y: auto;
-  background: rgba(207, 206, 206, 0.45);   /*lower last number for opacity*/
-  backdrop-filter: blur(3px);
-}
-
-/* Give the content its own readable panel */
-.landing-overlay .landing {
-  background: rgba(43, 37, 37, 0.78);
-  margin: 40px auto;
-  border-radius: 12px;
+/* The landing is a side panel over the live globe: the globe stays usable (tap it to drop the starting pin). */
+.landing-overlay { position: fixed; left: 16px; top: 16px; bottom: 16px; width: min(440px, calc(100vw - 32px));
+                   z-index: 50; overflow-y: auto; }
+.landing-overlay .landing { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+                            backdrop-filter: blur(10px); margin: 0; padding: 24px; }
+.landing-mode .hud, .landing-mode .dock, .landing-mode .tabs, .landing-mode .stopwork, .landing-mode .banner,
+.landing-mode .demo-caption, .landing-mode .map-layers { display: none; }
+.landing-search { display: flex; gap: 8px; margin: 12px 0 6px; }
+.landing-results { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 6px; max-height: 200px; overflow-y: auto; }
+.landing-results .link { text-align: left; font-size: 13px; }
+@media (max-width: 1000px) {
+  .landing-overlay { top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 62vh; }
+  .landing-overlay .landing { border-radius: 12px 12px 0 0; padding: 16px; }
 }.dot--ring { background: transparent; border: 1.5px solid; }
 .badge--flood { background: rgba(57, 135, 229, .22); color: #8cc0ff; }
 
@@ -381,3 +369,15 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
 .radar-scale span { flex: 1; }
 .radar-labels { display: flex; justify-content: space-between; color: var(--text-2); }
 @media (max-width: 1000px) { .map-layers { left: 8px; right: 8px; width: auto; bottom: auto; top: 110px; max-height: 40vh; } }
+
+/* Map controls and the imagery credit stay inside the visible map, clear of the side panels. */
+@media (min-width: 1001px) {
+  .app:not(.landing-mode) .maplibregl-ctrl-top-right { top: 76px; right: 408px; }
+  .app:not(.landing-mode) .maplibregl-ctrl-bottom-right { right: 408px; }
+}
+@media (max-width: 1000px) {
+  .app:not(.landing-mode) .maplibregl-ctrl-bottom-right { bottom: calc(54vh + 8px); right: 44px; }
+}
+@media (max-width: 480px) {
+  .app:not(.landing-mode) .maplibregl-ctrl-bottom-right { bottom: calc(58vh + 8px); }
+}

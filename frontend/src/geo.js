@@ -10,13 +10,6 @@ export function milesBetween(lat1, lon1, lat2, lon2) {
   return 2 * R_MILES * Math.asin(Math.sqrt(a));
 }
 
-export function pixelToLatLon(x, y) {
-  return {
-    lat: 34.73 - (y - 67) / 105.2,
-    lon: (x - 196) / 93.75 - 86.59,
-  };
-}
-
 const latOf = (s) => s.lat ?? s.latitude;
 const lonOf = (s) => s.lon ?? s.lng ?? s.longitude;
 
