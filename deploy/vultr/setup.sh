@@ -5,7 +5,8 @@
 #
 # First run: installs everything and clones the repo, then stops and asks for the secret files (.env, .env.api,
 # frontend/.env). Copy them over, run it again, and it builds and starts the app. Re-run any time to update to the
-# latest main. Never set PLANIT_DEV here: it's the public site. Private repo: REPO=https://<token>@github.com/... bash setup.sh <domain>
+# latest main. Never set PLANIT_DEV here: it's the public site. Private repo: use a GitHub deploy key (docs/DEPLOY.md), or
+# push from your laptop: git push vultr main:deploy, then SKIP_PULL=1 bash setup.sh <domain>
 set -euo pipefail
 DOMAIN=${1:?usage: bash setup.sh <domain>}
 APP=/srv/planet/app
@@ -29,8 +30,14 @@ if ! command -v caddy >/dev/null; then                      # ---- first run: sy
 fi
 
 git config --global --add safe.directory "$APP"              # the repo belongs to the app's user; root updates it
-if [ -d "$APP/.git" ]; then                                   # ---- code: latest main (history may be rewritten) ----
-  git -C "$APP" fetch --depth 1 origin main && git -C "$APP" reset --hard origin/main   # keeps the git-ignored .env files
+if [ -n "${SKIP_PULL:-}" ]; then                             # ---- code: pushed from a laptop (see docs/DEPLOY.md) ----
+  git -C "$APP" reset --hard deploy                            # the branch `git push vultr main:deploy` sent
+elif [ -d "$APP/.git" ]; then                                 # ---- code: latest main (history may be rewritten) ----
+  if ! git -C "$APP" fetch --depth 1 origin main; then
+    echo "Can't download from GitHub. If the repo is private, add a deploy key or push from your laptop (docs/DEPLOY.md)."
+    exit 1
+  fi
+  git -C "$APP" reset --hard origin/main                       # keeps the git-ignored .env files
 else
   mkdir -p /srv/planet && git clone --depth 1 "$REPO" "$APP"
 fi
