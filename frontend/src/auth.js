@@ -17,7 +17,7 @@ export function useAuth() {
   if (!authEnabled) return LOCAL;
   const a = useAuth0(); // eslint-disable-line react-hooks/rules-of-hooks
   return {
-    enabled: true, isLoading: a.isLoading, isAuthenticated: a.isAuthenticated, user: a.user,
+    enabled: true, isLoading: a.isLoading, isAuthenticated: a.isAuthenticated, user: a.user, error: a.error,
     login: () => a.loginWithRedirect(),
     logout: () => a.logout({ logoutParams: { returnTo: window.location.origin } }),
     getToken: a.getAccessTokenSilently,
