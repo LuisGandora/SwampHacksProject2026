@@ -43,13 +43,13 @@ export const PIN_COLORS = { crew: "#5fd3ff", osha: "#c08cff" };
 const point = (lon, lat, properties = {}) => ({ type: "Feature", geometry: { type: "Point", coordinates: [lon, lat] }, properties });
 
 const GlobeMap = forwardRef(function GlobeMap(
-  { sites, lightning, pins, warnings, radar, selectedId, onSelect, pinMode, pin, onPin, me, sensor }, ref) {
+  { sites, lightning, pins, warnings, radar, selectedId, onSelect, onLocation, inspectedLocation, pinMode, pin, onPin, me, sensor }, ref) {
   const container = useRef(null);
   const map = useRef(null);
   const ready = useRef(false);
   const hasStops = useRef(false);
-  const handlers = useRef({ onSelect, onPin, pinMode });
-  handlers.current = { onSelect, onPin, pinMode };
+  const handlers = useRef({ onSelect, onLocation, onPin, pinMode });
+  handlers.current = { onSelect, onLocation, onPin, pinMode };
 
   useImperativeHandle(ref, () => ({
     flyHome: () => map.current?.flyTo({ ...NORTH_AMERICA, duration: reducedMotion() ? 0 : 2500 }),
@@ -156,6 +156,7 @@ const GlobeMap = forwardRef(function GlobeMap(
         if (handlers.current.pinMode) return handlers.current.onPin({ lat: e.lngLat.lat, lon: e.lngLat.lng });
         const hit = m.queryRenderedFeatures(e.point, { layers: ["sites"] })[0];
         if (hit) return handlers.current.onSelect(Number(hit.properties.site_id));
+        handlers.current.onLocation?.({ lat: e.lngLat.lat, lon: ((e.lngLat.lng + 180) % 360 + 360) % 360 - 180 });
         const pinHit = m.queryRenderedFeatures(e.point, { layers: ["pins"] })[0];
         if (pinHit) return showPin(pinHit);
         const warn = m.queryRenderedFeatures(e.point, { layers: ["warn-fill", "warn-site"] })[0];
@@ -220,6 +221,7 @@ const GlobeMap = forwardRef(function GlobeMap(
   // Draft report pin and the viewer's own location, as DOM markers.
   useMarker(map, pin, "marker marker--pin", "Report location");
   useMarker(map, me, "marker marker--me", "You are here");
+  useMarker(map, inspectedLocation, "marker marker--inspection", "Checking alerts within 10 miles");
 
   useEffect(() => {
     if (map.current) map.current.getCanvas().style.cursor = pinMode ? "crosshair" : "";
