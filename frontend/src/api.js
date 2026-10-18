@@ -4,6 +4,9 @@ export const API = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").rep
 // The signed-in user's Auth0 access token is attached to every call (set by App once signed in).
 let tokenGetter = null;
 export const setTokenGetter = (fn) => { tokenGetter = fn; };
+// The identity the user is acting as (crew or supervisor): each has its own saved locations, channels and reports.
+let activeRole = "crew";
+export const setActiveRole = (role) => { activeRole = role || "crew"; };
 
 export class ApiError extends Error {
   constructor(status, message) {
@@ -16,7 +19,7 @@ async function request(path, { method = "GET", json, form, timeout = 30000 } = {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeout);
   try {
-    const headers = json ? { "Content-Type": "application/json" } : {};
+    const headers = { ...(json ? { "Content-Type": "application/json" } : {}), "X-Planit-Role": activeRole };
     if (tokenGetter) {
       try { headers.Authorization = `Bearer ${await tokenGetter()}`; } catch { /* signed out or offline: send without */ }
     }
@@ -58,6 +61,7 @@ export const api = {
   compliance: (id, refresh = false) =>
     request(`/sites/${id}/compliance${refresh ? "?refresh=true" : ""}`, { method: "POST", timeout: 120000 }),
   setCrewReportStatus: (reportId, status) => request(`/crew-reports/${reportId}`, { method: "PATCH", json: { status } }),
+  deleteCrewReport: (reportId) => request(`/crew-reports/${reportId}`, { method: "DELETE" }),
   modelBacktest: () => request("/model/backtest"),
   crewReports: (id) => request(`/crew-reports?site_id=${id}&status=open&limit=20`),
   upload: (file) => {
@@ -70,6 +74,11 @@ export const api = {
   nwsAlertMap: () => request("/nws-alerts/map"),
   me: () => request("/me"),
   channels: () => request("/me/channels"),
+  locations: () => request("/me/locations"),
+  myReports: () => request("/me/reports?limit=50"),
+  saveLocation: (l) => request("/me/locations", { method: "POST", json: l }),
+  deleteLocation: (id) => request(`/me/locations/${id}`, { method: "DELETE" }),
+  locationBriefing: (id) => request(`/me/locations/${id}/briefing`, { method: "POST", timeout: 60000 }),
   addChannel: (c) => request("/me/channels", { method: "POST", json: c }),
   deleteChannel: (id) => request(`/me/channels/${id}`, { method: "DELETE" }),
   testChannel: (id) => request(`/me/channels/${id}/test`, { method: "POST" }),

@@ -14,7 +14,7 @@ from collections import defaultdict, deque
 
 import httpx
 import jwt
-from fastapi import Depends, HTTPException
+from fastapi import Depends, Header, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from backend.db import connection
@@ -53,8 +53,15 @@ def profile(token):
         return None, None
 
 
-def current_user(creds: HTTPAuthorizationCredentials | None = Depends(bearer)):
-    """The signed-in user (created on first sight), or 401/503."""
+def supervisor_emails():
+    """SUPERVISOR_EMAILS: comma-separated emails allowed supervisor powers (besides app_users.role = 'supervisor')."""
+    return {e.strip().lower() for e in os.environ.get("SUPERVISOR_EMAILS", "").split(",") if e.strip()}
+
+
+def current_user(creds: HTTPAuthorizationCredentials | None = Depends(bearer),
+                 x_planit_role: str | None = Header(None)):
+    """The signed-in user (created on first sight), or 401/503. Adds the identity they're acting as (X-Planit-Role:
+    crew or supervisor; anyone may pick either) and whether that identity has supervisor powers (needs approval)."""
     token = None
     if domain():
         if creds is None:
@@ -73,7 +80,16 @@ def current_user(creds: HTTPAuthorizationCredentials | None = Depends(bearer)):
             if name or email:
                 user = conn.execute("UPDATE app_users SET name = %s, email = %s WHERE user_id = %s RETURNING *",
                                     (name, email, user["user_id"])).fetchone()
-    return user
+    return with_identity(user, x_planit_role, auth_on=bool(domain()))
+
+
+def with_identity(user, header, auth_on=True):
+    """The user plus the identity they picked and whether it carries supervisor powers. Picking "supervisor" is free;
+    the powers need approval (role = 'supervisor' or SUPERVISOR_EMAILS), except on a local PLANIT_DEV laptop."""
+    identity = header if header in ("crew", "supervisor") else "crew"
+    approved = user["role"] == "supervisor" or (user["email"] or "").lower() in supervisor_emails() or not auth_on
+    return {**user, "identity": identity, "supervisor_approved": approved,
+            "can_supervise": identity == "supervisor" and approved}
 
 
 # ponytail: in-memory and per process, so limits reset on restart and multiply with replicas; move to Redis or
@@ -83,9 +99,9 @@ _hits = defaultdict(deque)
 
 def require_supervisor(user=Depends(current_user)):
     """Signed-in supervisor (app_users.role). Without Auth0 (local PLANIT_DEV laptop) the dev user passes."""
-    if domain() and user["role"] != "supervisor":
-        raise HTTPException(403, "Supervisors only. An admin can run: UPDATE app_users SET role = 'supervisor' "
-                                 "WHERE email = '<your email>';")
+    if not user["can_supervise"]:
+        raise HTTPException(403, "Supervisors only: switch to your Supervisor identity, and have an admin approve it "
+                                 "(SUPERVISOR_EMAILS, or UPDATE app_users SET role = 'supervisor' WHERE email = '...').")
     return user
 
 

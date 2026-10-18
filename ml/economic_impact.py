@@ -186,6 +186,8 @@ def correlate(df, xs, y, scope, entity, rows):
             if deseason:
                 xv, yv = xv - xv.groupby(month).transform("mean"), yv - yv.groupby(month).transform("mean")
             r, p = stats.pearsonr(xv, yv)
+            if np.isnan(r):  # a series with no variation left after removing the season: no correlation to report
+                continue
             rows.append((scope, entity, x, y, deseason, round(float(r), 3), float(p),
                          round(float(stats.spearmanr(xv, yv)[0]), 3), len(df)))
 

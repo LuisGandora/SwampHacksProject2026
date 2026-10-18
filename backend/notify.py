@@ -100,6 +100,12 @@ def report_line(r):
     return line + (f" {r['photo_url']}" if r["photo_url"] else "")
 
 
+LOCATION_BRIEFINGS = """
+SELECT b.location_id, b.briefing_date, b.summary, l.user_id FROM location_briefings b JOIN saved_locations l USING (location_id)
+ WHERE b.sent_at > now() - interval '1 hour'
+"""
+
+
 def items(conn):
     """Everything sendable right now: (key, site_id, kind, level, text)."""
     return ([(f"alert:{a['alert_id']}", a["site_id"], "alert", a["level"], alert_line(a))
@@ -108,11 +114,16 @@ def items(conn):
              for r in conn.execute(REPORTS).fetchall()] +
             [(f"briefing:{b['site_id']}:{b['briefing_date']}", b["site_id"], "briefing", None,
               f"📋 **{b['site_name']}, briefing for {b['briefing_date']:%a %b %d}**: {b['summary']}")
-             for b in conn.execute(BRIEFINGS).fetchall()])
+             for b in conn.execute(BRIEFINGS).fetchall()] +
+            [(f"locbrief:{b['location_id']}:{b['briefing_date']}", None, "location", None,
+              f"📋 **Your saved location** · {b['summary']}", b["user_id"])
+             for b in conn.execute(LOCATION_BRIEFINGS).fetchall()])
 
 
 def wants(channel, item):
-    _, site_id, kind, level, _ = item
+    _, site_id, kind, level, _, *owner = item
+    if kind == "location":  # a saved location's briefing goes only to its owner's briefing channels
+        return channel["briefings"] and channel["user_id"] == owner[0]
     if channel["site_ids"] is not None and site_id not in channel["site_ids"]:
         return False
     return {"alert": level in channel["levels"], "report": channel["crew_reports"],

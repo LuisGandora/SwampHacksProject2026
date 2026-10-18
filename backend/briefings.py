@@ -110,6 +110,56 @@ def to_json(obj):
     return json.dumps(obj, default=lambda o: float(o) if isinstance(o, decimal.Decimal) else str(o))
 
 
+# Saved locations take the time zone of their nearest plant (all of FL/GA/AL is Eastern or Central).
+LOCATIONS_DUE = """
+SELECT l.location_id, (now() AT TIME ZONE tz.timezone)::date + 1 AS day
+  FROM saved_locations l
+  CROSS JOIN LATERAL (SELECT timezone FROM sites ORDER BY geog <-> l.geog LIMIT 1) tz
+ WHERE (now() AT TIME ZONE tz.timezone)::time >= %(start)s AND (now() AT TIME ZONE tz.timezone)::time < %(end)s
+   AND NOT EXISTS (SELECT 1 FROM location_briefings b
+                    WHERE b.location_id = l.location_id AND b.briefing_date = (now() AT TIME ZONE tz.timezone)::date + 1)
+"""
+IN_RANGE = """
+SELECT s.site_id, s.name, round((ST_Distance(s.geog, l.geog) / 1609.344)::numeric, 1) AS miles,
+       h.score, h.category_scores,
+       (SELECT count(*) FROM active_site_alerts a WHERE a.site_id = s.site_id AND a.level = 'stop_work') AS stop_work
+  FROM saved_locations l JOIN sites s ON ST_DWithin(s.geog, l.geog, l.radius_mi * 1609.344)
+  LEFT JOIN LATERAL (SELECT score, category_scores FROM hazard_scores
+                      WHERE site_id = s.site_id AND horizon = 'next_day' ORDER BY scored_for DESC, created_at DESC
+                      LIMIT 1) h ON true
+ WHERE l.location_id = %s
+ ORDER BY h.score DESC NULLS LAST
+"""
+
+
+def location_summary(name, radius, day, plants):
+    """One-paragraph briefing for a saved location from its in-range plants (highest score first)."""
+    if not plants:
+        return f"{name}, {day:%a %b %d}: no power plants within {radius:g} mi."
+    def top_hazard(p):
+        cs = {k: v for k, v in (p["category_scores"] or {}).items() if k != "_meta"}
+        k = max(cs, key=lambda k: cs[k]["score"]) if cs else None
+        return f", mostly {k.replace('_', ' ')}" if k and cs[k]["score"] >= 1 else ""
+    worst = [f"{p['name']} {float(p['score']):.1f}/10{top_hazard(p)}" for p in plants[:3] if p["score"] is not None]
+    stops = [p["name"] for p in plants if p["stop_work"]]
+    return (f"{name}, {day:%a %b %d}: {len(plants)} plants within {radius:g} mi. "
+            + (f"Highest hazard tomorrow: {'; '.join(worst)}. " if worst else "")
+            + (f"Stop work now at {', '.join(stops[:3])}{' and more' if len(stops) > 3 else ''}." if stops
+               else "No stop-work alerts right now."))
+
+
+def save_location_briefing(conn, location_id, day):
+    loc = conn.execute("SELECT name, radius_mi FROM saved_locations WHERE location_id = %s", (location_id,)).fetchone()
+    plants = conn.execute(IN_RANGE, (location_id,)).fetchall()
+    summary = location_summary(loc["name"], float(loc["radius_mi"]), day, plants)
+    content = {"plants": [{k: p[k] for k in ("site_id", "name", "miles", "score", "stop_work")} for p in plants[:20]]}
+    conn.execute("INSERT INTO location_briefings (location_id, briefing_date, summary, content) VALUES (%s, %s, %s, %s) "
+                 "ON CONFLICT (location_id, briefing_date) DO UPDATE SET summary = EXCLUDED.summary, "
+                 "content = EXCLUDED.content, sent_at = now()",
+                 (location_id, day, summary, Jsonb(json.loads(json.dumps(content, default=to_json)))))
+    return summary
+
+
 def run_due(conn):
     """Briefings for every site where it's between 6:00 and 6:15 PM local and tomorrow's isn't written yet."""
     end = (dt.datetime.combine(dt.date.today(), BRIEFING_TIME) + WINDOW).time()
@@ -120,4 +170,7 @@ def run_due(conn):
         observations.sync(conn, ids)
     for d in due:
         save(conn, d["site_id"], d["day"], *build(conn, d["site_id"], d["day"]))
-    return f"{len(due)} briefings written"
+    locs = conn.execute(LOCATIONS_DUE, {"start": BRIEFING_TIME, "end": end}).fetchall()
+    for l in locs:  # after the sites, so the plants' scores and alerts are fresh
+        save_location_briefing(conn, l["location_id"], l["day"])
+    return f"{len(due)} site briefings and {len(locs)} saved-location briefings written"

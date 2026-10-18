@@ -148,3 +148,27 @@ _d = _daily([_row(3, 70, 0.1, 10), _row(14, 88, 0.2, 25)], [{**_row(20, 84, 0.3,
 assert [x["day"].isoformat() for x in _d] == ["2026-10-17", "2026-10-18"], _d   # 03 UTC is still the 17th in Florida
 assert (_d[1]["high_f"], _d[1]["rain_in"], _d[1]["max_gust_mph"], _d[1]["source"]) == (88, 0.5, 30, "forecast + measured"), _d
 print("weather scanner daily ok")
+
+# saved locations: the 6 PM summary names the riskiest plants and stop-work sites; it goes only to the owner's channels
+from backend.briefings import location_summary
+_p = lambda n, s, stop=0, cat=None: {"name": n, "score": s, "stop_work": stop,
+                                     "category_scores": {cat: {"score": s}, "_meta": {}} if cat else {}}
+_s = location_summary("Yard", 25, _dt.date(2026, 10, 18), [_p("A", 8.2, 1, "lightning"), _p("B", 3.0)])
+assert "2 plants within 25 mi" in _s and "A 8.2/10, mostly lightning" in _s and "Stop work now at A" in _s, _s
+assert "no power plants" in location_summary("Yard", 5, _dt.date(2026, 10, 18), [])
+_ch = {"site_ids": None, "levels": [], "briefings": True, "crew_reports": False, "user_id": "u1"}
+assert wants(_ch, ("k", None, "location", None, "", "u1")) and not wants(_ch, ("k", None, "location", None, "", "u2"))
+print("saved locations ok")
+
+# identities: anyone may pick "supervisor", but its powers need approval (role or SUPERVISOR_EMAILS)
+from backend.auth import with_identity
+_crew = {"role": "crew", "email": "a@x.com"}
+assert with_identity(_crew, "supervisor")["can_supervise"] is False            # picked, not approved
+assert with_identity(_crew, "supervisor")["identity"] == "supervisor"          # ...but still its own identity
+assert with_identity({"role": "supervisor", "email": None}, "supervisor")["can_supervise"] is True
+assert with_identity({"role": "supervisor", "email": None}, "crew")["can_supervise"] is False   # acting as crew
+assert with_identity(_crew, "admin")["identity"] == "crew"                     # unknown header -> crew
+os.environ["SUPERVISOR_EMAILS"] = "boss@x.com, A@X.com"
+assert with_identity(_crew, "supervisor")["can_supervise"] is True             # approved by email, any case
+del os.environ["SUPERVISOR_EMAILS"]
+print("identities ok")

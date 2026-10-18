@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API, api, setTokenGetter } from "./api.js";
+import { API, api, setActiveRole, setTokenGetter } from "./api.js";
 import { useAuth } from "./auth.js";
 import { flush, queued } from "./offlineQueue.js";
 import AlertsPanel from "./components/AlertsPanel.jsx";
@@ -8,6 +8,7 @@ import ModelModal from "./components/ModelModal.jsx";
 import NotifyModal from "./components/NotifyModal.jsx";
 import StopWorkBanner from "./components/StopWorkBanner.jsx";
 import MapLayers from "./components/MapLayers.jsx";
+import AccountMenu from "./components/AccountMenu.jsx";
 import CrewReportForm from "./components/CrewReportForm.jsx";
 import GlobeMap from "./components/GlobeMap.jsx";
 import RankingPanel from "./components/RankingPanel.jsx";
@@ -37,7 +38,7 @@ export default function App() {
   const [health, setHealth] = useState(null);
   const [apiError, setApiError] = useState("");
   const [categories, setCategories] = useState([]);
-  const [horizon, setHorizon] = useState("next_day");
+  const [horizon, setHorizon] = useState("now");
   const [sites, setSites] = useState([]);
   const [loadingSites, setLoadingSites] = useState(true);
   const [alerts, setAlerts] = useState([]);
@@ -69,6 +70,11 @@ export default function App() {
   const globe = useRef(null);
   const [focus, setFocus] = useState(null); // null = landing page still showing
   const [landingPlace, setLandingPlace] = useState(null); // starting point picked on the landing page
+  const [reopened, setReopened] = useState(false);          // the 🧭 Location button skips the welcome step
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [saved, setSaved] = useState([]);                    // your saved locations (signed in)
+  const starBusy = useRef(false);                            // one save/unsave at a time (double clicks)
+  const [identity, setIdentityState] = useState(null);       // "crew" | "supervisor", remembered per account
 
   const toast = useCallback((text, kind = "info") => {
     const id = Math.random();
@@ -79,6 +85,27 @@ export default function App() {
   useEffect(() => { const id = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(id); }, []);
   useEffect(() => { setTokenGetter(auth.enabled && auth.isAuthenticated ? auth.getToken : null); },
             [auth.enabled, auth.isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+  const identityKey = `planit.identity.${auth.user?.sub || "local"}`;
+  useEffect(() => {  // before anything loads per-identity data: restore the identity this account used last
+    if (!auth.isAuthenticated) return;
+    let v = null;
+    try { v = localStorage.getItem(identityKey); } catch { /* private mode */ }
+    setActiveRole(v);
+    setIdentityState(v);
+  }, [auth.isAuthenticated, identityKey]);
+  const setIdentity = (v) => {
+    try { localStorage.setItem(identityKey, v); } catch { /* private mode */ }
+    setActiveRole(v);
+    setIdentityState(v);
+    setSaved([]);
+    setRefreshKey((k) => k + 1);
+  };
+  const loadSaved = () => auth.isAuthenticated && api.locations().then(setSaved).catch(() => {});
+  useEffect(() => { loadSaved(); }, [auth.isAuthenticated, focus, identity]); // eslint-disable-line react-hooks/exhaustive-deps
+  const savedSite = (id) => {
+    const s = sites.find((x) => x.site_id === id);
+    return saved.find((l) => l.site_id === id || (s && Math.abs(l.lat - s.lat) < 5e-4 && Math.abs(l.lon - s.lon) < 5e-4));
+  };
   useEffect(() => {
     api.health().then((h) => { setHealth(h); setApiError(""); }).catch((e) => setApiError(e.message));
     api.categories().then(setCategories).catch(() => {});
@@ -251,17 +278,22 @@ export default function App() {
             <>
               <button onClick={() => setNotifyOpen(true)} title="Discord / Slack notifications" aria-label="Notifications">🔔</button>
               {auth.enabled && (
-                <button onClick={auth.logout} title={`Signed in as ${auth.user?.name || auth.user?.email}. Sign out`}
-                        aria-label="Sign out" className="user-btn">
+                <button onClick={() => setAccountOpen((v) => !v)}
+                        title={`Signed in as ${auth.user?.name || auth.user?.email}, acting as ${identity || "crew"}`}
+                        aria-label="Your account" aria-expanded={accountOpen} className="user-btn">
                   {auth.user?.picture ? <img src={auth.user.picture} alt="" /> : "⎋"}
                 </button>
+              )}
+              {auth.enabled && (
+                <span className={`identity-chip ${identity === "supervisor" ? "sup" : ""}`}>{identity === "supervisor" ? "Supervisor" : "Crew"}</span>
               )}
             </>
           )}
           <button onClick={() => setModelOpen(true)} title="Model accuracy (backtest)" aria-label="Model accuracy">📈<span className="hide-sm"> Model</span></button>
           <button onClick={() => globe.current?.flyHome()} title="North America" aria-label="Show North America">🌎</button>
           <button onClick={() => globe.current?.flySites()} title="All sites" aria-label="Show all sites">◎<span className="hide-sm"> Sites</span></button>
-          <button onClick={() => { setFocus(null); globe.current?.flyHome(); }} title="Pick a different area">Change location</button>
+          <button onClick={() => { setReopened(true); setFocus(null); globe.current?.flyHome(); }}
+                  title="Change your position, or show all sites" aria-label="Change location">🧭<span className="hide-sm"> Location</span></button>
         </div>
       </header>
 
@@ -316,6 +348,22 @@ export default function App() {
                       dev={health?.dev} refreshKey={refreshKey} onClose={() => setSelectedId(null)}
                       onReport={() => setCrewOpen(true)} onAiReport={() => setAiSite(selected)}
                       onCompliance={() => setComplianceSite(selected)} onChanged={refreshAll}
+                      saved={!!savedSite(selected.site_id)}
+                      onToggleSave={async () => {
+                        if (!auth.isAuthenticated) return toast("Sign in to save locations.");
+                        if (starBusy.current) return;
+                        starBusy.current = true;
+                        const s = savedSite(selected.site_id);
+                        try {
+                          if (s) await api.deleteLocation(s.location_id).catch((e) => { if (e.status !== 404) throw e; });  // already gone
+                          else await api.saveLocation({ name: selected.name.slice(0, 80), lat: selected.lat, lon: selected.lon,
+                                                        radius_mi: 25, site_id: selected.site_id });
+                          toast(s ? `Removed ${selected.name} from saved locations.`
+                                  : `Saved ${selected.name}: it gets a 6 PM briefing for plants within 25 mi.`);
+                        } catch (e) { toast(e.message, "error"); }
+                        await loadSaved();
+                        starBusy.current = false;
+                      }}
                       onScenario={dev(api.startScenario, "Demo scenario running on this site.")}
                       onStrike={dev(api.fakeStrike, "Strike recorded 3 mi away: all-clear countdown restarted.")}
                       onClearScenario={dev(api.stopScenario, "Demo cleared.")} />
@@ -338,6 +386,12 @@ export default function App() {
       {aiSite && <ReportModal site={aiSite} categories={categories} onClose={() => setAiSite(null)} />}
       {complianceSite && <ComplianceModal site={complianceSite} categories={categories} onClose={() => setComplianceSite(null)} />}
       {modelOpen && <ModelModal onClose={() => setModelOpen(false)} />}
+      {accountOpen && auth.enabled && auth.isAuthenticated && (
+        <AccountMenu auth={auth} categories={categories} saved={saved} onSavedChange={loadSaved}
+                     identity={identity || "crew"} onIdentity={setIdentity}
+                     onClose={() => setAccountOpen(false)}
+                     onGoTo={(l) => { setAccountOpen(false); handleLandingDone({ lat: l.lat, lon: l.lon, radius: Number(l.radius_mi) }); }} />
+      )}
       {notifyOpen && <NotifyModal sites={sites} selected={selected} onClose={() => setNotifyOpen(false)} />}
 
       <div className="toasts" aria-live="polite">
@@ -346,7 +400,8 @@ export default function App() {
 
       {!focus && (
         <div className="landing-overlay">
-          <Landing sites={sites} auth={auth} place={landingPlace} setPlace={setLandingPlace}
+          <Landing sites={sites} auth={auth} place={landingPlace} setPlace={setLandingPlace} reopened={reopened}
+                   identity={identity} onIdentity={setIdentity}
                    flyTo={(lon, lat) => globe.current?.flyTo(lon, lat, 8)} onDone={handleLandingDone} />
         </div>
       )}
