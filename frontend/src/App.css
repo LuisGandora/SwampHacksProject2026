@@ -62,6 +62,11 @@ code { font-family: var(--mono); background: var(--surface-3); padding: 1px 5px;
 .banner { position: absolute; top: 72px; left: 50%; transform: translateX(-50%); z-index: 4; max-width: min(720px, 92vw);
           background: #3a1515; border: 1px solid var(--critical); border-radius: var(--radius); padding: 8px 14px; font-size: 13px; }
 .banner--pin { background: #12303d; border-color: var(--accent); }
+.data-notices { position: absolute; top: 72px; left: 50%; transform: translateX(-50%); z-index: 4;
+  width: min(720px, 92vw); max-height: 25vh; overflow-y: auto; display: grid; gap: 6px; }
+.data-notices .banner { position: static; transform: none; max-width: none; }
+.data-warning summary { cursor: pointer; }
+.data-warning ul { margin: 8px 0 0; padding-left: 20px; }
 
 /* ---------- controls ---------- */
 button { background: var(--surface-3); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer;

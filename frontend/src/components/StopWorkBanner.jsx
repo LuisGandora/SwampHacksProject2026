@@ -4,7 +4,7 @@ import { categoryLabel, countdown } from "../hazard.js";
 // The brief's #1 rule, impossible to miss: a full-width STOP WORK screen with the all-clear countdown, which flashes
 // "restarted" whenever a new strike pushes the all-clear back. Shows the selected site's stop-work alert if it has
 // one, else the newest. Minimizing hides it until that alert restarts or another site stops work.
-export default function StopWorkBanner({ alerts, selectedId, now, categories, onSelect }) {
+export default function StopWorkBanner({ alerts, selectedId, now, categories, onSelect, reliable = false }) {
   const stops = alerts.filter((a) => a.level === "stop_work")
     .sort((a, b) => new Date(b.last_trigger_at) - new Date(a.last_trigger_at));
   const a = stops.find((x) => x.site_id === selectedId) || stops[0];
@@ -28,7 +28,8 @@ export default function StopWorkBanner({ alerts, selectedId, now, categories, on
   const left = countdown(a.all_clear_at, now.getTime());
   const total = a.all_clear_at && (new Date(a.all_clear_at) - new Date(a.last_trigger_at)) / 1000;
   const remaining = a.all_clear_at ? Math.max(0, (new Date(a.all_clear_at) - now) / 1000) : null;
-  const clear = a.all_clear_at && !left;  // countdown ran out; the next poll removes the alert
+  const expired = a.all_clear_at && !left;
+  const clear = expired && reliable;
   const others = stops.filter((x) => x.site_id !== a.site_id);
 
   return (
@@ -36,15 +37,16 @@ export default function StopWorkBanner({ alerts, selectedId, now, categories, on
              aria-label="Stop-work alert">
       <div className="stopwork-main">
         <p className="stopwork-title" role="alert">
-          {clear ? "✓ ALL CLEAR: work may resume" : `⛔ STOP WORK · ${categoryLabel(a.category, categories).toUpperCase()}`}
+          {clear ? "Countdown ended — verify current conditions before resuming" : `⛔ STOP WORK · ${categoryLabel(a.category, categories).toUpperCase()}`}
         </p>
         <button className="link stopwork-site" onClick={() => onSelect(a.site_id)}>{a.site_name}</button>
         <p className="small">{a.message}</p>
+        {!reliable && <p className="warn small">Live alert data is unverified. A countdown cannot confirm all-clear.</p>}
         {restarted && !clear && <p className="stopwork-flash">⚡ New strike: countdown restarted</p>}
       </div>
       <div className="stopwork-clock">
         <span className="small">{clear ? "" : a.all_clear_at ? "ALL-CLEAR IN" : "UNTIL"}</span>
-        <strong className="mono">{clear ? "00:00" : left || "the warning ends"}</strong>
+        <strong className="mono">{clear ? "00:00" : expired ? "Awaiting fresh data" : left || "the warning ends"}</strong>
         {total > 0 && <span className="stopwork-bar"><span style={{ width: `${(remaining / total) * 100}%` }} /></span>}
         {a.category === "lightning" && !clear && <span className="small muted">Restarts on every strike within range</span>}
       </div>

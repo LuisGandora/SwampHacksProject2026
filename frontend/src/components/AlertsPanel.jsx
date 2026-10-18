@@ -1,6 +1,6 @@
 import { categoryLabel, countdown } from "../hazard.js";
 
-export default function AlertsPanel({ alerts, categories, now, onSelect, notifyOn, onToggleNotify }) {
+export default function AlertsPanel({ alerts, categories, now, onSelect, notifyOn, onToggleNotify, reliable = false, lastUpdated }) {
   const sorted = [...alerts].sort((a, b) =>
     (a.level === b.level ? 0 : a.level === "stop_work" ? -1 : 1) || new Date(b.last_trigger_at) - new Date(a.last_trigger_at));
   const stops = alerts.filter((a) => a.level === "stop_work").length;
@@ -16,7 +16,11 @@ export default function AlertsPanel({ alerts, categories, now, onSelect, notifyO
           {notifyOn ? "🔔 Desktop alerts on" : "🔕 Turn on desktop alerts for stop-work"}
         </button>
       )}
-      {sorted.length === 0 ? <p className="muted small">No active alerts.</p> : (
+      <p className={`small ${reliable ? "muted" : "warn"}`} role="status">
+        {reliable ? "Live alerts refreshed" : "Alert data unverified; absence of alerts does not confirm safe conditions"}
+        {lastUpdated && ` · last received ${new Date(lastUpdated).toLocaleTimeString()}`}
+      </p>
+      {sorted.length === 0 ? <p className="muted small">{reliable ? "No active alerts reported." : "No verified current alert list."}</p> : (
         <ul className="alert-list">
           {sorted.map((a) => {
             const left = countdown(a.all_clear_at, now.getTime());
