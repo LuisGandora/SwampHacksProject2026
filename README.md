@@ -1,6 +1,56 @@
 # Plan It By The Planet (Planet Control)
 SwampHacks 2026, Sperry Tech brief. Live weather and hazard intelligence for power-plant crews: instant stop-work alerts, a 6 PM briefing, and a plan for where to send crews and money first. Live at **https://plan-it-by-the-planet.us**.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    users["Crews and supervisors<br/>browser or phone"]
+
+    subgraph live["Live public data"]
+        nws["NWS<br/>forecasts, alerts, readings"]
+        goes["GOES-19 lightning<br/>NOAA bucket on AWS"]
+        water["NOAA river gauges<br/>and tide stations"]
+        other["NASA FIRMS fires, iNaturalist,<br/>utility outage maps"]
+    end
+
+    subgraph history["History, loaded once"]
+        hist["NOAA storms, OSHA, CDC,<br/>IEM station weather, EIA,<br/>FEMA flood zones, USACE levees"]
+    end
+
+    subgraph server["Vultr server: plan-it-by-the-planet.us"]
+        caddy["Caddy<br/>HTTPS"]
+        web["Dashboard<br/>React + MapLibre globe"]
+        api["API<br/>FastAPI, served at /api"]
+        worker["Worker<br/>exactly one copy,<br/>jobs every 1 to 60 min"]
+    end
+
+    db[("Tiger Data<br/>TimescaleDB + PostGIS")]
+    ml["Hazard Index<br/>XGBoost models in ml/"]
+    auth["Auth0<br/>sign-in, RS256 JWT"]
+    gemini["Google Gemini<br/>reports and briefings"]
+    chat["Discord and Slack<br/>webhooks"]
+
+    users -->|HTTPS| caddy
+    caddy --> web
+    caddy -->|/api| api
+    users -.->|sign in| auth
+    api -->|checks the token| auth
+    live --> worker
+    hist -->|loaders in db/ and scraper/| db
+    worker -->|readings, alerts, briefings| db
+    worker --> ml
+    ml -->|scores today and tomorrow| db
+    api <-->|queries| db
+    api -->|computed facts only| gemini
+    worker -->|alerts, crew reports, 6 PM briefings| chat
+    api -->|drafts a supervisor sends| chat
+```
+
+- **The worker** pulls every live feed on a schedule, raises the site alerts, writes the hourly Hazard Index scores and the 6 PM briefings, and posts to each user's Discord/Slack channels.
+- **The API** serves the dashboard. It reads the database, and calls Gemini only with facts our code computed. Every number Gemini writes is checked against them.
+- **The two share only the database:** they never call each other.
+
 ## Setup (virtual environment)
 
 Use one Python virtual environment (`.venv`) for the whole project, so everyone runs the same Python with the same packages. Without it, `python` can point at different installs: this project hit a `No module named 'psycopg'` error because `python` was 3.14 while the packages were installed for 3.13.
