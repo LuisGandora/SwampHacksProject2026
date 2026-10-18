@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
+import WebhookGuide from "./WebhookGuide.jsx";
 
 const LEVELS = [["stop_work", "Stop work"], ["warning", "Warnings"]];
 
@@ -13,6 +14,7 @@ export default function NotifyModal({ sites, selected, onClose }) {
   const [scope, setScope] = useState("all");
   const [picked, setPicked] = useState(() => (selected ? [selected.site_id] : []));
   const [search, setSearch] = useState("");
+  const [guide, setGuide] = useState(false);
 
   const load = () => api.channels().then(setChannels).catch((e) => setError(e.message));
   useEffect(() => { load(); }, []);
@@ -44,9 +46,13 @@ export default function NotifyModal({ sites, selected, onClose }) {
           <div>
             <p className="eyebrow">NOTIFICATIONS</p>
             <h3>Send alerts to your Discord or Slack</h3>
+            <button className="link small" onClick={() => setGuide((g) => !g)} aria-expanded={guide}>
+              📖 {guide ? "Hide tutorial" : "Tutorial: how to set this up"}</button>
           </div>
           <button className="icon-btn" onClick={onClose} aria-label="Close">✕</button>
         </header>
+
+        {guide && <WebhookGuide />}
 
         {channels === null ? <p className="muted">Loading…</p> : channels.length === 0 ? (
           <p className="muted small">No channels yet. Add one below.</p>
