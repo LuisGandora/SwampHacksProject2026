@@ -266,7 +266,8 @@ def expected_crew_cost(df, a):
 # already observed today replace the forecast), and the 6 previous days of observed rain.
 FORECAST_DAY = """
 WITH s AS (SELECT site_id, timezone, state, weather_station_id AS st, geog,
-                  (now() AT TIME ZONE timezone)::date AS today FROM sites),
+                  (now() AT TIME ZONE timezone)::date AS today FROM sites
+            WHERE coverage = 'full'),   -- trained on the Southeast study area; live-only sites get no model score
 fc AS (
     SELECT f.site_id, date_trunc('hour', f.valid_at) AS h, max(f.temp_f) AS t,
            max(coalesce(f.heat_index_f, f.temp_f)) AS hi, max(f.precip_in) AS p, max(f.wind_gust_mph) AS g,

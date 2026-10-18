@@ -53,3 +53,15 @@ Both stacks share the one Tiger database, so a demo scenario also shows up on th
 - **Photos:** App Platform has no persistent disk, so uploaded crew photos are lost on each redeploy. That's fine for judging; move uploads to DigitalOcean Spaces for real use.
 - **Demo instance:** run the demo from a laptop with `PLANIT_DEV=1`. Never set `PLANIT_DEV` on the public app.
 - **Cost:** two 1 GB instances (API + worker) at about $12 a month each; the static site is free.
+
+## Vultr (one server, MLH credits) — the current plan
+[deploy/vultr/setup.sh](../deploy/vultr/setup.sh) turns a fresh **Ubuntu 24.04** Vultr Cloud Compute server (2 GB RAM recommended) into the whole app:
+- **Caddy:** https (automatic certificate), serves the dashboard at `/` and the API at `/api`
+- **Two services that restart on crash or reboot:** the API (`planet-api`) and exactly one worker (`planet-worker`)
+- **Photos** are kept on the server's own disk, so they survive restarts
+- **Running it:** `bash setup.sh <domain>`. A free `<ip-with-dashes>.sslip.io` name works with no DNS setup.
+- **First run:** it stops and asks for `.env`, `.env.api` and `frontend/.env` (copy them with `scp`). Run it again to build and start.
+- **Updating:** run it again any time to pull the latest `main`.
+- **Logs:** `journalctl -u planet-worker -f`, `journalctl -u planet-api -f`
+- **Auth0:** add `https://<domain>` to the Allowed Callback URLs, Logout URLs and Web Origins.
+- **After judging:** destroy the server in Vultr. Stopping it isn't enough; it keeps billing.

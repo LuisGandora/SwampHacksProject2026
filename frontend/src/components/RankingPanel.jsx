@@ -91,6 +91,9 @@ export default function RankingPanel({ sites, horizon, setHorizon, selectedId, o
                   {s.percentile >= 90 && (
                     <span className="badge badge--unusual" title={`Higher than ${Math.round(s.percentile)}% of this site's days in this month`}>UNUSUAL</span>
                   )}
+                  {s.coverage === "live" && (
+                    <span className="badge" title="Live alerts, forecasts and lightning only: no history or Hazard Index model for this region yet">LIVE ONLY</span>
+                  )}
                   {s.fema_sfha && (
                     <span className="badge badge--flood" title={`FEMA flood zone ${s.fema_flood_zone}: inside the 1%-a-year (100-year) floodplain`}>FLOODPLAIN</span>
                   )}

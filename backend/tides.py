@@ -11,7 +11,6 @@ import httpx
 
 MD = "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi"
 DATA = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter"
-STATES = {"FL", "GA", "AL"}
 client = httpx.Client(timeout=30, headers={"User-Agent": "PlanetControl/0.1 (SwampHacks 2026)"})
 
 RAISE = """
@@ -39,8 +38,9 @@ def sync_stations(conn):
     """Station list, mean higher high water and flood levels, once a day."""
     if conn.execute("SELECT 1 FROM tide_stations WHERE updated_at > now() - interval '1 day' LIMIT 1").fetchone():
         return 0
+    states = {r["state"] for r in conn.execute("SELECT DISTINCT state FROM sites")}
     stations = [s for s in client.get(f"{MD}/stations.json", params={"type": "waterlevels"}).json()["stations"]
-                if s.get("state") in STATES]
+                if s.get("state") in states]
     rows = []
     for s in stations:
         try:

@@ -101,7 +101,7 @@ def sites(state: str | None = None, horizon: Literal["now", "next_day"] = "next_
               FROM active_site_alerts GROUP BY site_id
         )
         SELECT s.site_id, s.name, s.operator, s.state, s.county, s.timezone, s.capacity_mw, s.primary_technology,
-               s.coord_check, s.fema_flood_zone, s.fema_sfha, {LATLON.format('s.geog')},
+               s.coord_check, s.coverage, s.fema_flood_zone, s.fema_sfha, {LATLON.format('s.geog')},
                CASE WHEN %(horizon)s = 'now' THEN greatest(h.score, f.floor) ELSE h.score END AS score,
                h.score AS model_score, %(horizon)s AS horizon, h.scored_for, h.category_scores,
                greatest(n.score, f.floor) AS score_now, t.score AS score_next_day,

@@ -306,7 +306,7 @@ CREATE TABLE IF NOT EXISTS weather_observations (       -- live conditions per s
     PRIMARY KEY (site_id, observed_at)
 );
 SELECT create_hypertable('weather_observations', by_range('observed_at', INTERVAL '7 days'), if_not_exists => true);
-SELECT add_retention_policy('weather_observations', INTERVAL '30 days', if_not_exists => true);
+SELECT add_retention_policy('weather_observations', INTERVAL '8 days', if_not_exists => true);  -- the scanner shows 7
 
 CREATE TABLE IF NOT EXISTS weather_forecasts (           -- next-day forecast for the 6 PM briefing
     site_id         bigint NOT NULL REFERENCES sites,
@@ -325,7 +325,7 @@ SELECT create_hypertable('weather_forecasts', by_range('valid_at', INTERVAL '7 d
 ALTER TABLE weather_forecasts ADD COLUMN IF NOT EXISTS wind_chill_f  numeric;
 ALTER TABLE weather_forecasts ADD COLUMN IF NOT EXISTS visibility_mi numeric;
 ALTER TABLE weather_forecasts ADD COLUMN IF NOT EXISTS wind_mph      numeric;  -- sustained
-SELECT add_retention_policy('weather_forecasts', INTERVAL '30 days', if_not_exists => true);
+SELECT add_retention_policy('weather_forecasts', INTERVAL '8 days', if_not_exists => true);
 
 CREATE TABLE IF NOT EXISTS nws_alerts (
     alert_id        text NOT NULL,
@@ -720,6 +720,10 @@ CALL add_columnstore_policy('site_hazard_events', after => INTERVAL '30 days', i
 -- Dollar figures depend on economic_assumptions, every one labeled as an assumption until replaced with
 -- company data. Correlations are computed in ml/economic_impact.py (never by an LLM).
 -- ===========================================================================================================
+-- full: the Southeast study area (FL/GA/AL), with history, the Hazard Index model and economics.
+-- live: the rest of the lower 48, thinned to 2 plants per 50-mile square (scraper/us_live_sites.py): live alerts,
+-- forecasts, readings, lightning and rivers only.
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS coverage text NOT NULL DEFAULT 'full' CHECK (coverage IN ('full', 'live'));
 ALTER TABLE sites ADD COLUMN IF NOT EXISTS utility_id          bigint;  -- EIA utility (operator) ID
 ALTER TABLE sites ADD COLUMN IF NOT EXISTS utility_name        text;
 ALTER TABLE sites ADD COLUMN IF NOT EXISTS balancing_authority text;    -- grid operator, e.g. FPL, SOCO

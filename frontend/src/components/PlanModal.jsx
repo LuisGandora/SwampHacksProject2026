@@ -13,12 +13,12 @@ export default function PlanModal({ sites, categories, onSelect, onClose, identi
   const [tab, setTab] = useState("now");
   const [data, setData] = useState({});
   const [error, setError] = useState("");
-  const ids = sites.map((s) => s.site_id);
+  const ids = sites.map((s) => s.site_id);   // more than 1,000 sites in view: ask for all (the URL would be too long)
 
   useEffect(() => {
     if (data[tab]) return;
     setError("");
-    api.plan(tab, ids.length < 694 ? ids : null).then((d) => setData((x) => ({ ...x, [tab]: d }))).catch((e) => setError(e.message));
+    api.plan(tab, ids.length <= 1000 ? ids : null).then((d) => setData((x) => ({ ...x, [tab]: d }))).catch((e) => setError(e.message));
   }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const esc = (e) => e.key === "Escape" && onClose();
@@ -34,7 +34,7 @@ export default function PlanModal({ sites, categories, onSelect, onClose, identi
     try {
       await api.setAssumption(key, Number(edits[key]));
       setEdits((e) => { const { [key]: _, ...rest } = e; return rest; });
-      const fresh = await api.plan("economics", ids.length < 694 ? ids : null);
+      const fresh = await api.plan("economics", ids.length <= 1000 ? ids : null);
       setData({ economics: fresh });   // week, invest and economics all use the assumptions: drop the others
     } catch (e) { setError(e.message); }
     setSaving("");

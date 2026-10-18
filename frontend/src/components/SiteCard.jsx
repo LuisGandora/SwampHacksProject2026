@@ -8,7 +8,7 @@ import { scoreIsCurrent, SCORE_EXPLANATION } from "../freshness.js";
 const COORD = {
   ok: ["✓ Location verified (OSM)", "ok"], corrected: ["✓ Location corrected to OSM outline", "ok"],
   review: ["Location: EIA and OSM differ 1–5 km", "warn"], unresolved: ["⚠ Location unresolved", "warn"],
-  no_osm: ["Location: EIA only (no OSM match)", "muted"],
+  no_osm: ["Location: EIA only (no OSM match)", "muted"], eia_only: ["Location: EIA-860M (not cross-checked)", "muted"],
 };
 
 // FEMA National Flood Hazard Layer zone at the site, in plain words (scraper/fema_flood_zones.py).
@@ -72,6 +72,10 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, al
             {now.toLocaleTimeString("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit", timeZoneName: "short" })}
           </p>
           <p className={`small ${coordCls}`}>{coordText}</p>
+          {summary.coverage === "live" && (
+            <p className="small warn">Live data only: alerts, forecasts, readings and lightning. This region has no site
+              history or Hazard Index yet (the model is trained on the FL/GA/AL study area).</p>
+          )}
           {detail?.fema_flood_zone && <p className={`small ${detail.fema_sfha ? "warn" : "muted"}`}>{floodZoneText(detail)}</p>}
           {detail?.levee?.leveed_area_system && (
             <p className={`small ${/Non-Accredited/.test(detail.levee.levee_accreditation || "") ? "warn" : "muted"}`}>

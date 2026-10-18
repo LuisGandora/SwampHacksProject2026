@@ -17,7 +17,8 @@ from db.setup_db import ROOT, database_url
 
 ROLE = "planit_api"
 WRITES = ["crew_reports", "site_alerts", "site_reports", "app_users", "notification_channels", "notification_log",
-          "saved_locations", "location_briefings", "user_briefings", "economic_assumptions"]
+          "saved_locations", "location_briefings", "user_briefings", "economic_assumptions",
+          "weather_observations", "weather_forecasts"]  # opening a site card refreshes its weather
 
 
 def main():
