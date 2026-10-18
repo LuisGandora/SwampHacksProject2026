@@ -13,6 +13,9 @@ from psycopg.types.json import Jsonb
 from backend import nws, observations
 
 BRIEFING_TIME = dt.time(18, 0)
+# The most recent 6 PM in a time zone (SQL, for a timezone column or parameter). AI reports and briefings written
+# since then are replayed as they are; the first request after the next 6 PM writes fresh ones.
+LAST_6PM = "(((now() AT TIME ZONE {tz})::date - ((now() AT TIME ZONE {tz})::time < '18:00')::int) + time '18:00') AT TIME ZONE {tz}"
 WINDOW = dt.timedelta(minutes=15)  # the worker runs every 15 min, so each site is caught once
 LIGHTNING_LIKELY_PCT = 50          # chance of thunder at which tomorrow gets a lightning flag
 

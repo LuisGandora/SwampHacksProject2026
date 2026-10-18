@@ -122,6 +122,11 @@ Correlations are reported raw and **deseasonalized**, meaning each series minus 
 
 These are correlations, not proof of cause. The outage stand-in measures all restoration work in a county, not one company's crews.
 
+**Experiment 3, the full write-up** (data, method, results, how to get real crew logs): [docs/EXPERIMENT_ECONOMIC_IMPACT.md](docs/EXPERIMENT_ECONOMIC_IMPACT.md). Added since:
+- **Weather in real sales** (`python -m ml.weather_sales`): the degree-day model utilities use for their SEC "weather" line, on EIA-861M sales. Weather lifts the fit from R² 0.06–0.23 to 0.85–0.98 (Alabama Power 0.13 → 0.98). It priced Georgia Power's mild 2023 at −$147M.
+- **Real crew dispatches** (worker job `crew_dispatch`): utilities' public outage maps (KUBRA: Alabama Power, Georgia Power, Mississippi Power, JEA; add any KUBRA utility in `backend/crew_dispatch.py`) give each outage near a site with the utility's own crew status and cause. Finished ones become `crew_trips` rows (`source = 'outage_map'`).
+- **Assumptions you can change:** 📋 Plan → Economics → Assumptions (supervisors). Measured stop-work hours from the app's own alerts sit next to each assumed value.
+
 ### Did weather disrupt a crew contract?
 
 **Hypothesis tested:** when a crew contract fails and a bad revenue quarter follows, a severe weather event (such as a tornado) near the work during the contract caused the disruption.
@@ -194,6 +199,9 @@ cd frontend; npm install; npm run dev          # terminal 2: open http://localho
 | Feature | What it does | API |
 |---|---|---|
 | **Hazard ranking** (the dashboard requirement) | All 694 plants ranked by Hazard Index, **Today or Tomorrow**. Band tiles (Critical / High / Moderate / Low / Stop work) double as filters. State filter and search. Each row shows its hazard bar, band label, top hazard and alert badges. Click a row to fly to the site. | `GET /sites?horizon=` |
+| **Your briefing** (supervisors, 6 PM) | Full-screen briefing across your current area and every saved location (of the identity you're acting as), written by Gemini from computed facts (numbers checked; template fallback). Pops up for supervisors at **6 PM local** once a day, and is **replayed** (Account → 📋 Replay 6 PM briefing) until the next 6 PM, when the next request writes a fresh one. Supervisors get a **drafted crew message per Discord/Slack channel**: edit, then Send. **↻ Run again** rebuilds it now. Debugging: 🧪 Briefing next to the identity chip, shown only in demo mode (`PLANIT_DEV=1`). | `POST /me/briefing`, `POST /me/channels/{id}/send` |
+| **AI answers are replayed** | The AI safety report, Compliance and the briefing are each kept until the next 6 PM at the site, then rewritten on the next open; Regenerate / Run again forces it. The browser keeps the last copy of each, shown (marked offline) when the API can't be reached. | server: `site_reports`, `user_briefings`; browser: `planit.ai.*` in localStorage |
+| **Supervisor plan** (📋 Plan in the header) | Where to focus attention and resources first, for the sites in view. **Economics**: crew-hours and dollars at risk this week, yearly weather loss by utility, weather in real sales, real crew dispatches, the experiments' findings, and the assumptions panel (supervisors edit; `PUT /economics/assumptions/{key}`). This week also shows at-risk crew-hours and dollars per site. **Act now**: sites with alerts or a high live score, with what to do and what to bring. **This week**: a 7-day grid of heat ☀️, storm ⚡, heavy-rain 🌧 and wind 💨 days, plus what to schedule or stage ahead (floodplain 🌊 and levee 🧱 sites flagged before heavy rain). **Invest**: sites ranked by crew time lost to weather in a typical year, the costliest hazard, a suggested fix, its cost and payback (fix costs are labeled assumptions in `economic_assumptions`). | `GET /plan/{now,week,invest}` |
 | Globe | Plants colored by band, pulsing red rings on stop-work sites, lightning from the last 30 min, your GPS location, a draft report pin. 🌎 returns to North America, ◎ fits all sites. | `/sites`, `/lightning/recent` |
 | Site card | Today and tomorrow scores, what drives the score (weather drivers), expected crew impact (labeled estimate), live alerts with all-clear countdowns, 48 h forecast chart (with a table view), 6 PM briefing, site history, economic impact, crew reports with photos | `/sites/{id}`, `/forecast`, `/briefings/{id}`, `/economics`, `/crew-reports` |
 | **Compliance** | Prioritized next steps from OSHA reports nearby and open crew reports, with the OSHA standards to check and reporting deadlines. Crew reports can be marked resolved or dismissed. | `POST /sites/{id}/compliance`, `PATCH /crew-reports/{id}` |
@@ -491,6 +499,8 @@ python db/load_history.py
 
 It downloads any NOAA location or fatality files that are missing from `data/raw/`. To stay well under the free service's storage cap, it keeps only events within about 70 miles of the sites. Then it ties each site to its events (`site_hazard_events`) and refreshes `site_risk_profile`.
 
+Levees (USACE National Levee Database): `python scraper/levees.py` writes `data/levees.geojson`, then `python -m db.load_levees` loads it into `levee_features`. The `site_levees` view gives each site its leveed area, FEMA accreditation, yearly overtopping chance and nearest levee.
+
 NOAA events without coordinates are placed at their NWS forecast zone's centroid, with `location_precision = 'zone'`. Tornado tracks are stored as paths, so distance is measured to the nearest point on the track.
 
 ### Hazard ranges are data
@@ -511,7 +521,7 @@ Every radius, threshold and countdown is a row in `hazard_categories`, so you ca
 | `dense_fog` | visibility 1 mi | 0.25 mi | at site | 10 mi | |
 | `wildlife` | sighting | sighting | 1 / 0.1 mi | 2 mi | |
 | `coastal` | (history only) | | | 5 mi | |
-| `ppe`, `heavy_machinery`, `slip_trip`, `osha_inspection` | (crew categories) | | | 50 mi | |
+| `ppe`, `heavy_machinery`, `slip_trip`, `osha_inspection` | (crew categories) | | | 50 mi, but 20 mi for reports with no tie to the plant (see below) | |
 
 For example, to widen the lightning stop-work radius to 15 miles:
 
@@ -529,7 +539,7 @@ UPDATE hazard_categories SET stop_radius_mi = 15 WHERE category = 'lightning';
 | App | `crew_reports`, `site_alerts`, `hazard_scores` (ML 0–10), `daily_briefings` |
 | Ties | `site_hazard_events` (table), `site_weather_days` (view) |
 
-- **Event ties:** `site_hazard_events` has one row per site, category and event, from NOAA storm events, OSHA reports and crew reports. Each row includes the distance in miles, deaths, injuries and damage. An event is tied to a site when it's within that category's `history_radius_mi`. After changing a radius, run `SELECT refresh_site_hazard_events();` and then refresh the profile.
+- **Event ties:** `site_hazard_events` has one row per site, category and event, from NOAA storm events, OSHA reports and crew reports. Each row includes the distance in miles, deaths, injuries and damage. An event is tied to a site when it's within that category's `history_radius_mi`. Crew-type reports (PPE, machinery, slips, OSHA inspections) have no other link to a plant, so they count only within **20 mi**, unless they are linked: an OSHA report from a power utility or power-line contractor (NAICS 2211xx or 237130), or a crew report filed for that site. After changing a radius, run `SELECT refresh_site_hazard_events();` and then refresh the profile.
 - **Weather-day ties:** `site_weather_days` lists each day the site's station crossed a category's warn or stop threshold, labeled `warning` or `stop_work`. It covers extreme heat (max heat index), extreme cold (minimum temperature, standing in for wind chill), flooding (daily rain), high wind (peak gust) and soil saturation (7-day rain total). It's a view, so threshold edits apply immediately.
 
 - **Time-series:** the time-based tables are TimescaleDB hypertables. Lightning strikes, live observations and gauge readings are compressed after a few days, and lightning strikes are deleted after 90 days.
@@ -583,7 +593,9 @@ python -m backend.test_backend         # parsing and threshold checks (no networ
 | `briefings` | every 15 min | Tomorrow's briefing for each site where it's 6:00–6:15 PM local time → `daily_briefings` |
 | `points` | daily | NWS grid and zones for any new site |
 | `scores` | hourly (at :20) | Hazard model scores for today and tomorrow → `hazard_scores` (needs a trained model: `python -m ml.hazard_model train`) |
-| `daily_weather` | daily (11:30 UTC) | Last 7 days of IEM station summaries → `weather_daily`, so the model's inputs stay current |
+| `daily_weather` | daily (11:30 UTC) | Last 7 days of IEM station summaries → `weather_daily`, so the model's inputs stay current. Impossible wind readings (over 87 kt sustained with no gust at least as high) are blanked. |
+| `crew_dispatch` | every 15 min | Utilities' public outage maps (KUBRA StormCenter) → `crew_dispatch`: each outage within 25 mi of a site, when a crew was assigned and on site (the utility's own status text), the cause, and when power came back. Finished outages with a crew become `crew_trips` (`source = 'outage_map'`). |
+| `tides` | every 15 min | NOAA Tides & Currents: latest water level at FL/GA/AL tide stations → `tide_readings` (stations and NOAA flood levels refreshed daily → `tide_stations`). Minor flooding within 10 mi → warning, moderate or worse → stop work. |
 
 Every threshold, radius and NWS alert name is stored as data in `hazard_categories`. That includes which NWS alerts mean a warning and which mean stop work (`nws_warn_events`, `nws_stop_events`).
 

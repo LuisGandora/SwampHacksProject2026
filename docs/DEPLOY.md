@@ -46,3 +46,10 @@ Both stacks share the one Tiger database, so a demo scenario also shows up on th
 `PLANIT_DEV=1` turns on endpoints that write to the shared database: a fake lightning strike, the scenario, running worker jobs. On the public URL, anyone could trigger a stop-work alert. With the separate instance:
 - the public link never has them
 - the demo instance's endpoints need a signed-in supervisor once Auth0 is on (`backend/auth.py: require_supervisor`)
+
+## DigitalOcean App Platform (alternative to Render)
+[.do/app.yaml](../.do/app.yaml) runs the public stack as one app at one https URL. The dashboard is at `/`, the API at `/api` and there's exactly one worker. Create it under **Apps → Create App → Import from app spec** (or run `doctl apps create --spec .do/app.yaml`), then type the secrets into each component's environment variables.
+- **Auth0:** add `https://<your-app>.ondigitalocean.app` to the Allowed Callback URLs, Logout URLs, Web Origins and CORS origins.
+- **Photos:** App Platform has no persistent disk, so uploaded crew photos are lost on each redeploy. That's fine for judging; move uploads to DigitalOcean Spaces for real use.
+- **Demo instance:** run the demo from a laptop with `PLANIT_DEV=1`. Never set `PLANIT_DEV` on the public app.
+- **Cost:** two 1 GB instances (API + worker) at about $12 a month each; the static site is free.

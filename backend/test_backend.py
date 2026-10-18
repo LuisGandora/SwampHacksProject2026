@@ -172,3 +172,51 @@ os.environ["SUPERVISOR_EMAILS"] = "boss@x.com, A@X.com"
 assert with_identity(_crew, "supervisor")["can_supervise"] is True             # approved by email, any case
 del os.environ["SUPERVISOR_EMAILS"]
 print("identities ok")
+
+# supervisor plan: every live hazard has something to bring; tidal alerts never reuse the rip-current category
+from backend.plan import RESOURCES
+from backend.reports import ACTIONS as _ACTIONS
+assert set(_ACTIONS) <= set(RESOURCES), set(_ACTIONS) - set(RESOURCES)
+from backend.tides import RAISE as _TIDE
+assert "'tidal_flooding'" in _TIDE and "minor_ft" in _TIDE
+from backend.daily_weather import BAD_WIND    # 200-959 kt "sustained" readings at EUF/BCR once topped the Invest list
+assert "max_wind_kt > 87" in BAD_WIND and "max_gust_kt < max_wind_kt" in BAD_WIND
+print("plan ok")
+
+# your briefing: drafted crew messages only go to the user's own channels, every channel gets one, no mass pings
+from backend import team_briefing as _tb
+_plant = {"site_id": 1, "name": "Plant A", "score_tomorrow": 7.1, "top_hazard_tomorrow": "extreme_heat", "stop_work_now": True,
+          "active_alerts": ["Stop work: Lightning"]}
+_facts = {"kind": "6pm", "tomorrow": "Sunday Oct 18", "week_outlook": [], "policy_actions": {"extreme_heat": "Water."},
+          "areas": [{"area": "Home (50 mi)", "plants_in_range": 1, "stop_work_now": 1, "high_tomorrow": 1, "top_plants": [_plant],
+                     "crew_hours_at_risk_tomorrow": 20, "usd_at_risk_tomorrow": 1166},
+                    {"area": "Saved: B (25 mi)", "plants_in_range": 1, "stop_work_now": 1, "high_tomorrow": 1, "top_plants": [_plant],
+                     "crew_hours_at_risk_tomorrow": 20, "usd_at_risk_tomorrow": 1166}],
+          "channels": [{"channel_id": 5, "label": "Crew Slack", "kind": "slack", "covers": "every site"},
+                       {"channel_id": 6, "label": "Night crew", "kind": "discord", "covers": ["Plant A"]}]}
+_t = _tb.template(_facts)
+assert len(_t["priorities"]) == 2 and "Plant A" in _t["priorities"][0]          # overlapping areas: listed once
+assert "20 crew-hours ($1,166)" in _t["summary"]                               # dollars in the briefing
+_r = _tb.clean_messages({"crew_messages": [{"channel_id": 5, "audience": "x", "text": "@everyone heat " * 300},
+                                           {"channel_id": 77, "audience": "not yours", "text": "hi"}]}, _facts)
+assert [m["channel_id"] for m in _r["crew_messages"]] == [5, 6]                   # 77 dropped, 6 filled by the template
+assert "@everyone" not in _r["crew_messages"][0]["text"] and len(_r["crew_messages"][0]["text"]) <= 1900
+assert "Plant A" in _r["crew_messages"][1]["text"] and _r["crew_messages"][1]["audience"] == "Night crew"
+print("briefing ok")
+
+# economics: real crew status parsed from a utility's outage-map text, map geometry decoded, at-risk money per day
+from backend import crew_dispatch as _cd
+assert _cd.status({"comments": "Personnel are currently on site repairing the outage. The cause of the outage is a dead tree. "
+                               "Your estimated repair time ..."}) == (True, True, "dead tree")
+assert _cd.status({"comments": "Personnel have been assigned to evaluate the outage in your area."}) == (True, False, None)
+assert _cd.status({"comments": "An outage has been reported in your area. We are working to determine a restoration time."}) \
+    == (False, False, None)
+assert _cd.polyline_point("_p~iF~ps|U") == (38.5, -120.2)       # Google's documented example
+assert _cd.quadkey(0.1, 0.1, 2) == "12"                                   # NE tile, then its lower-left child
+from backend.plan import at_risk as _risk
+_a = {"crew_size": 4, "shift_hours": 10, "hours_lost_extreme_heat": 3, "hours_lost_lightning": 2, "hours_lost_flooding": 6,
+      "hours_lost_high_wind": 2, "loaded_cost_per_hour": 60, "loaded_cost_per_hour_FL": 50}
+assert _risk({"heat": True, "storm": True}, "FL", _a) == (20, 1000)           # (3 + 2) h x 4 people x $50
+assert _risk({"heat": True, "storm": True, "rain": True}, "GA", _a) == (40, 2400)  # capped at a 10 h shift, US rate
+assert _risk({}, "FL", _a) == (0, 0)
+print("economics ok")
