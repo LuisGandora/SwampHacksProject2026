@@ -10,6 +10,7 @@ import httpx
 
 NWPS = "https://api.water.noaa.gov/nwps/v1/gauges"
 FLOODING = ("action", "minor", "moderate", "major")
+TILE = 10   # degrees per NWPS request
 client = httpx.Client(timeout=60)
 
 RAISE = """
@@ -42,11 +43,27 @@ SELECT count(raise_site_alert(site_id, 'flooding',
 def sync(conn):
     box = conn.execute("SELECT min(ST_X(geog::geometry)) - 0.5 AS w, min(ST_Y(geog::geometry)) - 0.5 AS s, "
                        "max(ST_X(geog::geometry)) + 0.5 AS e, max(ST_Y(geog::geometry)) + 0.5 AS n FROM sites").fetchone()
-    r = client.get(NWPS, params={"bbox.xmin": box["w"], "bbox.ymin": box["s"], "bbox.xmax": box["e"],
-                                 "bbox.ymax": box["n"], "srid": "EPSG_4326"})
-    r.raise_for_status()
+    # One request for the whole US times out (504), so ask in tiles of about 10 x 10 degrees; a tile that fails is
+    # skipped this run (its gauges keep their last reading), and the job only fails if every tile does.
+    found, failed, tiles = {}, 0, 0
+    lon = box["w"]
+    while lon < box["e"]:
+        lat = box["s"]
+        while lat < box["n"]:
+            tiles += 1
+            try:
+                r = client.get(NWPS, params={"bbox.xmin": lon, "bbox.ymin": lat, "bbox.xmax": min(lon + TILE, box["e"]),
+                                             "bbox.ymax": min(lat + TILE, box["n"]), "srid": "EPSG_4326"})
+                r.raise_for_status()
+                found.update((g["lid"], g) for g in r.json()["gauges"])
+            except httpx.HTTPError:
+                failed += 1
+            lat += TILE
+        lon += TILE
+    if failed == tiles:
+        raise RuntimeError(f"NOAA NWPS: all {tiles} tiles failed")
     gauges, readings = [], []
-    for g in r.json()["gauges"]:
+    for g in found.values():
         gauges.append((g["lid"], g["name"], g["longitude"], g["latitude"]))
         obs, fc = (g.get("status") or {}).get("observed") or {}, (g.get("status") or {}).get("forecast") or {}
         if obs.get("primary", -999) == -999 or obs.get("floodCategory") in ("obs_not_current", "out_of_service"):
@@ -64,4 +81,5 @@ def sync(conn):
                     "ON CONFLICT DO NOTHING", readings)
     raised = conn.execute(RAISE, {"flooding": list(FLOODING)}).fetchone()["count"]
     flooding = sum(r[4] in FLOODING for r in readings)
-    return f"{len(readings)} gauge readings ({flooding} at action stage or worse), {raised} site alerts raised or extended"
+    return (f"{len(readings)} gauge readings ({flooding} at action stage or worse), {raised} site alerts raised or extended"
+            + (f"; {failed} of {tiles} tiles failed" if failed else ""))

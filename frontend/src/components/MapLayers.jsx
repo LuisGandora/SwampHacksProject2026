@@ -7,7 +7,7 @@ const RADAR_SCALE = ["#04e9e7", "#019ff4", "#0300f4", "#02fd02", "#01c501", "#00
                      "#fd9500", "#fd0000", "#d40000", "#bc0000", "#f800fd"];
 
 // Map layer switches plus a legend for every icon currently on the map. Every swatch has a text label.
-export default function MapLayers({ layers, setLayer, pinCount, warnings, onClose, basemap, setBasemap }) {
+export default function MapLayers({ layers, setLayer, pinCount, warnings, onClose }) {
   const events = Object.entries((warnings?.features || []).reduce((acc, f) => {
     acc[f.properties.event] = (acc[f.properties.event] || 0) + 1;
     return acc;
@@ -25,11 +25,6 @@ export default function MapLayers({ layers, setLayer, pinCount, warnings, onClos
         <h3>Layers</h3>
         <button className="icon-btn" onClick={onClose} aria-label="Close layers">✕</button>
       </header>
-      <div className="seg basemap-seg" role="group" aria-label="Basemap">
-        {[["dark", "Dark map"], ["satellite", "Satellite"]].map(([k, label]) => (
-          <button key={k} className={basemap === k ? "on" : ""} aria-pressed={basemap === k} onClick={() => setBasemap(k)}>{label}</button>
-        ))}
-      </div>
       <div className="layer-toggles">
         {toggle("radar", <><CloudRain className="ico" aria-hidden="true" /> Radar</>, "live, every 5 min")}
         {toggle("warnings", <><TriangleAlert className="ico" aria-hidden="true" /> NWS warnings</>, "active now")}
@@ -41,6 +36,8 @@ export default function MapLayers({ layers, setLayer, pinCount, warnings, onClos
         {[...BANDS, NO_SCORE].map((b) => (
           <li key={b.key}><i className="dot" style={{ background: b.color }} /> {b.label}{b.min != null ? ` (${b.min}+)` : ""}</li>
         ))}
+        <li className="small muted">Gray (no score): a LIVE ONLY site outside FL/GA/AL with no alert right now. The Hazard Index
+          model covers the FL/GA/AL study area; elsewhere a site takes a color only from a live alert.</li>
         <li><i className="dot dot--ring" style={{ borderColor: "#d03b3b" }} /> Pulsing ring: stop work now</li>
         <li><i className="dot" style={{ background: "#3987e5", boxShadow: "0 0 0 3px rgba(57,135,229,.3)" }} /> You are here</li>
         <li><i className="dot" style={{ background: "#fff3a3" }} /> Lightning, last 30 min (fades with age)</li>

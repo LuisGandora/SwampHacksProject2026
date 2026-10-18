@@ -73,10 +73,6 @@ export default function App() {
   const [notifyOpen, setNotifyOpen] = useState(false);
   const [showPins, setShowPins] = useState(false);
   const [radar, setRadar] = useState(false);
-  const [basemap, setBasemapState] = useState(() => {   // "dark" (CARTO) or "satellite" (Esri), remembered here
-    try { return localStorage.getItem("planit.basemap") || "dark"; } catch { return "dark"; }
-  });
-  const setBasemap = (b) => { setBasemapState(b); try { localStorage.setItem("planit.basemap", b); } catch { /* private mode */ } };
   const [warnOn, setWarnOn] = useState(false);
   const [warnings, setWarnings] = useState(null);
   const [layersOpen, setLayersOpen] = useState(false);
@@ -97,6 +93,7 @@ export default function App() {
   const [identity, setIdentityState] = useState(null);       // "crew" | "supervisor", remembered per account
   const [briefing, setBriefing] = useState(null);            // { kind: "start" | "6pm" } while the briefing screen is open
   const shown6pm = useRef("");
+  const [closedNotice, setClosedNotice] = useState("");     // the data notice the user closed (by its list of problems)
   const hud = useRef(null);                                  // the header: banners sit just below its real height
   useEffect(() => {
     const el = hud.current;
@@ -273,6 +270,8 @@ export default function App() {
   const inViewIds = new Set(visibleSites.map((s) => s.site_id));
   const viewAlerts = focus && !focus.all ? alerts.filter((a) => inViewIds.has(a.site_id)) : alerts;
   inView.current = (a) => !focus || focus.all || inViewIds.has(a.site_id);
+  const dataNoticeKey = [...activeErrors.map(([n]) => n), ...feedProblems.map((f) => `${f.name}:${f.status}`),
+                         oldStatus ? "old" : ""].join("|");
   const counts = { stop: viewAlerts.filter((a) => a.level === "stop_work").length, warn: viewAlerts.filter((a) => a.level === "warning").length };
   const feedProblems = (feedStatus?.feeds || []).filter((f) => f.status !== "current");
   const activeErrors = Object.entries(dataErrors).filter(([name, message]) => message
@@ -306,7 +305,7 @@ export default function App() {
                 }}
                 pinMode={!focus || pinMode} pin={focus ? pin : landingPlace}
                 onPin={(p) => focus ? (setPin(p), setPinMode(false), setTab("site")) : setLandingPlace({ ...p, label: "Dropped pin" })}
-                pins={showPins ? pins : null} warnings={warnOn ? warnings : null} radar={radar} me={me} sensor={sensor} basemap={basemap} />
+                pins={showPins ? pins : null} warnings={warnOn ? warnings : null} radar={radar} me={me} sensor={sensor} />
       {sensor === "crt" && <div className="scanlines" aria-hidden="true" />}
 
       <header className="hud" ref={hud}>
@@ -378,9 +377,11 @@ export default function App() {
           Site rankings could not be refreshed. Previously received scores may be outdated.
         </div>
       )}
-      {(activeErrors.length > 0 || feedProblems.length > 0 || oldStatus) && (
+      {(activeErrors.length > 0 || feedProblems.length > 0 || oldStatus) && dataNoticeKey !== closedNotice && (
         <details className="banner data-warning">
-          <summary>Some live data is unavailable or incomplete · View details</summary>
+          <summary>Some live data is unavailable or incomplete · View details
+            <button className="link small notice-close" aria-label="Close this notice"
+                    onClick={(e) => { e.preventDefault(); setClosedNotice(dataNoticeKey); }}>✕</button></summary>
           <ul>
             {activeErrors.map(([name, message]) => <li key={name}>{name}: {message}</li>)}
             {feedProblems.map((f) => <li key={f.name}>{f.name}: {f.status}
@@ -394,7 +395,6 @@ export default function App() {
       <StopWorkBanner alerts={viewAlerts} selectedId={selectedId} now={now} categories={categories} onSelect={select} reliable={alertsReliable} />
       {layersOpen && (
         <MapLayers layers={{ radar, warnings: warnOn, pins: showPins }} setLayer={setLayer} pinCount={pins.length}
-                   basemap={basemap} setBasemap={setBasemap}
                    warnings={warnings} onClose={() => setLayersOpen(false)} />
       )}
       {demo && (

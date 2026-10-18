@@ -7,19 +7,12 @@ const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services";
 const NORTH_AMERICA = { center: [-97, 39.5], zoom: 3.1 };
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-// Two keyless basemaps on a globe: CARTO Dark Matter (default: the hazard colors stand out) and Esri satellite
-// imagery with boundary/place and road labels on top. setBasemap() switches between them.
-const CARTO = ["a", "b", "c", "d"].map((s) => `https://${s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png`);
-export const BASEMAP_LAYERS = { dark: ["carto"], satellite: ["imagery", "roads", "places"] };
+// Keyless Esri satellite imagery on a globe, with boundary/place and road labels on top.
 const STYLE = {
   version: 8,
   projection: { type: "globe" },
   sky: { "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0] },
   sources: {
-    carto: {
-      type: "raster", tileSize: 256, maxzoom: 20, tiles: CARTO,
-      attribution: "© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors © <a href=\"https://carto.com/attributions\">CARTO</a>",
-    },
     imagery: {
       type: "raster", tileSize: 256, maxzoom: 19,
       tiles: [`${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`],
@@ -36,10 +29,9 @@ const STYLE = {
   },
   layers: [
     { id: "space", type: "background", paint: { "background-color": "#05070a" } },
-    { id: "carto", type: "raster", source: "carto" },
-    { id: "imagery", type: "raster", source: "imagery", layout: { visibility: "none" } },
-    { id: "roads", type: "raster", source: "roads", minzoom: 7, layout: { visibility: "none" }, paint: { "raster-opacity": 0.55 } },
-    { id: "places", type: "raster", source: "places", layout: { visibility: "none" }, paint: { "raster-opacity": 0.85 } },
+    { id: "imagery", type: "raster", source: "imagery" },
+    { id: "roads", type: "raster", source: "roads", minzoom: 7, paint: { "raster-opacity": 0.55 } },
+    { id: "places", type: "raster", source: "places", paint: { "raster-opacity": 0.85 } },
   ],
 };
 
@@ -51,8 +43,7 @@ export const PIN_COLORS = { crew: "#5fd3ff", osha: "#c08cff" };
 const point = (lon, lat, properties = {}) => ({ type: "Feature", geometry: { type: "Point", coordinates: [lon, lat] }, properties });
 
 const GlobeMap = forwardRef(function GlobeMap(
-  { sites, lightning, pins, warnings, radar, selectedId, onSelect, onLocation, inspectedLocation, pinMode, pin, onPin, me, sensor,
-    basemap = "dark" }, ref) {
+  { sites, lightning, pins, warnings, radar, selectedId, onSelect, onLocation, inspectedLocation, pinMode, pin, onPin, me, sensor }, ref) {
   const container = useRef(null);
   const map = useRef(null);
   const ready = useRef(false);
@@ -211,15 +202,6 @@ const GlobeMap = forwardRef(function GlobeMap(
     };
     if (ready.current) apply(); else m.once("planit:ready", apply);
   }, [sites, lightning, pins, selectedId]);
-
-  // Basemap: dark map or satellite imagery (style layers, so it works before the overlays load too).
-  useEffect(() => {
-    const m = map.current;
-    if (!m) return;
-    const apply = () => Object.entries(BASEMAP_LAYERS).forEach(([key, ids]) =>
-      ids.forEach((id) => m.getLayer(id) && m.setLayoutProperty(id, "visibility", key === basemap ? "visible" : "none")));
-    if (m.isStyleLoaded()) apply(); else m.once("load", apply);
-  }, [basemap]);
 
   // Weather layers: show or hide, and keep the radar fresh (the tile cache updates every 5 minutes).
   useEffect(() => {
