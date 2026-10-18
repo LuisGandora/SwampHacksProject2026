@@ -23,7 +23,7 @@ from pydantic import BaseModel, Field
 from db.setup_db import load_env
 load_env()  # read .env (GEMINI_API_KEY, GEMINI_MODEL, ...) into os.environ before reports/briefings read them
 
-from backend import briefings, compliance, lightning, notify, nws, observations, plan, reports, scenario, team_briefing
+from backend import briefings, compliance, report_check, lightning, notify, nws, observations, plan, reports, scenario, team_briefing
 from backend.auth import current_user, rate_limit, require_supervisor
 from backend.db import connection
 
@@ -374,8 +374,19 @@ class ReportStatus(BaseModel):
 
 @app.patch("/crew-reports/{report_id}")
 def update_crew_report(report_id: uuid.UUID, body: ReportStatus, user=Depends(rate_limit("write", 60))):
-    """Supervisor closes (or reopens) a crew report. Closing also clears the site alert it raised."""
+    """Supervisor closes (or reopens) a crew report. Closing also clears the site alert it raised. Approving a report
+    that needs review (status=open) is for approved supervisors, and raises its site alert and notifications then."""
     with connection() as conn:
+        before = conn.execute("SELECT status, site_id, category, reported_at, description, photo_url FROM crew_reports "
+                              "WHERE report_id = %s", (report_id,)).fetchone()
+        if before and before["status"] == "needs_review" and body.status == "open":
+            if not user["can_supervise"]:
+                raise HTTPException(403, "Only an approved supervisor can approve a report that needs review.")
+            conn.execute("UPDATE crew_reports SET received_at = now(), review_reason = NULL WHERE report_id = %s",
+                         (report_id,))   # received now: the worker posts it to Discord/Slack
+            if before["site_id"]:
+                alert_for_report(conn, before["site_id"], before["category"], before["reported_at"],
+                                 before["description"], before["photo_url"])
         r = conn.execute("UPDATE crew_reports SET status = %(s)s, "
                          "resolved_at = CASE WHEN %(s)s = 'open' THEN NULL ELSE now() END, "
                          "resolved_by = CASE WHEN %(s)s = 'open' THEN NULL ELSE %(u)s::uuid END "
@@ -526,42 +537,58 @@ class CrewReport(BaseModel):
     site_id: int | None = None            # defaults to the nearest site within 10 miles
 
 
+def alert_for_report(conn, site_id, category, reported_at, description, photo_url):
+    """The site's warning for a crew report, open for 12 hours."""
+    conn.execute("SELECT raise_site_alert(%s, %s, 'warning', %s, NULL, %s, %s, %s)",
+                 (site_id, category, reported_at, "Crew report: " + (description or category.replace("_", " ")),
+                  reported_at + dt.timedelta(hours=12), photo_url))
+
+
 @app.post("/crew-reports", status_code=201)
 def create_crew_report(r: CrewReport, user=Depends(rate_limit("write", 60))):
-    """Save a crew hazard report and alert the site right away (warning, open for 12 hours). Sending the same
-    report_id again returns the saved report instead of a duplicate."""
-    cols = f"report_id, reported_at, site_id, category, status, {LATLON.format('geog')}"
+    """Save a crew hazard report and alert the site right away (warning, open for 12 hours). A report too vague to act
+    on, or that doesn't mention its hazard, is saved as needs_review (with review_reason) and alerts nobody until a
+    supervisor approves it; one with a photo or severity 4-5 always alerts at once (backend/report_check.py). Sending
+    the same report_id again, or the same text again within 10 minutes, returns the saved report, not a duplicate."""
+    cols = f"report_id, reported_at, site_id, category, status, review_reason, {LATLON.format('geog')}"
     with connection() as conn:
-        if not conn.execute("SELECT 1 FROM hazard_categories WHERE category = %s", (r.category,)).fetchone():
+        cat = conn.execute("SELECT label FROM hazard_categories WHERE category = %s", (r.category,)).fetchone()
+        if not cat:
             raise HTTPException(422, f"Unknown category {r.category!r}; see GET /hazard-categories")
         if r.report_id and (old := conn.execute(f"SELECT {cols} FROM crew_reports WHERE report_id = %s",
                                                 (r.report_id,)).fetchone()):
             return old
+        if (dup := conn.execute(f"SELECT {cols} FROM crew_reports WHERE user_id = %s AND category = %s "
+                                "AND lower(coalesce(description, '')) = lower(coalesce(%s, '')) AND status <> 'dismissed' "
+                                "AND received_at > now() - interval '10 minutes' ORDER BY received_at DESC LIMIT 1",
+                                (user["user_id"], r.category, r.description)).fetchone()):
+            return dup
+        reason = report_check.review_reason(r.category, r.description, r.photo_url, r.severity, cat["label"])
         report = conn.execute(
             f"""INSERT INTO crew_reports (report_id, reported_at, site_id, category, description, photo_url, geog,
-                                          reported_by, severity, user_id, reported_as)
+                                          reported_by, severity, user_id, reported_as, status, review_reason)
                 VALUES (coalesce(%(report_id)s, gen_random_uuid()),
                         least(now(), greatest(coalesce(%(reported_at)s, now()), now() - interval '24 hours')),
                         coalesce(%(site_id)s, (SELECT site_id FROM sites
                                                WHERE ST_DWithin(geog, ST_MakePoint(%(lon)s, %(lat)s)::geography, 16093)
                                                ORDER BY geog <-> ST_MakePoint(%(lon)s, %(lat)s)::geography LIMIT 1)),
                         %(category)s, %(description)s, %(photo_url)s, ST_MakePoint(%(lon)s, %(lat)s)::geography,
-                        coalesce(%(reported_by)s, %(user_name)s), %(severity)s, %(user_id)s, %(identity)s)
+                        coalesce(%(reported_by)s, %(user_name)s), %(severity)s, %(user_id)s, %(identity)s,
+                        %(status)s, %(reason)s)
                 RETURNING {cols}""",
-            {**r.model_dump(), "user_name": user["name"], "user_id": user["user_id"], "identity": user["identity"]}).fetchone()
-        if report["site_id"]:
-            conn.execute("SELECT raise_site_alert(%s, %s, 'warning', %s, NULL, %s, %s, %s)",
-                         (report["site_id"], r.category, report["reported_at"],
-                          "Crew report: " + (r.description or r.category.replace("_", " ")),
-                          report["reported_at"] + dt.timedelta(hours=12), r.photo_url))
+            {**r.model_dump(), "user_name": user["name"], "user_id": user["user_id"], "identity": user["identity"],
+             "status": "needs_review" if reason else "open", "reason": reason}).fetchone()
+        if report["site_id"] and not reason:
+            alert_for_report(conn, report["site_id"], r.category, report["reported_at"], r.description, r.photo_url)
         return report
 
 
 @app.get("/crew-reports")
 def crew_reports(site_id: int | None = None, category: str | None = None,
-                 status: Literal["open", "resolved", "dismissed"] | None = "open", limit: int = Query(100, le=1000)):
+                 status: Literal["open", "resolved", "dismissed", "needs_review"] | None = "open",
+                 limit: int = Query(100, le=1000)):
     return many(f"""SELECT report_id, reported_at, site_id, category, description, photo_url, reported_by, severity,
-                           status, resolved_at, {LATLON.format('geog')}
+                           status, review_reason, resolved_at, {LATLON.format('geog')}
                       FROM crew_reports
                      WHERE (%(site)s::bigint IS NULL OR site_id = %(site)s)
                        AND (%(category)s::text IS NULL OR category = %(category)s)
@@ -578,7 +605,7 @@ def hazard_pins(days: int = Query(1095, ge=1, le=3650)):
         SELECT 'crew' AS source, report_id::text AS id, reported_at AS at, category, status,
                coalesce(description, replace(category, '_', ' ')) AS title, photo_url, severity,
                {LATLON.format('geog')}
-          FROM crew_reports WHERE reported_at > now() - make_interval(days => %(days)s)
+          FROM crew_reports WHERE reported_at > now() - make_interval(days => %(days)s) AND status <> 'needs_review'
         UNION ALL
         SELECT 'osha', o.report_id::text, o.event_time,
                coalesce(o.weather_category, o.crew_categories[1], 'osha_inspection'), NULL,

@@ -87,7 +87,7 @@ export const api = {
   modelBacktest: () => request("/model/backtest"),
   setAssumption: (key, value) => request(`/economics/assumptions/${key}`, { method: "PUT", json: { value } }),
   plan: (h, ids) => request(`/plan/${h}?limit=50${ids ? `&site_ids=${ids.join(",")}` : ""}`, { timeout: 90000 }),
-  crewReports: (id) => request(`/crew-reports?site_id=${id}&status=open&limit=20`),
+  crewReports: (id, status = "open") => request(`/crew-reports?site_id=${id}&status=${status}&limit=20`),
   upload: (file) => {
     const form = new FormData();
     form.append("file", file);

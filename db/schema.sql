@@ -405,7 +405,7 @@ CREATE TABLE IF NOT EXISTS crew_reports (
     geog            geography(Point, 4326) NOT NULL,
     reported_by     text,
     severity        int CHECK (severity BETWEEN 1 AND 5),
-    status          text NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'resolved', 'dismissed')),
+    status          text NOT NULL DEFAULT 'open',      -- open / resolved / dismissed / needs_review (constraint below)
     resolved_at     timestamptz
 );
 CREATE INDEX IF NOT EXISTS crew_reports_geog_idx ON crew_reports USING gist (geog);
@@ -493,6 +493,10 @@ ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS user_id     uuid REFERENCES ap
 ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS resolved_by uuid REFERENCES app_users;
 ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS reported_as text CHECK (reported_as IN ('crew', 'supervisor'));
 ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS received_at timestamptz DEFAULT now();  -- reported_at can be earlier (sent from an offline queue)
+-- Reports too vague to act on wait for a supervisor (backend/report_check.py): no alert until approved.
+ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS review_reason text;
+ALTER TABLE crew_reports DROP CONSTRAINT IF EXISTS crew_reports_status_check;
+ALTER TABLE crew_reports ADD CONSTRAINT crew_reports_status_check CHECK (status IN ('open', 'resolved', 'dismissed', 'needs_review'));
 
 CREATE TABLE IF NOT EXISTS site_alerts (
     alert_id        bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

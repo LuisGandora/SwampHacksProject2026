@@ -222,3 +222,10 @@ assert _risk({"heat": True, "storm": True}, "FL", _a) == (20, 1000)           # 
 assert _risk({"heat": True, "storm": True, "rain": True}, "GA", _a) == (40, 2400)  # capped at a 10 h shift, US rate
 assert _risk({}, "FL", _a) == (0, 0)
 print("economics ok")
+
+# crew report check: vague or off-topic reports wait for a supervisor; photos and severity 4-5 always alert
+from backend.report_check import review_reason as _rr
+assert _rr("wildlife", "Yo jovon is here") and _rr("wildlife", "Stuff")
+assert _rr("wildlife", "Large alligator sunning by the east fence gate") is None
+assert _rr("wildlife", "Stuff", photo_url="https://x/p.jpg") is None and _rr("flooding", "help", severity=5) is None
+print("report check ok")

@@ -429,12 +429,14 @@ export default function App() {
                                 if (r.queued) {
                                   setQueuedCount((n) => n + 1);
                                   toast("No signal: report saved on this phone. It sends automatically when you're back online.");
+                                } else if (r.status === "needs_review") {
+                                  toast(`Report saved for a supervisor to review: ${r.review_reason}. Add a photo, more detail or severity 4–5 to alert the site right away.`);
                                 } else toast(`Report sent${r.site_id ? "; site alerted" : ""}. Thanks for keeping the crew safe.`);
                                 refreshAll();
                               }} />
             </section>
           ) : selected ? (
-            <SiteCard summary={selected} horizon={horizon} categories={categories} alerts={alerts} now={now}
+            <SiteCard summary={selected} identity={identity || "crew"} horizon={horizon} categories={categories} alerts={alerts} now={now}
                       alertsReliable={alertsReliable} lastAlertAt={lastAlertAt} onSelectNearby={select}
                       dev={health?.dev} refreshKey={refreshKey} onClose={() => setSelectedId(null)}
                       onReport={() => setCrewOpen(true)} onAiReport={() => setAiSite(selected)}

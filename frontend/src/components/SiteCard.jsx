@@ -21,10 +21,11 @@ function floodZoneText(d) {
 }
 
 export default function SiteCard({ summary, horizon, categories, alerts, now, alertsReliable, lastAlertAt, onSelectNearby, dev, onReport, onAiReport, onCompliance, saved, onToggleSave,
-                                   onChanged,
+                                   onChanged, identity,
                                    onScenario, onStrike, onClearScenario, refreshKey, onClose }) {
   const [detail, setDetail] = useState(null);
   const [crew, setCrew] = useState([]);
+  const [review, setReview] = useState([]);   // reports waiting for a supervisor (too vague to alert on their own)
   const [briefing, setBriefing] = useState(undefined);
   const [econ, setEcon] = useState(null);
   const [error, setError] = useState("");
@@ -32,19 +33,20 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, al
 
   useEffect(() => {
     let live = true, pending = false;
-    setDetail(null); setCrew([]); setError(""); setBriefing(undefined); setEcon(null);
+    setDetail(null); setCrew([]); setReview([]); setError(""); setBriefing(undefined); setEcon(null);
     const load = () => {
       if (pending) return;
       pending = true;
-      return Promise.all([api.site(id), api.crewReports(id)])
-      .then(([d, c]) => { if (live) { setDetail(d); setCrew(c); setError(""); } })
+      return Promise.all([api.site(id), api.crewReports(id),
+                          identity === "supervisor" ? api.crewReports(id, "needs_review") : Promise.resolve([])])
+      .then(([d, c, r]) => { if (live) { setDetail(d); setCrew(c); setReview(r); setError(""); } })
       .catch((e) => live && setError(`Site details and crew reports could not be refreshed. ${e.message}`))
       .finally(() => { pending = false; });
     };
     load();
     const interval = setInterval(load, 15000);
     return () => { live = false; clearInterval(interval); };
-  }, [id, refreshKey]);
+  }, [id, refreshKey, identity]);
 
   // Collapsible sections load their data the first time they're opened.
   const loadBriefing = (e) => e.target.open && briefing === undefined &&
@@ -260,6 +262,38 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, al
           </div>
         )}
       </details>
+
+      {review.length > 0 && (
+        <section>
+          <h4>Needs review ({review.length})</h4>
+          <p className="small muted">Too vague to alert the site on their own. Approve to raise the site alert and notify
+            channels; dismiss test or junk entries.</p>
+          <ul className="crew-list">
+            {review.map((c) => (
+              <li key={c.report_id}>
+                <div>
+                  <strong>{categoryLabel(c.category, categories)}</strong>
+                  {c.severity && <span className="muted small"> · severity {c.severity}/5</span>}
+                  <p className="small">{c.description || "No description"}</p>
+                  <p className="small warn">{c.review_reason}</p>
+                  <p className="small muted">{c.reported_by || "Crew"} · {new Date(c.reported_at).toLocaleString()}</p>
+                  <div className="row-actions">
+                    {[["open", "Approve"], ["dismissed", "Dismiss"]].map(([status, label]) => (
+                      <button key={status} className="link small" onClick={async () => {
+                        try {
+                          await api.setCrewReportStatus(c.report_id, status);
+                          setReview((list) => list.filter((x) => x.report_id !== c.report_id));
+                          onChanged?.();
+                        } catch (e) { setError(e.message); }
+                      }}>{label}</button>
+                    ))}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section>
         <h4>Crew reports ({crew.length})</h4>
