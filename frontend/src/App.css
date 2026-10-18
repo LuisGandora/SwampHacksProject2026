@@ -254,7 +254,7 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
 }
 
 /* ---------- compliance, model accuracy, live reasons ---------- */
-.live-reason { color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.live-reason { color: var(--accent); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .row-actions { display: flex; gap: 12px; margin-top: 2px; }
 .priority-list { padding-left: 18px; display: grid; gap: 12px; }
 .priority-head { display: flex; gap: 8px; align-items: center; }
@@ -380,4 +380,13 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
 }
 @media (max-width: 480px) {
   .app:not(.landing-mode) .maplibregl-ctrl-bottom-right { bottom: calc(58vh + 8px); }
+}
+/* Grid and flex children default to min-width: auto, so one long word or line could widen the whole card. */
+.score-tile, .dock > *, .site-card section, .alert-main, .crew-list li > div { min-width: 0; }
+.dock { overflow-x: hidden; }
+.site-card p, .alert p, .alert-main span { overflow-wrap: anywhere; }
+/* Medium screens: drop the sensor looks so the header stays one row and doesn't cover the panels. */
+@media (min-width: 1001px) and (max-width: 1400px) {
+  .hud-controls .seg { display: none; }
+  .hud-stats { gap: 10px; }
 }
