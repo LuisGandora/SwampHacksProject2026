@@ -59,7 +59,7 @@ export default function Landing({ sites = [], auth, place, setPlace, flyTo, onDo
 
   if (step === "welcome") return (
     <div className="landing">
-      <p className="eyebrow">PLANET CONTROL</p>
+      <p className="eyebrow">PLAN IT BY THE PLANET</p>
       <h1>Field hazard operations</h1>
       <p className="landing-intro">Live hazard levels, stop-work alerts and crew reports for power plant sites in Florida,
         Georgia and Alabama.</p>

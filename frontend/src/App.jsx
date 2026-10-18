@@ -312,7 +312,7 @@ export default function App() {
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">◎</span>
           <div>
-            <h1>PLANET CONTROL</h1>
+            <h1>PLAN IT BY THE PLANET</h1>
             <p className="mono small">FIELD HAZARD OPS · FL / GA / AL</p>
           </div>
         </div>

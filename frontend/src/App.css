@@ -54,7 +54,7 @@ code { font-family: var(--mono); background: var(--surface-3); padding: 1px 5px;
        padding: 8px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .brand { display: flex; align-items: center; gap: 10px; }
-.brand h1 { font: 700 15px var(--mono); letter-spacing: 0.22em; color: var(--accent); }
+.brand h1 { font: 700 15px var(--mono); letter-spacing: 0.16em; color: var(--accent); white-space: nowrap; }
 .brand p { margin: 0; color: var(--muted); letter-spacing: 0.1em; font-size: 10px; }
 .brand-mark { font-size: 22px; color: var(--accent); text-shadow: 0 0 12px rgba(95, 211, 255, .7); }
 .hud-stats { display: flex; gap: 14px; flex-wrap: wrap; flex: 1; justify-content: center; letter-spacing: 0.06em; }
