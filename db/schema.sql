@@ -86,7 +86,7 @@ UPDATE hazard_categories h SET nws_warn_events = d.warn, nws_stop_events = d.sto
                      '{"Flash Flood Warning","Flash Flood Emergency"}'),
     ('extreme_heat', '{"Heat Advisory","Excessive Heat Watch","Extreme Heat Watch"}',
                      '{"Excessive Heat Warning","Extreme Heat Warning"}'),
-    ('extreme_cold', '{"Frost Advisory","Freeze Watch","Freeze Warning","Hard Freeze Watch","Hard Freeze Warning","Cold Weather Advisory","Wind Chill Advisory","Winter Weather Advisory","Winter Storm Watch"}',
+    ('extreme_cold', '{"Cold Weather Advisory","Wind Chill Advisory","Winter Weather Advisory","Winter Storm Watch"}',  -- frost/freeze products are for crops
                      '{"Extreme Cold Warning","Wind Chill Warning","Winter Storm Warning","Ice Storm Warning","Blizzard Warning"}'),
     ('high_wind',    '{"Wind Advisory","High Wind Watch"}', '{"High Wind Warning"}'),
     ('wildfire',     '{"Red Flag Warning","Fire Weather Watch"}', '{"Fire Warning"}'),

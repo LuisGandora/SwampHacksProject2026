@@ -86,7 +86,7 @@ def hazard_categories():
 
 @app.get("/sites")
 def sites(state: str | None = None, horizon: Literal["now", "next_day"] = "next_day",
-          limit: int = Query(1000, le=1000)):
+          limit: int = Query(5000, le=5000)):
     """Dashboard ranking by hazard index for the chosen horizon (today or tomorrow), then active alerts.
     Today's score includes the live floor (active stop-work alert 8, warning 5, crew report 4) with its reason;
     model_score is the forecast model alone. percentile = where the score sits in this site's normal range for the

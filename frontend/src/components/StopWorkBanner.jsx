@@ -3,17 +3,27 @@ import { alertTiming, categoryLabel, countdown } from "../hazard.js";
 
 // The brief's #1 rule, impossible to miss: a full-width STOP WORK screen with the all-clear countdown, which flashes
 // "restarted" whenever a new strike pushes the all-clear back. Shows the selected site's stop-work alert if it has
-// one, else the newest. Minimizing hides it until that alert restarts or another site stops work.
+// one, else the newest. Close (✕) hides every stop-work alert showing now, for this browser session; it comes back for
+// a new stop-work alert, or when a new lightning strike restarts a countdown. They stay in Live alerts either way.
+const closedKey = (a) => (a.category === "lightning" ? `${a.alert_id}@${a.all_clear_at}` : String(a.alert_id));
+const readClosed = () => { try { return new Set(JSON.parse(sessionStorage.getItem("planit.stopwork.closed") || "[]")); } catch { return new Set(); } };
+
 export default function StopWorkBanner({ alerts, selectedId, now, categories, onSelect, reliable = false }) {
-  const stops = alerts.filter((a) => a.level === "stop_work")
+  const [closed, setClosed] = useState(readClosed);
+  const allStops = alerts.filter((a) => a.level === "stop_work")
     .sort((a, b) => new Date(b.last_trigger_at) - new Date(a.last_trigger_at));
+  const stops = allStops.filter((x) => !closed.has(closedKey(x)));
   const a = stops.find((x) => x.site_id === selectedId) || stops[0];
-  const [hidden, setHidden] = useState(null);      // "alert_id@all_clear_at" the user minimized
+  const closeAll = () => {
+    const next = new Set([...closed, ...stops.map(closedKey)]);
+    setClosed(next);
+    try { sessionStorage.setItem("planit.stopwork.closed", JSON.stringify([...next].slice(-500))); } catch { /* private mode */ }
+  };
   const [restarted, setRestarted] = useState(false);
   const lastClear = useRef({});
 
   useEffect(() => {  // detect a countdown restart: the same alert's all-clear moved later
-    stops.forEach((x) => {
+    allStops.forEach((x) => {   // include closed ones, so a new strike on a closed alert still flashes "restarted"
       const prev = lastClear.current[x.alert_id];
       if (x.category === "lightning" && x.alert_id === a?.alert_id && prev && x.all_clear_at && new Date(x.all_clear_at) > new Date(prev)) {
         setRestarted(true);
@@ -24,7 +34,7 @@ export default function StopWorkBanner({ alerts, selectedId, now, categories, on
     });
   }, [alerts]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!a || hidden === `${a.alert_id}@${a.all_clear_at}`) return null;
+  if (!a) return null;
   const left = countdown(a.all_clear_at, now.getTime());
   const total = a.all_clear_at && (new Date(a.all_clear_at) - new Date(a.last_trigger_at)) / 1000;
   const remaining = a.all_clear_at ? Math.max(0, (new Date(a.all_clear_at) - now) / 1000) : null;
@@ -56,7 +66,8 @@ export default function StopWorkBanner({ alerts, selectedId, now, categories, on
         {others.length > 0 && (
           <button className="small" onClick={() => onSelect(others[0].site_id)}>+{others.length} more site{others.length > 1 ? "s" : ""}</button>
         )}
-        <button className="icon-btn" onClick={() => setHidden(`${a.alert_id}@${a.all_clear_at}`)} aria-label="Minimize">▁</button>
+        <button className="stopwork-close" onClick={closeAll} aria-label="Close stop-work alerts"
+                title="Close (they stay in Live alerts; a new stop-work alert or strike shows again)">✕ Close</button>
       </div>
     </section>
   );

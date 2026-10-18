@@ -69,7 +69,7 @@ export const api = {
   health: () => request("/health"),
   dataStatus: () => request("/data-status"),
   categories: () => request("/hazard-categories"),
-  sites: (horizon) => request(`/sites?horizon=${horizon}&limit=1000`),
+  sites: (horizon) => request(`/sites?horizon=${horizon}&limit=5000`),
   site: (id) => request(`/sites/${id}`),
   forecast: (id) => request(`/sites/${id}/forecast?hours=48`),
   weather: (id, refresh = false) => request(`/sites/${id}/weather${refresh ? "?refresh=true" : ""}`, { timeout: 90000 }),

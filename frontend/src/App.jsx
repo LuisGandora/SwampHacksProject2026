@@ -96,7 +96,15 @@ export default function App() {
   const starBusy = useRef(false);                            // one save/unsave at a time (double clicks)
   const [identity, setIdentityState] = useState(null);       // "crew" | "supervisor", remembered per account
   const [briefing, setBriefing] = useState(null);            // { kind: "start" | "6pm" } while the briefing screen is open
-  const shown6pm = useRef("");                               // the day the supervisor's 6 PM screen last popped up
+  const shown6pm = useRef("");
+  const hud = useRef(null);                                  // the header: banners sit just below its real height
+  useEffect(() => {
+    const el = hud.current;
+    if (!el || !window.ResizeObserver) return;
+    const ro = new ResizeObserver(() => document.documentElement.style.setProperty("--hud-bottom", `${el.offsetTop + el.offsetHeight}px`));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);                               // the day the supervisor's 6 PM screen last popped up
 
   const toast = useCallback((text, kind = "info") => {
     const id = Math.random();
@@ -301,7 +309,7 @@ export default function App() {
                 pins={showPins ? pins : null} warnings={warnOn ? warnings : null} radar={radar} me={me} sensor={sensor} basemap={basemap} />
       {sensor === "crt" && <div className="scanlines" aria-hidden="true" />}
 
-      <header className="hud">
+      <header className="hud" ref={hud}>
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">◎</span>
           <div>

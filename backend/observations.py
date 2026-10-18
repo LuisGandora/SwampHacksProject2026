@@ -21,6 +21,8 @@ WITH latest AS (
 ), v AS (
     SELECT site_id, observed_at, 'extreme_heat'::text AS category, heat_index_f AS value FROM latest
     UNION ALL SELECT site_id, observed_at, 'extreme_cold', coalesce(wind_chill_f, temp_f) FROM latest
+     WHERE site_id IN (SELECT site_id FROM sites WHERE coverage = 'full')   -- 32/15 F are Southeast limits; elsewhere
+                                                                            -- NWS cold products (local criteria) decide
     UNION ALL SELECT site_id, observed_at, 'high_wind', wind_mph FROM latest   -- sustained
     UNION ALL SELECT site_id, observed_at, 'dense_fog', visibility_mi FROM latest
 ), lv AS (

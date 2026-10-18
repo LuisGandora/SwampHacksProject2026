@@ -99,7 +99,7 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, al
                     reliable={alertsReliable} lastUpdated={lastAlertAt} onSelect={onSelectNearby} />
 
       <p className="small muted">{SCORE_EXPLANATION}</p>
-      {!scoreIsCurrent(summary, horizon, now) && <p className="warn small" role="status">
+      {summary.coverage !== "live" && !scoreIsCurrent(summary, horizon, now) && <p className="warn small" role="status">
         Score date is out of date or unavailable for {horizon === "now" ? "today" : "tomorrow"}.
         {summary.scored_for && ` Scored for ${new Date(summary.scored_for).toLocaleString()}.`} Check live conditions before work.
       </p>}
@@ -110,7 +110,7 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, al
             <div key={label} className="score-tile" style={{ borderColor: b.color }}>
               <span className="muted small">{label}</span>
               <strong className="big">{fmtScore(s)}<small>/10</small></strong>
-              {!scoreIsCurrent({ ...summary, scored_for: label === "Today" ? summary.score_now_for : summary.score_next_day_for },
+              {summary.coverage !== "live" && !scoreIsCurrent({ ...summary, scored_for: label === "Today" ? summary.score_now_for : summary.score_next_day_for },
                 label === "Today" ? "now" : "next_day", now) && <span className="warn small">Score date unverified</span>}
               <span className="band-label"><i className="dot" style={{ background: b.color }} />{b.label}</span>
               {floor != null && floor >= s && (
