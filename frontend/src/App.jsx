@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API, api, setActiveRole, setTokenGetter } from "./api.js";
+import { API, api, setActiveRole, setCacheUser, setTokenGetter } from "./api.js";
 import { useAuth } from "./auth.js";
 import { flush, queued } from "./offlineQueue.js";
 import AlertsPanel from "./components/AlertsPanel.jsx";
@@ -9,6 +9,8 @@ import NotifyModal from "./components/NotifyModal.jsx";
 import StopWorkBanner from "./components/StopWorkBanner.jsx";
 import MapLayers from "./components/MapLayers.jsx";
 import AccountMenu from "./components/AccountMenu.jsx";
+import PlanModal from "./components/PlanModal.jsx";
+import BriefingScreen from "./components/BriefingScreen.jsx";
 import CrewReportForm from "./components/CrewReportForm.jsx";
 import GlobeMap from "./components/GlobeMap.jsx";
 import RankingPanel from "./components/RankingPanel.jsx";
@@ -72,9 +74,12 @@ export default function App() {
   const [landingPlace, setLandingPlace] = useState(null); // starting point picked on the landing page
   const [reopened, setReopened] = useState(false);          // the 🧭 Location button skips the welcome step
   const [accountOpen, setAccountOpen] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
   const [saved, setSaved] = useState([]);                    // your saved locations (signed in)
   const starBusy = useRef(false);                            // one save/unsave at a time (double clicks)
   const [identity, setIdentityState] = useState(null);       // "crew" | "supervisor", remembered per account
+  const [briefing, setBriefing] = useState(null);            // { kind: "start" | "6pm" } while the briefing screen is open
+  const shown6pm = useRef("");                               // the day the supervisor's 6 PM screen last popped up
 
   const toast = useCallback((text, kind = "info") => {
     const id = Math.random();
@@ -83,6 +88,7 @@ export default function App() {
   }, []);
 
   useEffect(() => { const id = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(id); }, []);
+  useEffect(() => { setCacheUser(auth.user?.sub); }, [auth.user?.sub]);
   useEffect(() => { setTokenGetter(auth.enabled && auth.isAuthenticated ? auth.getToken : null); },
             [auth.enabled, auth.isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
   const identityKey = `planit.identity.${auth.user?.sub || "local"}`;
@@ -215,6 +221,21 @@ export default function App() {
     refreshAll();
   };
 
+  // Your briefing: pops up for supervisors at 6 PM local, once a day, and replays (Account → Replay 6 PM briefing)
+  // until the next 6 PM. "Run again" inside rebuilds it. 🧪 Briefing (demo mode only) opens it any time for debugging.
+  const canBrief = auth.isAuthenticated || (!auth.enabled && !!health?.dev);
+  const sixKey = `planit.brief6pm.${auth.user?.sub || "local"}`;
+  const due6pm = () => {
+    const today = new Date().toDateString();
+    if (identity !== "supervisor" || new Date().getHours() < 18 || shown6pm.current === today) return false;
+    try { if (localStorage.getItem(sixKey) === today) { shown6pm.current = today; return false; } localStorage.setItem(sixKey, today); }
+    catch { /* private mode: the ref still keeps it to once per session */ }
+    shown6pm.current = today;
+    return true;
+  };
+  useEffect(() => { if (canBrief && focus && due6pm()) setBriefing({ kind: "6pm" }); },
+            [now.getMinutes(), identity, focus, canBrief]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const counts = { stop: alerts.filter((a) => a.level === "stop_work").length, warn: alerts.filter((a) => a.level === "warning").length };
   const online = health && !apiError;
 
@@ -287,8 +308,13 @@ export default function App() {
               {auth.enabled && (
                 <span className={`identity-chip ${identity === "supervisor" ? "sup" : ""}`}>{identity === "supervisor" ? "Supervisor" : "Crew"}</span>
               )}
+              {health?.dev && canBrief && focus && (  // debugging only: hidden unless PLANIT_DEV=1 (never on the public site)
+                <button className="small" onClick={() => setBriefing({ kind: now.getHours() >= 18 ? "6pm" : "start" })}
+                        title="Debug: open the briefing now (demo mode only)">🧪<span className="hide-sm"> Briefing</span></button>
+              )}
             </>
           )}
+          <button className="primary" onClick={() => setPlanOpen(true)} title="Where to focus attention and resources first">📋<span className="hide-sm"> Plan</span></button>
           <button onClick={() => setModelOpen(true)} title="Model accuracy (backtest)" aria-label="Model accuracy">📈<span className="hide-sm"> Model</span></button>
           <button onClick={() => globe.current?.flyHome()} title="North America" aria-label="Show North America">🌎</button>
           <button onClick={() => globe.current?.flySites()} title="All sites" aria-label="Show all sites">◎<span className="hide-sm"> Sites</span></button>
@@ -386,11 +412,19 @@ export default function App() {
       {aiSite && <ReportModal site={aiSite} categories={categories} onClose={() => setAiSite(null)} />}
       {complianceSite && <ComplianceModal site={complianceSite} categories={categories} onClose={() => setComplianceSite(null)} />}
       {modelOpen && <ModelModal onClose={() => setModelOpen(false)} />}
+      {planOpen && <PlanModal sites={visibleSites} categories={categories} onSelect={select} onClose={() => setPlanOpen(false)}
+                             identity={identity || "crew"} />}
+      {briefing && focus && (
+        <BriefingScreen key={`${identity}:${JSON.stringify(focus)}`} focus={focus} kind={briefing.kind} identity={identity || "crew"}
+                        onSelect={select} onClose={() => setBriefing(null)} toast={toast}
+                        onNotify={() => { setBriefing(null); setNotifyOpen(true); }} />
+      )}
       {accountOpen && auth.enabled && auth.isAuthenticated && (
         <AccountMenu auth={auth} categories={categories} saved={saved} onSavedChange={loadSaved}
                      identity={identity || "crew"} onIdentity={setIdentity}
+                     onBriefing={focus ? () => { setAccountOpen(false); setBriefing({ kind: "6pm" }); } : null}
                      onClose={() => setAccountOpen(false)}
-                     onGoTo={(l) => { setAccountOpen(false); handleLandingDone({ lat: l.lat, lon: l.lon, radius: Number(l.radius_mi) }); }} />
+                     onGoTo={(l) => { setAccountOpen(false); handleLandingDone({ lat: l.lat, lon: l.lon, radius: Number(l.radius_mi), label: l.name }); }} />
       )}
       {notifyOpen && <NotifyModal sites={sites} selected={selected} onClose={() => setNotifyOpen(false)} />}
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api.js";
-import { categoryLabel } from "../hazard.js";
+import { categoryLabel, replayNote } from "../hazard.js";
 
 const LEVEL = { high: "badge--stop", medium: "badge--warn", low: "badge--live" };
 
@@ -105,6 +105,7 @@ export default function ComplianceModal({ site, categories, onClose }) {
                 {data.verified ? "✓ Every number matches the facts" : `⚠ Numbers not in the facts: ${data.unverified_numbers.join(", ")}`}
               </span>
               <span>{r.disclaimer}</span>
+              <span>{replayNote(data)}</span>
               <button className="link" onClick={() => load(true)}>Regenerate</button>
             </footer>
           </div>

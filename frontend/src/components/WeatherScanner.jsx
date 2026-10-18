@@ -49,6 +49,12 @@ export default function WeatherScanner({ siteId, timezone, refreshKey }) {
           `⚡ Nearest lightning ${bolt.nearest_mi} mi ${bolt.direction}, ${minutesAgo} min ago · ` +
           `${bolt.within_10_mi} strikes within 10 mi, ${bolt.within_20_mi} within 20 mi`}
       </p>
+      {w.coast && (
+        <p className={`small ${w.coast.flooding ? "stop" : ""}`}>
+          🌊 Tide at {w.coast.name} ({w.coast.miles} mi): {w.coast.above_high_tide_ft >= 0 ? "+" : ""}{w.coast.above_high_tide_ft} ft vs a normal
+          high tide; flooding starts at +{w.coast.minor_flood_above_high_tide_ft} ft{w.coast.flooding ? " · FLOODING NOW" : ""} (NOAA Tides & Currents)
+        </p>
+      )}
       <ForecastChart rows={rows} timezone={timezone} title="Past 7 days (measured) · next 7 days (NWS forecast)"
                      nowIndex={w.past_hours.length} />
       <div className="table-wrap">

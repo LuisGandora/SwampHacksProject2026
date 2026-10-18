@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api.js";
-import { categoryLabel } from "../hazard.js";
+import { categoryLabel, replayNote } from "../hazard.js";
 
 const CALL = {
   go: { label: "GO", icon: "✓", cls: "call--go" },
@@ -107,7 +107,7 @@ export default function ReportModal({ site, categories, onClose }) {
               <span className={data.verified ? "ok" : "warn"}>
                 {data.verified ? "✓ Every number matches the facts" : `⚠ Numbers not in the facts: ${data.unverified_numbers.join(", ")}`}
               </span>
-              <span>{new Date(data.created_at).toLocaleString()}</span>
+              <span>{replayNote(data)}</span>
               <button className="link" onClick={() => load(true)}>Regenerate</button>
             </footer>
           </div>
