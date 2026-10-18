@@ -18,7 +18,7 @@ function floodZoneText(d) {
   return `FEMA flood zone ${d.fema_flood_zone}: minimal flood hazard`;
 }
 
-export default function SiteCard({ summary, horizon, categories, alerts, now, dev, onReport, onAiReport, onCompliance,
+export default function SiteCard({ summary, horizon, categories, alerts, now, dev, onReport, onAiReport, onCompliance, saved, onToggleSave,
                                    onChanged,
                                    onScenario, onStrike, onClearScenario, refreshKey, onClose }) {
   const [detail, setDetail] = useState(null);
@@ -66,7 +66,12 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
           <p className={`small ${coordCls}`}>{coordText}</p>
           {detail?.fema_flood_zone && <p className={`small ${detail.fema_sfha ? "warn" : "muted"}`}>{floodZoneText(detail)}</p>}
         </div>
-        <button className="icon-btn" onClick={onClose} aria-label="Close site">✕</button>
+        <div className="card-head-actions">
+          <button className={`icon-btn star ${saved ? "on" : ""}`} onClick={onToggleSave} aria-pressed={!!saved}
+                  title={saved ? "Saved: click to remove" : "Save this location (6 PM briefing for plants within 25 mi)"}
+                  aria-label={saved ? "Remove from saved locations" : "Save this location"}>{saved ? "★" : "☆"}</button>
+          <button className="icon-btn" onClick={onClose} aria-label="Close site">✕</button>
+        </div>
       </header>
 
       <div className="score-tiles">
@@ -263,6 +268,15 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
                         } catch (e) { setError(e.message); }
                       }}>{status === "resolved" ? "Mark resolved" : "Dismiss"}</button>
                     ))}
+                    <button className="link small" title="Delete the report, its alert and photo (yours, or any if you're a supervisor)"
+                            onClick={async () => {
+                              if (!window.confirm("Delete this report? This can't be undone.")) return;
+                              try {
+                                await api.deleteCrewReport(c.report_id);
+                                setCrew((list) => list.filter((x) => x.report_id !== c.report_id));
+                                onChanged?.();
+                              } catch (e) { setError(e.message); }
+                            }}>Delete</button>
                   </div>
                 </div>
               </li>

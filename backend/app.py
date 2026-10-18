@@ -30,7 +30,7 @@ app = FastAPI(title="PlanIT Control API")
 # Only the dashboard's own origins may call the API from a browser (CORS_ORIGINS, comma separated).
 app.add_middleware(CORSMiddleware, allow_origins=os.environ.get(
                        "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(","),
-                   allow_methods=["GET", "POST", "PATCH", "DELETE"], allow_headers=["Authorization", "Content-Type"])
+                   allow_methods=["GET", "POST", "PATCH", "DELETE"], allow_headers=["Authorization", "Content-Type", "X-Planit-Role"])
 
 # Crew photos are stored on this server's disk and served from /uploads.
 # ponytail: local disk only, switch to S3/R2 when the API runs on more than one machine.
@@ -298,6 +298,14 @@ def site_compliance(site_id: int, refresh: bool = False, user=Depends(rate_limit
     return r
 
 
+def clear_report_alert(conn, site_id, reported_at):
+    """Close the site alert a crew report raised. The report may have opened it or extended an alert that was already
+    open (e.g. an iNaturalist sighting), so match its trigger time too; a real sighting is re-raised by its job."""
+    conn.execute("UPDATE site_alerts SET cleared_at = now() WHERE site_id = %s AND cleared_at IS NULL "
+                 "AND message LIKE '%%Crew report:%%' AND (started_at = %s OR last_trigger_at = %s)",
+                 (site_id, reported_at, reported_at))
+
+
 class ReportStatus(BaseModel):
     status: Literal["open", "resolved", "dismissed"]
 
@@ -314,9 +322,25 @@ def update_crew_report(report_id: uuid.UUID, body: ReportStatus, user=Depends(ra
         if r is None:
             raise HTTPException(404, "Not found")
         if body.status != "open":
-            conn.execute("UPDATE site_alerts SET cleared_at = now() WHERE site_id = %s AND started_at = %s "
-                         "AND message LIKE 'Crew report:%%' AND cleared_at IS NULL", (r["site_id"], r["reported_at"]))
+            clear_report_alert(conn, r["site_id"], r["reported_at"])
     return r
+
+
+@app.delete("/crew-reports/{report_id}", status_code=204)
+def delete_crew_report(report_id: uuid.UUID, user=Depends(rate_limit("write", 60))):
+    """Remove a crew report, the site alert it raised and its photo: your own reports, or any if you're a supervisor.
+    (To keep a record instead, close it with PATCH status=resolved or dismissed.)"""
+    with connection() as conn:
+        r = conn.execute("SELECT site_id, reported_at, user_id, photo_url FROM crew_reports WHERE report_id = %s",
+                         (report_id,)).fetchone()
+        if r is None:
+            raise HTTPException(404, "Not found")
+        if r["user_id"] != user["user_id"] and not user["can_supervise"]:
+            raise HTTPException(403, "You can delete your own reports; supervisors can delete any.")
+        clear_report_alert(conn, r["site_id"], r["reported_at"])
+        conn.execute("DELETE FROM crew_reports WHERE report_id = %s", (report_id,))
+    if r["photo_url"] and "/uploads/" in r["photo_url"]:  # our own upload: just the file name, never a path
+        (UPLOADS / Path(r["photo_url"].rsplit("/", 1)[-1]).name).unlink(missing_ok=True)
 
 
 @app.get("/model/backtest")
@@ -416,16 +440,16 @@ def create_crew_report(r: CrewReport, user=Depends(rate_limit("write", 60))):
             return old
         report = conn.execute(
             f"""INSERT INTO crew_reports (report_id, reported_at, site_id, category, description, photo_url, geog,
-                                          reported_by, severity, user_id)
+                                          reported_by, severity, user_id, reported_as)
                 VALUES (coalesce(%(report_id)s, gen_random_uuid()),
                         least(now(), greatest(coalesce(%(reported_at)s, now()), now() - interval '24 hours')),
                         coalesce(%(site_id)s, (SELECT site_id FROM sites
                                                WHERE ST_DWithin(geog, ST_MakePoint(%(lon)s, %(lat)s)::geography, 16093)
                                                ORDER BY geog <-> ST_MakePoint(%(lon)s, %(lat)s)::geography LIMIT 1)),
                         %(category)s, %(description)s, %(photo_url)s, ST_MakePoint(%(lon)s, %(lat)s)::geography,
-                        coalesce(%(reported_by)s, %(user_name)s), %(severity)s, %(user_id)s)
+                        coalesce(%(reported_by)s, %(user_name)s), %(severity)s, %(user_id)s, %(identity)s)
                 RETURNING {cols}""",
-            {**r.model_dump(), "user_name": user["name"], "user_id": user["user_id"]}).fetchone()
+            {**r.model_dump(), "user_name": user["name"], "user_id": user["user_id"], "identity": user["identity"]}).fetchone()
         if report["site_id"]:
             conn.execute("SELECT raise_site_alert(%s, %s, 'warning', %s, NULL, %s, %s, %s)",
                          (report["site_id"], r.category, report["reported_at"],
@@ -472,7 +496,87 @@ def hazard_pins(days: int = Query(1095, ge=1, le=3650)):
 @app.get("/me")
 def me(user=Depends(current_user)):
     """The signed-in user (created on first sign-in)."""
-    return {k: user[k] for k in ("user_id", "name", "email", "role", "created_at")}
+    return {k: user[k] for k in ("user_id", "name", "email", "role", "created_at", "identity", "supervisor_approved",
+                                 "can_supervise")}
+
+
+class SavedLocation(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    radius_mi: float = Field(50, ge=1, le=300)
+    site_id: int | None = None   # set when saved from a site card (the ☆ toggle)
+
+
+LOCATION_COLS = f"""l.location_id, l.name, l.radius_mi, l.created_at, l.site_id, {LATLON.format('l.geog')},
+    (SELECT count(*) FROM sites s WHERE ST_DWithin(s.geog, l.geog, l.radius_mi * 1609.344)) AS plants,
+    b.briefing_date, b.summary AS briefing, b.sent_at AS briefing_at"""
+LOCATION_BRIEF = """LEFT JOIN LATERAL (SELECT * FROM location_briefings WHERE location_id = l.location_id
+                                       ORDER BY briefing_date DESC LIMIT 1) b ON true"""
+
+
+@app.get("/me/locations")
+def my_locations(user=Depends(current_user)):
+    """Your saved locations, each with its plant count and latest 6 PM briefing."""
+    return many(f"SELECT {LOCATION_COLS} FROM saved_locations l {LOCATION_BRIEF} WHERE l.user_id = %s "
+                "AND l.identity = %s ORDER BY l.created_at", (user["user_id"], user["identity"]))
+
+
+@app.post("/me/locations", status_code=201)
+def save_location(loc: SavedLocation, user=Depends(rate_limit("write", 60))):
+    """Save a starting point. At 6 PM local it gets a briefing for the plants within radius_mi, sent to your
+    Discord/Slack channels that include 6 PM briefings."""
+    with connection() as conn:
+        # the same spot (within 50 m) saved again: keep the one row, with the new name and radius
+        same = conn.execute("UPDATE saved_locations SET name = %s, radius_mi = %s, site_id = coalesce(%s, site_id) "
+                            "WHERE location_id = (SELECT location_id FROM saved_locations WHERE user_id = %s AND identity = %s "
+                            "AND ST_DWithin(geog, ST_MakePoint(%s, %s)::geography, 50) LIMIT 1) RETURNING location_id",
+                            (loc.name.strip(), loc.radius_mi, loc.site_id, user["user_id"], user["identity"], loc.lon,
+                             loc.lat)).fetchone()
+        if same:
+            return conn.execute(f"SELECT {LOCATION_COLS} FROM saved_locations l {LOCATION_BRIEF} WHERE l.location_id = %s",
+                                (same["location_id"],)).fetchone()
+        if conn.execute("SELECT count(*) AS n FROM saved_locations WHERE user_id = %s AND identity = %s",
+                        (user["user_id"], user["identity"])).fetchone()["n"] >= 20:
+            raise HTTPException(409, "You already have 20 saved locations; delete one first.")
+        lid = conn.execute("INSERT INTO saved_locations (user_id, identity, name, geog, radius_mi, site_id) "
+                           "VALUES (%s, %s, %s, ST_MakePoint(%s, %s)::geography, %s, %s) "
+                           "ON CONFLICT (user_id, identity, site_id) WHERE site_id IS NOT NULL DO UPDATE SET name = EXCLUDED.name "
+                           "RETURNING location_id",
+                           (user["user_id"], user["identity"], loc.name.strip(), loc.lon, loc.lat, loc.radius_mi,
+                            loc.site_id)).fetchone()["location_id"]
+        return conn.execute(f"SELECT {LOCATION_COLS} FROM saved_locations l {LOCATION_BRIEF} WHERE l.location_id = %s",
+                            (lid,)).fetchone()
+
+
+@app.delete("/me/locations/{location_id}", status_code=204)
+def delete_location(location_id: int, user=Depends(rate_limit("write", 60))):
+    with connection() as conn:
+        if not conn.execute("DELETE FROM saved_locations WHERE location_id = %s AND user_id = %s RETURNING 1",
+                            (location_id, user["user_id"])).fetchone():
+            raise HTTPException(404, "Not found")
+
+
+@app.get("/me/reports")
+def my_reports(limit: int = Query(50, le=200), user=Depends(current_user)):
+    """Crew reports you sent, newest first, with their site and whether a supervisor closed them."""
+    return many(f"""SELECT r.report_id, r.reported_at, r.category, r.description, r.photo_url, r.severity, r.status,
+                           r.resolved_at, r.site_id, s.name AS site_name, {LATLON.format('r.geog')}
+                      FROM crew_reports r LEFT JOIN sites s USING (site_id)
+                     WHERE r.user_id = %s AND coalesce(r.reported_as, 'crew') = %s
+                     ORDER BY r.reported_at DESC LIMIT %s""", (user["user_id"], user["identity"], limit))
+
+
+@app.post("/me/locations/{location_id}/briefing")
+def location_briefing_now(location_id: int, user=Depends(rate_limit("ai", 10))):
+    """Write tomorrow's briefing for a saved location now (normally 6 PM local). It's also sent to your channels."""
+    with connection() as conn:
+        day = conn.execute("""SELECT (now() AT TIME ZONE tz.timezone)::date + 1 AS d FROM saved_locations l
+                              CROSS JOIN LATERAL (SELECT timezone FROM sites ORDER BY geog <-> l.geog LIMIT 1) tz
+                              WHERE l.location_id = %s AND l.user_id = %s""", (location_id, user["user_id"])).fetchone()
+        if day is None:
+            raise HTTPException(404, "Not found")
+        return {"briefing_date": day["d"], "summary": briefings.save_location_briefing(conn, location_id, day["d"])}
 
 
 CHANNEL_COLS = ("channel_id, kind, label, webhook_hint, levels, site_ids, briefings, crew_reports, created_at, "
@@ -491,8 +595,8 @@ class Channel(BaseModel):
 @app.get("/me/channels")
 def my_channels(user=Depends(current_user)):
     """Your Discord/Slack channels (webhook URLs are never returned, only their last 4 characters)."""
-    return many(f"SELECT {CHANNEL_COLS} FROM notification_channels WHERE user_id = %s ORDER BY channel_id",
-                (user["user_id"],))
+    return many(f"SELECT {CHANNEL_COLS} FROM notification_channels WHERE user_id = %s AND identity = %s ORDER BY channel_id",
+                (user["user_id"], user["identity"]))
 
 
 @app.post("/me/channels", status_code=201)
@@ -510,13 +614,13 @@ def add_channel(c: Channel, user=Depends(rate_limit("write", 60))):
     except RuntimeError as e:
         raise HTTPException(503, str(e))
     with connection() as conn:
-        if conn.execute("SELECT count(*) AS n FROM notification_channels WHERE user_id = %s",
-                        (user["user_id"],)).fetchone()["n"] >= 10:
+        if conn.execute("SELECT count(*) AS n FROM notification_channels WHERE user_id = %s AND identity = %s",
+                        (user["user_id"], user["identity"])).fetchone()["n"] >= 10:
             raise HTTPException(409, "You already have 10 channels; delete one first.")
         return conn.execute(
-            f"INSERT INTO notification_channels (user_id, kind, label, webhook_encrypted, webhook_hint, levels, "
-            f"site_ids, briefings, crew_reports) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING {CHANNEL_COLS}",
-            (user["user_id"], kind, c.label, secret, url[-4:], sorted(set(c.levels)), c.site_ids, c.briefings,
+            f"INSERT INTO notification_channels (user_id, identity, kind, label, webhook_encrypted, webhook_hint, levels, "
+            f"site_ids, briefings, crew_reports) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING {CHANNEL_COLS}",
+            (user["user_id"], user["identity"], kind, c.label, secret, url[-4:], sorted(set(c.levels)), c.site_ids, c.briefings,
              c.crew_reports)).fetchone()
 
 

@@ -16,6 +16,8 @@ envVarGroups:
         sync: false
       - key: NWS_USER_AGENT         # "Planet Control (team contact email)"
         sync: false
+      - key: SUPERVISOR_EMAILS      # who may use supervisor powers, comma separated
+        sync: false
 
 services:
   - type: web

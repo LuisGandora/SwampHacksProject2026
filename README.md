@@ -560,6 +560,7 @@ python -m backend.test_backend         # parsing and threshold checks (no networ
 | `DATABASE_URL` | everything (or put it in `.env`) | (none) |
 | `NWS_USER_AGENT` | NWS API etiquette: include a contact email | `PlanIT-Control/0.1 (SwampHacks 2026)` |
 | `AUTH0_DOMAIN`, `AUTH0_AUDIENCE` | sign-in (see [Sign-in and security](#sign-in-and-security)) | not set, so writes are refused (with `PLANIT_DEV=1`, a local "dev" user) |
+| `SUPERVISOR_EMAILS` | comma-separated emails whose **Supervisor identity** gets supervisor powers (deleting any crew report, demo endpoints). Anyone can pick Crew or Supervisor at sign-in; each identity keeps its own saved locations, channels and reports. Also approvable with `UPDATE app_users SET role = 'supervisor' WHERE email = '…'`. | none |
 | `WEBHOOK_KEY` | encrypting users' Discord/Slack webhook URLs (API and worker need the same key) | not set, so channels can't be added |
 | `FIRMS_MAP_KEY` | wildfire detections. Get a free key at https://firms.modaps.eosdis.nasa.gov/api/area/ | not set, so the job is skipped |
 | `WILDLIFE_TAXA` | species to watch on iNaturalist, separated by `;` | alligator; cottonmouth; eastern diamondback |

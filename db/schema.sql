@@ -430,14 +430,42 @@ CREATE TABLE IF NOT EXISTS notification_channels (
     last_error        text
 );
 CREATE INDEX IF NOT EXISTS notification_channels_user_idx ON notification_channels (user_id);
+ALTER TABLE notification_channels ADD COLUMN IF NOT EXISTS identity text NOT NULL DEFAULT 'crew' CHECK (identity IN ('crew', 'supervisor'));
 CREATE TABLE IF NOT EXISTS notification_log (            -- what each channel has been sent, so nothing repeats
     channel_id      bigint NOT NULL REFERENCES notification_channels ON DELETE CASCADE,
     item            text NOT NULL,                       -- alert:<id> / report:<uuid> / briefing:<site>:<date>
     sent_at         timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (channel_id, item)
 );
+-- A user's saved starting points; each gets its own 6 PM briefing (backend/briefings.py) for the plants in range.
+CREATE TABLE IF NOT EXISTS saved_locations (
+    location_id     bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id         uuid NOT NULL REFERENCES app_users ON DELETE CASCADE,
+    name            text NOT NULL CHECK (length(name) BETWEEN 1 AND 80),
+    geog            geography(Point, 4326) NOT NULL,
+    radius_mi       numeric NOT NULL CHECK (radius_mi BETWEEN 1 AND 300),
+    created_at      timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS saved_locations_user_idx ON saved_locations (user_id);
+ALTER TABLE saved_locations ADD COLUMN IF NOT EXISTS site_id bigint REFERENCES sites ON DELETE SET NULL;  -- saved from a site card
+-- Identities: one person can work as crew and as supervisor; each identity keeps its own saved locations,
+-- notification channels and report list. The identity is picked in the app (X-Planit-Role header); supervisor
+-- *permissions* still need approval (app_users.role = 'supervisor' or SUPERVISOR_EMAILS, backend/auth.py).
+ALTER TABLE saved_locations ADD COLUMN IF NOT EXISTS identity text NOT NULL DEFAULT 'crew' CHECK (identity IN ('crew', 'supervisor'));
+DROP INDEX IF EXISTS saved_locations_user_site_idx;
+CREATE UNIQUE INDEX IF NOT EXISTS saved_locations_user_identity_site_idx ON saved_locations (user_id, identity, site_id)
+    WHERE site_id IS NOT NULL;
+CREATE TABLE IF NOT EXISTS location_briefings (
+    location_id     bigint NOT NULL REFERENCES saved_locations ON DELETE CASCADE,
+    briefing_date   date NOT NULL,                       -- the day it's about (tomorrow, at 6 PM)
+    summary         text NOT NULL,
+    content         jsonb NOT NULL,
+    sent_at         timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (location_id, briefing_date)
+);
 ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS user_id     uuid REFERENCES app_users;
 ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS resolved_by uuid REFERENCES app_users;
+ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS reported_as text CHECK (reported_as IN ('crew', 'supervisor'));
 ALTER TABLE crew_reports ADD COLUMN IF NOT EXISTS received_at timestamptz DEFAULT now();  -- reported_at can be earlier (sent from an offline queue)
 
 CREATE TABLE IF NOT EXISTS site_alerts (
