@@ -35,6 +35,11 @@ def main():
         conn.execute(sql.SQL("GRANT SELECT, INSERT, UPDATE, DELETE ON {} TO {}").format(
             sql.SQL(", ").join(map(sql.Identifier, WRITES)), r))
         conn.execute(sql.SQL("GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO {}").format(r))
+        for (mv,) in conn.execute("SELECT matviewname FROM pg_matviews WHERE schemaname = 'public'").fetchall():
+            conn.execute(sql.SQL("GRANT SELECT ON {} TO {}").format(sql.Identifier(mv), r))
+        # tables and views created later (new features) are readable too, or the live API fails with 500s
+        conn.execute(sql.SQL("ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO {}").format(r))
+        conn.execute(sql.SQL("ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO {}").format(r))
     u = urlsplit(admin)
     url = urlunsplit(u._replace(netloc=f"{ROLE}:{password}@{u.hostname}:{u.port}"))
     (ROOT / ".env.api").write_text(f"DATABASE_URL={url}\n", encoding="utf-8")

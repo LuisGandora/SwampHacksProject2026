@@ -16,7 +16,7 @@ export const BAND_COLOR_EXPRESSION = [
   NO_SCORE.color, 0, BANDS[3].color, 2.5, BANDS[2].color, 5, BANDS[1].color, 7.5, BANDS[0].color,
 ];
 
-export const fmtScore = (s) => (s == null ? "–" : Number(s).toFixed(1));
+export const fmtScore = (s) => (s == null || s === "" || !Number.isFinite(Number(s)) ? "–" : Number(s).toFixed(1));  // no score -> "–", never "NaN"
 
 const FALLBACK_LABELS = {
   severe_storm: "Severe storm", tropical: "Tropical", flooding: "Flooding", lightning: "Lightning",

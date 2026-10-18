@@ -1,5 +1,19 @@
-# Plan It By The Planet (Planet Control)
-SwampHacks 2026, Sperry Tech brief. Live weather and hazard intelligence for power-plant crews: instant stop-work alerts, a 6 PM briefing, and a plan for where to send crews and money first. Live at **https://plan-it-by-the-planet.us**.
+<h1 align="center">Plan It By The Planet (Planet Control)</h1>
+
+<p align="center">
+  SwampHacks 2026, Sperry Tech brief. Live weather and hazard intelligence for power-plant crews: instant stop-work alerts,
+  a 6 PM briefing, and a plan for where to send crews and money first.<br/>
+  Live at <a href="https://plan-it-by-the-planet.us"><b>plan-it-by-the-planet.us</b></a>
+</p>
+
+<p align="center">
+  <img src="docs/ZaWorldo.gif" alt="The Planet Control globe spinning down to the power plants" width="720"/>
+</p>
+
+<p align="center">
+  <img src="docs/ImageIOfMap.png" alt="The dashboard: hazard ranking, the globe with 2,579 power plants across the US, and live alerts" width="900"/><br/>
+  <sub>The dashboard: hazard ranking (left), 2,579 plants on the globe (FL/GA/AL scored by the model; gray = live alerts only), live alerts (right).</sub>
+</p>
 
 ## Architecture
 
