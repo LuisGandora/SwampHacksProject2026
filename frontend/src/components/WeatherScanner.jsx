@@ -14,7 +14,22 @@ export default function WeatherScanner({ siteId, timezone, refreshKey }) {
     return api.weather(siteId, refresh).then((d) => { setW(d); setError(""); })
       .catch((e) => setError(e.message)).finally(() => setBusy(false));
   };
-  useEffect(() => { setW(null); load(); }, [siteId, refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    let live = true, pending = false;
+    setW(null); setError("");
+    const poll = async () => {
+      if (pending) return;
+      pending = true;
+      try {
+        const data = await api.weather(siteId);
+        if (live) { setW(data); setError(""); }
+      } catch (e) { if (live) setError(`Weather freshness could not be verified. ${e.message}`); }
+      finally { pending = false; }
+    };
+    poll();
+    const interval = setInterval(poll, 60000);
+    return () => { live = false; clearInterval(interval); };
+  }, [siteId, refreshKey]);
 
   if (error) return <p className="error small">{error}</p>;
   if (!w) return <p className="muted small">Scanning weather: pulling the past week and the 7-day forecast…</p>;
@@ -34,14 +49,14 @@ export default function WeatherScanner({ siteId, timezone, refreshKey }) {
         <button className="link small" onClick={() => load(true)} disabled={busy}>{busy ? "Scanning…" : "↻ Refresh"}</button>
       </div>
       <p className="small muted">
-        Station K{w.station} · reading {time(now?.observed_at) || "none"} · forecast issued {time(w.forecast_issued_at) || "none"} ·
+        Station K{w.station} · source {now?.source || "unavailable"} · reading {time(now?.observed_at) || "none"} · forecast issued {time(w.forecast_issued_at) || "none"} ·
         refreshes when opened and at 6 PM local
       </p>
       {now && (
         <div className="now-strip">
-          <span><strong>{Math.round(now.temp_f)}°F</strong>{now.heat_index_f && now.heat_index_f > now.temp_f ? ` · feels ${Math.round(now.heat_index_f)}°F` : ""}</span>
-          <span>Wind {Math.round(now.wind_mph ?? 0)} mph{now.wind_gust_mph ? `, gusts ${Math.round(now.wind_gust_mph)}` : ""}</span>
-          <span>Rain last hour {Number(now.precip_1h_in ?? 0).toFixed(2)} in</span>
+          <span><strong>{now.temp_f == null ? "Temperature unavailable" : `${Math.round(now.temp_f)}°F`}</strong>{now.heat_index_f && now.heat_index_f > now.temp_f ? ` · feels ${Math.round(now.heat_index_f)}°F` : ""}</span>
+          <span>Wind {now.wind_mph == null ? "unavailable" : `${Math.round(now.wind_mph)} mph`}{now.wind_gust_mph ? `, gusts ${Math.round(now.wind_gust_mph)}` : ""}</span>
+          <span>Rain last hour {now.precip_1h_in == null ? "unavailable" : `${Number(now.precip_1h_in).toFixed(2)} in`}</span>
         </div>
       )}
       <p className={`small ${boltClass}`}>
@@ -65,7 +80,7 @@ export default function WeatherScanner({ siteId, timezone, refreshKey }) {
               <td>{new Date(`${d.day}T12:00`).toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })}
                 {d.day === today ? " today" : d.source === "forecast" ? " fc" : ""}</td>
               <td>{d.high_f ?? "–"} / {d.low_f ?? "–"}</td>
-              <td>{d.rain_in || "–"}</td>
+              <td>{d.rain_in ?? "–"}</td>
               <td>{d.max_gust_mph ?? "–"}</td>
               <td>{d.max_thunder_pct != null ? `${d.max_thunder_pct}%` : "–"}</td>
             </tr>

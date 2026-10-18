@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { BANDS, NO_SCORE, band, categoryLabel, fmtScore } from "../hazard.js";
+import { scoreIsCurrent, SCORE_EXPLANATION } from "../freshness.js";
 
 const STATES = ["All", "FL", "GA", "AL"];
 
-export default function RankingPanel({ sites, horizon, setHorizon, selectedId, onSelect, categories, loading }) {
+export default function RankingPanel({ sites, horizon, setHorizon, selectedId, onSelect, categories, loading, now }) {
   const [state, setState] = useState("All");
   const [query, setQuery] = useState("");
   const [onlyBand, setOnlyBand] = useState(null);
@@ -60,7 +61,7 @@ export default function RankingPanel({ sites, horizon, setHorizon, selectedId, o
       </div>
 
       <p className="muted small">
-        {loading ? "Loading sites…" : `${shown.length} of ${sites.length} sites · Hazard Index = 10 × chance of at least one hazard ${horizon === "now" ? "today" : "tomorrow"}`}
+        {loading ? "Loading sites…" : `${shown.length} of ${sites.length} sites · ${SCORE_EXPLANATION}`}
       </p>
 
       <ol className="rank-list">
@@ -82,6 +83,7 @@ export default function RankingPanel({ sites, horizon, setHorizon, selectedId, o
                 </span>
                 <span className="rank-score">
                   <strong>{fmtScore(s.score)}</strong>
+                  {!scoreIsCurrent(s, horizon, now) && <span className="badge badge--warn">SCORE DATE UNVERIFIED</span>}
                   <span className="band-label"><i className="dot" style={{ background: b.color }} />{b.label}</span>
                   {s.live_floor != null && horizon === "now" && s.live_floor > (s.model_score ?? 0) && (
                     <span className="badge badge--live" title={`Raised by what's happening now: ${s.live_floor_reason}`}>LIVE</span>

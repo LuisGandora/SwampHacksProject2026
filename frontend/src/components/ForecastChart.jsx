@@ -16,9 +16,9 @@ export default function ForecastChart({ rows, timezone, title = "Next 48 hours (
   const hour = (r) => new Date(r.valid_at).toLocaleString("en-US", { timeZone: timezone, weekday: "short", hour: "numeric" });
   const series = [
     { key: "heat", title: "Heat index °F", get: (r) => r.heat_index_f ?? r.temp_f, kind: "line", fmt: (v) => `${Math.round(v)}°F`, step: 5 },
-    { key: "rain", title: "Rain in/h", get: (r) => r.precip_in ?? 0, kind: "bar", fmt: (v) => `${Number(v).toFixed(2)} in`, step: 0.05, floor: 0.1 },
-    { key: "thunder", title: "Thunder %", get: (r) => r.thunder_chance ?? 0, kind: "bar", fmt: (v) => `${Math.round(v)}%`, max: 100 },
-  ];
+    { key: "rain", title: "Rain in/h", get: (r) => r.precip_in, kind: "bar", fmt: (v) => `${Number(v).toFixed(2)} in`, step: 0.05, floor: 0.1 },
+    { key: "thunder", title: "Thunder %", get: (r) => r.thunder_chance, kind: "bar", fmt: (v) => `${Math.round(v)}%`, max: 100 },
+  ].map((s) => ({ ...s, fmt: (v) => v == null ? "unavailable" : s.fmt(v) }));
 
   const onMove = (e) => {
     const box = svg.current.getBoundingClientRect();
@@ -51,10 +51,11 @@ export default function ForecastChart({ rows, timezone, title = "Next 48 hours (
                onMouseLeave={() => setHover(null)} role="img" aria-label="Forecast for the next 48 hours">
             {series.map((s, si) => {
               const vals = rows.map(s.get);
+              const known = vals.filter((v) => v != null);
               const top = PAD_T + si * ROW, h = ROW - 18;
               // nice per-chart scale: bars start at 0; heat rounds to 5 °F, rain to 0.05 in, thunder is 0-100 %
-              const lo = s.kind === "bar" ? 0 : Math.floor(Math.min(...vals) / s.step) * s.step;
-              const hi = s.max ?? (Math.max(s.floor ?? 0, Math.ceil(Math.max(...vals) / s.step) * s.step) || 1);
+              const lo = s.kind === "bar" ? 0 : Math.floor(Math.min(...(known.length ? known : [0])) / s.step) * s.step;
+              const hi = s.max ?? (Math.max(s.floor ?? 0, Math.ceil(Math.max(...(known.length ? known : [0])) / s.step) * s.step) || 1);
               const y = (v) => top + h - ((v - lo) / Math.max(hi - lo, 1e-9)) * h;
               const bw = Math.max(2, (W - PAD_L - PAD_R) / n - 2);
               return (
@@ -64,12 +65,12 @@ export default function ForecastChart({ rows, timezone, title = "Next 48 hours (
                   <text x={PAD_L - 4} y={top + 8} className="tick" textAnchor="end">{s.fmt(hi).replace(/ in|°F|%/, "")}</text>
                   <text x={PAD_L - 4} y={top + h} className="tick" textAnchor="end">{s.fmt(lo).replace(/ in|°F|%/, "")}</text>
                   {s.kind === "line" ? (
-                    <path d={vals.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("")}
+                    <path d={vals.map((v, i) => v == null ? "" : `${i && vals[i - 1] != null ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("")}
                           fill="none" stroke={BLUE} strokeWidth="2" strokeLinejoin="round" />
                   ) : vals.map((v, i) => v > 0 && (
                     <rect key={i} x={x(i) - bw / 2} y={y(v)} width={bw} height={top + h - y(v)} rx="1.5" fill={BLUE} />
                   ))}
-                  {hover != null && (
+                  {hover != null && vals[hover] != null && (
                     <circle cx={x(hover)} cy={y(vals[hover])} r="4" fill={BLUE} stroke="#14171c" strokeWidth="2" />
                   )}
                 </g>

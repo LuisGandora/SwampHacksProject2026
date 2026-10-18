@@ -606,6 +606,7 @@ Run any job once with `python -m backend.worker <job> [<job> ...]`.
 | Method and path | Returns |
 |---|---|
 | `GET /health` | database time and site count |
+| `GET /data-status` | whether live data is current: each worker feed (current / stale / failing / never run, from `worker_runs`) and how many sites have recent readings, forecasts and a week of rain history. The dashboard only trusts "no alerts" and all-clear countdowns while lightning and alerts are current. |
 | `GET /hazard-categories` | thresholds, radii and countdowns (for the frontend legend) |
 | `GET /sites?state=FL&limit=100` | **Dashboard ranking**, sorted by latest hazard score, then active stop-work and warning alerts |
 | `GET /sites/{id}` | site details, historical `risk_profile`, `active_alerts`, `latest_score` |

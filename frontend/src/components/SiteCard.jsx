@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { band, categoryLabel, countdown, fmtScore, usd } from "../hazard.js";
 import WeatherScanner from "./WeatherScanner.jsx";
+import { scoreIsCurrent, SCORE_EXPLANATION } from "../freshness.js";
 
 const COORD = {
   ok: ["✓ Location verified (OSM)", "ok"], corrected: ["✓ Location corrected to OSM outline", "ok"],
@@ -29,12 +30,19 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
   const id = summary.site_id;
 
   useEffect(() => {
-    let live = true;
-    setError(""); setBriefing(undefined); setEcon(null);
-    Promise.all([api.site(id), api.crewReports(id)])
-      .then(([d, c]) => live && (setDetail(d), setCrew(c)))
-      .catch((e) => live && setError(e.message));
-    return () => { live = false; };
+    let live = true, pending = false;
+    setDetail(null); setCrew([]); setError(""); setBriefing(undefined); setEcon(null);
+    const load = () => {
+      if (pending) return;
+      pending = true;
+      return Promise.all([api.site(id), api.crewReports(id)])
+      .then(([d, c]) => { if (live) { setDetail(d); setCrew(c); setError(""); } })
+      .catch((e) => live && setError(`Site details and crew reports could not be refreshed. ${e.message}`))
+      .finally(() => { pending = false; });
+    };
+    load();
+    const interval = setInterval(load, 15000);
+    return () => { live = false; clearInterval(interval); };
   }, [id, refreshKey]);
 
   // Collapsible sections load their data the first time they're opened.
@@ -83,6 +91,11 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
         </div>
       </header>
 
+      <p className="small muted">{SCORE_EXPLANATION}</p>
+      {!scoreIsCurrent(summary, horizon, now) && <p className="warn small" role="status">
+        Score date is out of date or unavailable for {horizon === "now" ? "today" : "tomorrow"}.
+        {summary.scored_for && ` Scored for ${new Date(summary.scored_for).toLocaleString()}.`} Check live conditions before work.
+      </p>}
       <div className="score-tiles">
         {[["Today", summary.score_now, summary.live_floor], ["Tomorrow", summary.score_next_day, null]].map(([label, s, floor]) => {
           const b = band(s);
@@ -90,6 +103,8 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
             <div key={label} className="score-tile" style={{ borderColor: b.color }}>
               <span className="muted small">{label}</span>
               <strong className="big">{fmtScore(s)}<small>/10</small></strong>
+              {!scoreIsCurrent({ ...summary, scored_for: label === "Today" ? summary.score_now_for : summary.score_next_day_for },
+                label === "Today" ? "now" : "next_day", now) && <span className="warn small">Score date unverified</span>}
               <span className="band-label"><i className="dot" style={{ background: b.color }} />{b.label}</span>
               {floor != null && floor >= s && (
                 <span className="small live-reason" title={summary.live_floor_reason}>⚡ Live: {summary.live_floor_reason}</span>
@@ -145,7 +160,7 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
           </p>
         )}
         {meta.nws_alerts?.length > 0 && <p className="small">NWS alerts in the forecast: {meta.nws_alerts.join(", ")}</p>}
-        {cats.length === 0 ? <p className="muted small">No hazard above 0.1/10.</p> : (
+        {cats.length === 0 ? <p className="muted small">{summary.category_scores ? "No model category above 0.1/10; check active alerts." : "Category breakdown unavailable for this score."}</p> : (
           <ul className="cat-bars">
             {cats.slice(0, 6).map(([k, v]) => {
               const b = band(v.score);
