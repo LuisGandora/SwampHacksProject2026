@@ -68,6 +68,7 @@ export default function App() {
   const seenAlerts = useRef(null);
   const globe = useRef(null);
   const [focus, setFocus] = useState(null); // null = landing page still showing
+  const [landingPlace, setLandingPlace] = useState(null); // starting point picked on the landing page
 
   const toast = useCallback((text, kind = "info") => {
     const id = Math.random();
@@ -204,9 +205,10 @@ export default function App() {
   };
 
   return (
-    <div className="app">
-      <GlobeMap ref={globe} sites={visibleSites} lightning={lightning} selectedId={selectedId} onSelect={select}
-                pinMode={pinMode} pin={pin} onPin={(p) => { setPin(p); setPinMode(false); setTab("site"); }}
+    <div className={`app ${focus ? "" : "landing-mode"}`}>
+      <GlobeMap ref={globe} sites={focus ? visibleSites : []} lightning={lightning} selectedId={selectedId} onSelect={select}
+                pinMode={!focus || pinMode} pin={focus ? pin : landingPlace}
+                onPin={(p) => focus ? (setPin(p), setPinMode(false), setTab("site")) : setLandingPlace({ ...p, label: "Dropped pin" })}
                 pins={showPins ? pins : null} warnings={warnOn ? warnings : null} radar={radar} me={me} sensor={sensor} />
       {sensor === "crt" && <div className="scanlines" aria-hidden="true" />}
 
@@ -344,7 +346,8 @@ export default function App() {
 
       {!focus && (
         <div className="landing-overlay">
-          <Landing sites={sites} onDone={handleLandingDone} />
+          <Landing sites={sites} auth={auth} place={landingPlace} setPlace={setLandingPlace}
+                   flyTo={(lon, lat) => globe.current?.flyTo(lon, lat, 8)} onDone={handleLandingDone} />
         </div>
       )}
     </div>
