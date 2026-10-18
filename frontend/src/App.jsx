@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API, api, setActiveRole, setTokenGetter } from "./api.js";
+import { api, setActiveRole, setTokenGetter } from "./api.js";
 import { useAuth } from "./auth.js";
 import { flush, queued } from "./offlineQueue.js";
 import AlertsPanel from "./components/AlertsPanel.jsx";
@@ -25,7 +25,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 function usePoll(fn, ms, deps = []) {
   useEffect(() => {
     let live = true;
-    const tick = () => live && fn();
+    let pending = false;
+    const tick = async () => {
+      if (!live || pending) return;
+      pending = true;
+      try { await fn(); } finally { pending = false; }
+    };
     tick();
     const id = setInterval(tick, ms);
     return () => { live = false; clearInterval(id); };
@@ -37,6 +42,10 @@ export default function App() {
   const [now, setNow] = useState(new Date());
   const [health, setHealth] = useState(null);
   const [apiError, setApiError] = useState("");
+  const [feedStatus, setFeedStatus] = useState(null);
+  const [dataErrors, setDataErrors] = useState({});
+  const [lastAlertAt, setLastAlertAt] = useState(null);
+  const dataError = (name, message = null) => setDataErrors((previous) => ({ ...previous, [name]: message }));
   const [categories, setCategories] = useState([]);
   const [horizon, setHorizon] = useState("now");
   const [sites, setSites] = useState([]);
@@ -107,9 +116,12 @@ export default function App() {
     return saved.find((l) => l.site_id === id || (s && Math.abs(l.lat - s.lat) < 5e-4 && Math.abs(l.lon - s.lon) < 5e-4));
   };
   useEffect(() => {
-    api.health().then((h) => { setHealth(h); setApiError(""); }).catch((e) => setApiError(e.message));
     api.categories().then(setCategories).catch(() => {});
   }, []);
+  usePoll(() => api.health().then((h) => { setHealth(h); dataError("API"); })
+    .catch((e) => dataError("API", e.message)), 30000, []);
+  usePoll(() => api.dataStatus().then((s) => { setFeedStatus(s); dataError("Feed status"); })
+    .catch(() => dataError("Feed status", "Feed freshness could not be verified.")), 30000, []);
   useEffect(() => {
     if (!navigator.geolocation) return;
     const w = navigator.geolocation.watchPosition((p) => setMe({ lat: p.coords.latitude, lon: p.coords.longitude }),
@@ -125,6 +137,8 @@ export default function App() {
 
   const loadAlerts = () => api.alerts().then((list) => {
     setAlerts(list);
+    setLastAlertAt(Date.now());
+    dataError("Alerts");
     const ids = new Set(list.map((a) => a.alert_id));
     if (seenAlerts.current) {  // announce stop-work alerts that are new since the last poll
       list.filter((a) => a.level === "stop_work" && !seenAlerts.current.has(a.alert_id)).forEach((a) => {
@@ -134,12 +148,13 @@ export default function App() {
       });
     }
     seenAlerts.current = ids;
-  }).catch(() => {});
+  }).catch(() => dataError("Alerts", "Live alerts could not be refreshed; showing the last received alerts."));
   const anyStop = alerts.some((a) => a.level === "stop_work");
   usePoll(loadAlerts, anyStop ? POLL.alertsDuringStop : POLL.alerts, [notifyOn, refreshKey, anyStop]);
-  useEffect(() => { if (showPins) api.hazardPins().then(setPins).catch((e) => toast(e.message, "error")); },
-            [showPins, refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  usePoll(() => warnOn && api.nwsAlertMap().then(setWarnings).catch((e) => toast(e.message, "error")),
+  usePoll(() => showPins && api.hazardPins().then((p) => { setPins(p); dataError("Hazard pins"); })
+    .catch(() => dataError("Hazard pins", "Hazard pins could not be refreshed.")), 15000, [showPins, refreshKey]);
+  usePoll(() => warnOn && api.nwsAlertMap().then((w) => { setWarnings(w); dataError("NWS map"); })
+    .catch(() => dataError("NWS map", "NWS map warnings could not be refreshed.")),
           120000, [warnOn, refreshKey]);
   const setLayer = (key, on) => ({ radar: setRadar, warnings: setWarnOn, pins: setShowPins })[key](on);
 
@@ -157,7 +172,8 @@ export default function App() {
     return () => window.removeEventListener("online", sendQueued);
   }, [sendQueued, auth.isAuthenticated]);
   usePoll(() => queuedCount && auth.isAuthenticated && sendQueued(), 60000, [queuedCount, auth.isAuthenticated]);
-  usePoll(() => api.lightning().then(setLightning).catch(() => {}), POLL.lightning, [refreshKey]);
+  usePoll(() => api.lightning().then((l) => { setLightning(l); dataError("Lightning map"); })
+    .catch(() => dataError("Lightning map", "Lightning map could not be refreshed.")), POLL.lightning, [refreshKey]);
 
   const selected = sites.find((s) => s.site_id === selectedId) || null;
   const select = useCallback((id) => {
@@ -216,7 +232,18 @@ export default function App() {
   };
 
   const counts = { stop: alerts.filter((a) => a.level === "stop_work").length, warn: alerts.filter((a) => a.level === "warning").length };
-  const online = health && !apiError;
+  const feedProblems = (feedStatus?.feeds || []).filter((f) => f.status !== "current");
+  const activeErrors = Object.entries(dataErrors).filter(([name, message]) => message
+    && (name !== "Hazard pins" || showPins) && (name !== "NWS map" || warnOn));
+  const alertsReliable = lastAlertAt && now.getTime() - lastAlertAt < 45000 && !dataErrors.Alerts
+    && feedStatus && now - new Date(feedStatus.checked_at) < 90000
+    && !dataErrors["Feed status"] && feedStatus?.feeds?.find((f) => f.name === "lightning")?.status === "current"
+    && feedStatus?.feeds?.find((f) => f.name === "alerts")?.status === "current";
+  const online = health && !apiError && !activeErrors.length && !feedProblems.length && alertsReliable;
+  const coverage = feedStatus?.coverage;
+  const incompleteRain = coverage && coverage.rain_week_ready < coverage.sites;
+  const incompleteWeather = coverage && (coverage.observations_current < coverage.sites || coverage.forecasts_current < coverage.sites);
+  const oldStatus = feedStatus && now - new Date(feedStatus.checked_at) > 90000;
 
   // The landing page lets the user focus on an area (GPS or a dropped pin + radius). Until they choose, focus is
   // null and the Landing overlay is shown; after that the globe and ranking only show the in-range sites.
@@ -248,7 +275,7 @@ export default function App() {
           </div>
         </div>
         <div className="hud-stats mono small">
-          <span className={online ? "ok" : "warn"}>● {online ? "LIVE" : "OFFLINE"}</span>
+          <span className={online ? "ok" : "warn"}>● {online ? "LIVE" : "DATA UNVERIFIED"}</span>
           <span>{visibleSites.length} SITES</span>
           <span className="stop">{counts.stop} STOP</span>
           <span className="warn">{counts.warn} WARN</span>
@@ -297,12 +324,34 @@ export default function App() {
         </div>
       </header>
 
+      <div className="data-notices">
       {apiError && (
         <div className="banner" role="alert">
-          {apiError} Start it with <code>python -m uvicorn backend.app:app</code>, or set <code>VITE_API_URL</code> (now {API}).
+          Site rankings could not be refreshed. Previously received scores may be outdated.
         </div>
       )}
-      <StopWorkBanner alerts={alerts} selectedId={selectedId} now={now} categories={categories} onSelect={select} />
+      {(activeErrors.length > 0 || feedProblems.length > 0 || oldStatus || incompleteRain || incompleteWeather) && (
+        <details className="banner data-warning">
+          <summary>Some live data is unavailable or incomplete · View details</summary>
+          <ul>
+            {activeErrors.map(([name, message]) => <li key={name}>{name}: {message}</li>)}
+            {feedProblems.map((f) => <li key={f.name}>{f.name}: {f.status}
+              {f.last_success && ` · last success ${new Date(f.last_success).toLocaleString()}`}
+              {f.detail && <span className="small"> · {f.detail}</span>}</li>)}
+            {oldStatus && <li>Feed status is out of date.</li>}
+            {incompleteRain && <li>Rainfall history incomplete at {coverage.sites - coverage.rain_week_ready} sites.
+              Flood and soil alerts may underestimate rainfall while history is unavailable.</li>}
+            {incompleteWeather && <li>Recent weather readings: {coverage.observations_current}/{coverage.sites} sites.
+              Recently fetched forecasts: {coverage.forecasts_current}/{coverage.sites} sites.
+              {coverage.forecasts_available != null && ` Forecast data available: ${coverage.forecasts_available}/${coverage.sites}.`}
+              Missing data does not mean low risk.</li>}
+            {coverage?.nearby_station_sites > 0 && <li>{coverage.nearby_station_sites} sites use a nearby reporting station.
+              Source station and distance are shown in the weather scanner.</li>}
+          </ul>
+        </details>
+      )}
+      </div>
+      <StopWorkBanner alerts={alerts} selectedId={selectedId} now={now} categories={categories} onSelect={select} reliable={alertsReliable} />
       {layersOpen && (
         <MapLayers layers={{ radar, warnings: warnOn, pins: showPins }} setLayer={setLayer} pinCount={pins.length}
                    warnings={warnings} onClose={() => setLayersOpen(false)} />
@@ -324,7 +373,7 @@ export default function App() {
 
       <div className={`dock dock--left tab-${tab === "rank" ? "show" : "hide"}`}>
         <RankingPanel sites={visibleSites} horizon={horizon} setHorizon={setHorizon} selectedId={selectedId}
-                      onSelect={select} categories={categories} loading={loadingSites} />
+                      onSelect={select} categories={categories} loading={loadingSites} now={now} />
       </div>
 
       <div className="dock dock--right">
@@ -379,7 +428,7 @@ export default function App() {
         </div>
         <div className={`tab-${tab === "alerts" ? "show" : "hide"}`}>
           <AlertsPanel alerts={alerts} categories={categories} now={now} onSelect={select}
-                       notifyOn={notifyOn} onToggleNotify={toggleNotify} />
+                       notifyOn={notifyOn} onToggleNotify={toggleNotify} reliable={alertsReliable} lastUpdated={lastAlertAt} />
         </div>
       </div>
 
