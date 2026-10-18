@@ -31,10 +31,23 @@ export const categoryLabel = (key, categories = []) =>
 export function countdown(isoUntil, now = Date.now()) {
   if (!isoUntil) return null;
   const s = Math.round((new Date(isoUntil).getTime() - now) / 1000);
-  if (s <= 0) return null;
+  if (!Number.isFinite(s) || s <= 0) return null;
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
   return h ? `${h}h ${String(m).padStart(2, "0")}m` : `${m}:${String(sec).padStart(2, "0")}`;
 }
+
+// Expiration ends an alert record; it does not establish that conditions are safe.
+export function alertTiming(a, now = Date.now()) {
+  const left = countdown(a.all_clear_at, now);
+  if (!left) return null;
+  if (a.category === "lightning") return `Lightning hold: ${left} remaining; verify conditions before resuming`;
+  const end = new Date(a.all_clear_at);
+  return `Alert expires ${end.toLocaleString([], { timeZone: a.timezone, month: "short", day: "numeric",
+    hour: "numeric", minute: "2-digit", timeZoneName: "short" })}; may be extended`;
+}
+
+export const fmtCrewHours = (v) => v == null ? "–" : v > 0 && v < 0.1 ? "<0.1" : Number(v).toFixed(1);
+export const fmtProbability = (v) => v == null ? "–" : v > 0 && v < 0.001 ? "<0.1%" : `${(v * 100).toFixed(1)}%`;
 
 export const usd = (v) => (v == null ? "–" : `$${Math.round(v).toLocaleString()}`);
 

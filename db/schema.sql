@@ -60,8 +60,8 @@ INSERT INTO hazard_categories VALUES
  '{"Dense Fog","Dense Smoke"}', 'Lower is worse: equipment moves and site access.'),
 ('coastal', 'Rip current / high surf', 'environmental', NULL, NULL, NULL, NULL, NULL, NULL, 5, NULL, NULL, false,
  '{"Rip Current","High Surf",Sneakerwave}', 'History only; matters for waterfront sites.'),
-('wildlife', 'Wildlife sighting', 'environmental', 'sightings', 'count', 1, 1, 1, 0.1, 2, 10080, NULL, false,
- '{}', 'Alligators, snakes, bees, etc. from crew reports and iNaturalist in the last 7 days.'),
+('wildlife', 'Wildlife sighting', 'environmental', 'sightings', 'count', 1, 1, 1, 0.1, 2, 4320, NULL, false,
+ '{}', 'Wildlife observations within a 3-day relevance window; expiry does not establish that an animal left.'),
 ('ppe', 'PPE not worn', 'crew', NULL, NULL, NULL, NULL, NULL, NULL, 50, NULL, NULL, false, '{}', 'OSHA reports + crew reports.'),
 ('heavy_machinery', 'Heavy machinery misuse', 'crew', NULL, NULL, NULL, NULL, NULL, NULL, 50, NULL, NULL, false, '{}', 'OSHA reports + crew reports.'),
 ('slip_trip', 'Spills / trash in walkways', 'crew', NULL, NULL, NULL, NULL, NULL, NULL, 50, NULL, NULL, false, '{}', 'OSHA reports + crew reports.'),
@@ -88,12 +88,21 @@ UPDATE hazard_categories h SET nws_warn_events = d.warn, nws_stop_events = d.sto
                      '{"Excessive Heat Warning","Extreme Heat Warning"}'),
     ('extreme_cold', '{"Frost Advisory","Freeze Watch","Freeze Warning","Hard Freeze Watch","Hard Freeze Warning","Cold Weather Advisory","Wind Chill Advisory","Winter Weather Advisory","Winter Storm Watch"}',
                      '{"Extreme Cold Warning","Wind Chill Warning","Winter Storm Warning","Ice Storm Warning","Blizzard Warning"}'),
-    ('high_wind',    '{"Wind Advisory","High Wind Watch","Lake Wind Advisory"}', '{"High Wind Warning"}'),
+    ('high_wind',    '{"Wind Advisory","High Wind Watch"}', '{"High Wind Warning"}'),
     ('wildfire',     '{"Red Flag Warning","Fire Weather Watch"}', '{"Fire Warning"}'),
     ('dense_fog',    '{"Dense Fog Advisory","Dense Smoke Advisory"}', '{}'),
-    ('coastal',      '{"Rip Current Statement","High Surf Advisory","Beach Hazards Statement"}', '{"High Surf Warning"}')
+    ('coastal',      '{"High Surf Advisory"}', '{"High Surf Warning"}')  -- rip currents and beach hazards are for swimmers, not crews
   ) AS d(category, warn, stop)
  WHERE h.category = d.category AND h.nws_warn_events = '{}' AND h.nws_stop_events = '{}';
+
+-- Upgrade the old defaults on existing databases, while preserving other custom thresholds/event mappings.
+UPDATE hazard_categories SET nws_warn_events = array_remove(array_remove(nws_warn_events,
+    'Rip Current Statement'), 'Beach Hazards Statement') WHERE category = 'coastal';
+UPDATE hazard_categories SET nws_warn_events = array_remove(nws_warn_events, 'Lake Wind Advisory')
+ WHERE category = 'high_wind';
+UPDATE hazard_categories SET window_minutes = 4320,
+    notes = 'Wildlife observations within a 3-day relevance window; expiry does not establish that an animal left.'
+ WHERE category = 'wildlife' AND window_minutes = 10080;
 
 -- ===========================================================================================================
 -- Job sites (power plants) and weather stations
@@ -528,7 +537,9 @@ BEGIN
                all_clear_at = CASE WHEN rule.all_clear_restarts OR p_until IS NOT NULL
                                    THEN greatest(all_clear_at, new_clear) ELSE all_clear_at END,
                trigger_value = coalesce(p_value, trigger_value),
-               message = coalesce(p_message, message),
+               message = CASE WHEN p_message IS NULL OR position(p_message IN coalesce(message, '')) > 0 THEN message
+                              WHEN new_clear >= all_clear_at OR message IS NULL THEN p_message
+                              ELSE left(message || ' · also: ' || p_message, 500) END,
                image_url = coalesce(p_image, image_url)
          WHERE alert_id = a.alert_id
      RETURNING * INTO a;
@@ -561,7 +572,10 @@ SELECT a.*, s.name AS site_name, s.timezone,
 CREATE VIEW site_live_floor AS
 SELECT DISTINCT ON (site_id) site_id, floor, reason
   FROM (SELECT a.site_id,
-               CASE WHEN a.message LIKE '%Crew report:%' THEN 4
+               CASE WHEN a.level = 'warning' AND a.message LIKE 'Crew report:%' AND a.message NOT LIKE '% · also: %' THEN 4
+                    WHEN a.level = 'warning' AND a.category = 'flooding'
+                         AND (a.message LIKE 'Action flooding%' OR a.message LIKE 'Action stage%')
+                         AND a.message NOT LIKE '% · also: %' THEN 3.5
                     ELSE round((CASE a.level WHEN 'stop_work' THEN 8 ELSE 5 END) + 2 * coalesce(g.r, 0), 1) END AS floor,
                a.title || coalesce(': ' || a.message, '') AS reason
           FROM active_site_alerts a JOIN hazard_categories c USING (category)

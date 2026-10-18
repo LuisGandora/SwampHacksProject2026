@@ -140,16 +140,36 @@ def sync_alerts(conn):
     """Store active NWS alerts for the sites' states and raise site alerts for the ones in effect now."""
     states = [r["state"] for r in conn.execute("SELECT DISTINCT state FROM sites")]
     features = get("/alerts/active", area=",".join(states))["features"]
+    cancelled_ids = set()
     for f in features:
         p = f["properties"]
+        if p.get("messageType") == "Cancel":  # not a hazard: it ends the alerts it references
+            # Apply after all inserts: feed order must not resurrect a cancelled alert.
+            cancelled_ids.update(r["identifier"] for r in p.get("references") or [] if r.get("identifier"))
+            if p.get("id"):
+                cancelled_ids.add(p["id"])  # remove notices ingested by older versions too
+            continue
         conn.execute(
             "INSERT INTO nws_alerts (alert_id, sent_at, event, category, severity, urgency, onset_at, expires_at, "
             "headline, ugc_codes, geog) VALUES (%s, %s, %s, (SELECT category FROM hazard_categories WHERE "
             "%s = ANY (nws_warn_events || nws_stop_events) LIMIT 1), %s, %s, %s, %s, %s, %s, "
             "ST_GeomFromGeoJSON(%s)::geography) "
-            "ON CONFLICT (alert_id, sent_at) DO UPDATE SET expires_at = EXCLUDED.expires_at, headline = EXCLUDED.headline",
+            "ON CONFLICT (alert_id, sent_at) DO UPDATE SET expires_at = EXCLUDED.expires_at, headline = EXCLUDED.headline, "
+            "category = EXCLUDED.category",  # follows edits to hazard_categories' NWS event lists
             (p["id"], p["sent"], p["event"], p["event"], p.get("severity"), p.get("urgency"), p.get("onset"),
              p.get("ends") or p.get("expires"), p.get("headline"), p["geocode"].get("UGC", []),
              json.dumps(f["geometry"]) if f.get("geometry") else None))
+    cancelled = end_alerts(conn, list(cancelled_ids))
     raised = conn.execute(RAISE_FROM_ALERTS).fetchone()["count"]
-    return f"{len(features)} active NWS alerts, {raised} site alerts raised or extended"
+    return f"{len(features)} active NWS alerts, {raised} site alerts raised or extended, {cancelled} cancelled"
+
+
+def end_alerts(conn, alert_ids):
+    """Expire cancelled NWS alerts and clear the site alerts raised from them (they carry the alert's headline)."""
+    if not alert_ids:
+        return 0
+    gone = conn.execute("UPDATE nws_alerts SET expires_at = now() WHERE alert_id = ANY (%s) AND expires_at > now() "
+                        "RETURNING headline", (alert_ids,)).fetchall()
+    conn.execute("UPDATE site_alerts SET cleared_at = now() WHERE cleared_at IS NULL AND message = ANY (%s)",
+                 ([g["headline"] for g in gone],))
+    return len(gone)

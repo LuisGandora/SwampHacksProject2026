@@ -601,6 +601,12 @@ Every threshold, radius and NWS alert name is stored as data in `hazard_categori
 
 Run any job once with `python -m backend.worker <job> [<job> ...]`.
 
+Limitations:
+
+- **Weather comes from the nearest NWS station, not the site.** 508 of the 694 sites have their station more than 10 mi away (up to about 51 mi), so a storm or downpour at the site can be missed or overstated. The weather scanner shows each site's station and distance.
+- **Some stations stop reporting overnight.** Navy airfields (NSE Whiting Field, NFJ Choctaw) close at night. When a site's station has been silent for 2 hours, the `observations` job uses the nearest of up to 5 stations within 60 mi that is still reporting, and labels the reading with it (e.g. `nws:KPNS (KNFJ not reporting)`). That station can be 20–30 mi away.
+- **A station's gaps become the site's gaps.** Rain totals over 7 days (soil saturation, flood risk) only count days the station reported. Example: station GZH (Evergreen, AL), which serves 8 southwest Alabama sites, has no readings for Oct 11–13 2026. Those sites' 7-day totals undercount until the gap leaves the window. `GET /data-status` reports how many sites have a full week (`rain_week_ready`).
+
 ### Endpoints
 
 | Method and path | Returns |
@@ -674,5 +680,7 @@ Start the API with `$env:PLANIT_DEV = "1"` to turn on:
 - The dashboard ranks by `hazard_scores` (written hourly by the `scores` job). On calm days most scores are near 0, so active alerts decide the order.
 - GLM locates lightning to roughly 8 km (about 5 mi). That's coarse for a 10-mile rule, but it's the best free real-time source.
 - Two stations (`AMG`, `NFJ`) don't publish current NWS observations, so about 20 sites have forecasts and alerts but no live readings.
-- An NWS warning that's cancelled early keeps its site alert until the original expiry time.
+- NWS cancellation messages expire their referenced warnings, regardless of feed order. Alert expiry is not a safety all-clear.
 - Forecasts and observations keep 30 days, NWS alerts 180 days, and lightning 90 days (compressed after 2), to stay within the free tier.
+
+Alert/report consistency changes and validation commands: [dashboard feedback follow-up](docs/ALERT_CONSISTENCY.md).

@@ -91,13 +91,52 @@ def reading(p, station):
             kmh_to_mph(v("windGust")), mm_to_in(v("precipitationLastHour")), m_to_mi(v("visibility")), f"nws:K{station}")
 
 
+# Sites whose own station hasn't reported for 2 hours (e.g. Navy airfields NSE/NFJ close overnight), with the 5 nearest
+# other stations within 60 mi to fall back to.
+SILENT = """
+SELECT s.site_id, s.weather_station_id AS own,
+       ARRAY(SELECT w.station_id FROM weather_stations w
+              WHERE w.station_id <> s.weather_station_id AND ST_DWithin(w.geog, s.geog, 60 * 1609.344)
+              ORDER BY w.geog <-> s.geog LIMIT 5) AS nearby
+  FROM sites s
+ WHERE s.weather_station_id IS NOT NULL AND (%(ids)s::bigint[] IS NULL OR s.site_id = ANY (%(ids)s))
+   AND NOT EXISTS (SELECT 1 FROM weather_observations o
+                    WHERE o.site_id = s.site_id AND o.observed_at > now() - interval '2 hours')
+"""
+INSERT = ("INSERT INTO weather_observations (site_id, observed_at, temp_f, heat_index_f, wind_chill_f, dewpoint_f, rh, "
+          "wind_mph, wind_gust_mph, precip_1h_in, visibility_mi, source) "
+          "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING")
+
+
+def fallback(conn, site_ids, latest):
+    """Readings for sites whose station has gone quiet, from the nearest station still reporting. The source says
+    which station it came from, e.g. "nws:KPNS (KNSE not reporting)". Returns how many sites were covered."""
+    def fresh(station):
+        if station not in latest:
+            try:
+                latest[station] = get(f"/stations/K{station}/observations/latest")["properties"]
+            except httpx.HTTPError:
+                latest[station] = None
+        p = latest[station]
+        return p if p and p.get("timestamp") and \
+            dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(p["timestamp"]) < dt.timedelta(hours=2) else None
+    covered = 0
+    for site in conn.execute(SILENT, {"ids": site_ids}).fetchall():
+        alt = next((st for st in site["nearby"] if fresh(st)), None)
+        if alt:
+            r = reading(latest[alt], alt)
+            conn.execute(INSERT, (site["site_id"], *r[:-1], f"nws:K{alt} (K{site['own']} not reporting)"))
+            covered += 1
+    return covered
+
+
 def sync(conn, site_ids=None, history_days=0):
     """Latest reading at each site's station (or just site_ids). history_days > 0 also back-fills that many days
     (NWS keeps about 7), so a site opened after the worker was off still shows its week."""
     stations = conn.execute("SELECT weather_station_id AS station, array_agg(site_id) AS sites FROM sites "
                             "WHERE weather_station_id IS NOT NULL AND (%s::bigint[] IS NULL OR site_id = ANY(%s)) "
                             "GROUP BY 1", (site_ids, site_ids)).fetchall()
-    rows = 0
+    rows, latest = 0, {}
     for s in stations:
         try:  # NWS station ids are the ICAO code: K + the 3-letter FAA id for the lower 48
             if history_days:  # NWS returns at most 500 readings per call (~40 h at busy stations): one call per day
@@ -108,14 +147,13 @@ def sync(conn, site_ids=None, history_days=0):
                                       end=(now - dt.timedelta(days=d - 1)).isoformat(timespec="seconds"))["features"]]
             else:
                 props = [get(f"/stations/K{s['station']}/observations/latest")["properties"]]
+                latest[s["station"]] = props[0]
         except httpx.HTTPError as e:
             print(f"  observations: K{s['station']} skipped ({e})")
             continue
         readings = [reading(p, s["station"]) for p in props if p.get("timestamp")]
-        conn.cursor().executemany(
-            "INSERT INTO weather_observations (site_id, observed_at, temp_f, heat_index_f, wind_chill_f, dewpoint_f, rh, "
-            "wind_mph, wind_gust_mph, precip_1h_in, visibility_mi, source) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING",
-            [(site, *r) for site in s["sites"] for r in readings])
+        conn.cursor().executemany(INSERT, [(site, *r) for site in s["sites"] for r in readings])
         rows += len(s["sites"]) * len(readings)
-    return f"{rows} site readings from {len(stations)} stations, {raise_alerts(conn)} site alerts raised or extended"
+    covered = 0 if history_days else fallback(conn, site_ids, latest)
+    return (f"{rows} site readings from {len(stations)} stations, {covered} sites from a nearby station (theirs not "
+            f"reporting), {raise_alerts(conn)} site alerts raised or extended")

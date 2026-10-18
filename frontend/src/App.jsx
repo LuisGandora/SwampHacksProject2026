@@ -16,6 +16,7 @@ import GlobeMap from "./components/GlobeMap.jsx";
 import RankingPanel from "./components/RankingPanel.jsx";
 import ReportModal from "./components/ReportModal.jsx";
 import SiteCard from "./components/SiteCard.jsx";
+import NearbyAlerts from "./components/NearbyAlerts.jsx";
 import { categoryLabel } from "./hazard.js";
 import Landing from "./components/landing.jsx";
 import { sitesWithin } from "./geo.js";
@@ -55,6 +56,7 @@ export default function App() {
   const [alerts, setAlerts] = useState([]);
   const [lightning, setLightning] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [inspectedLocation, setInspectedLocation] = useState(null);
   const [crewOpen, setCrewOpen] = useState(false);
   const [pinMode, setPinMode] = useState(false);
   const [pin, setPin] = useState(null);
@@ -78,6 +80,7 @@ export default function App() {
   const [demo, setDemo] = useState(null);  // { step, total, text, site_id, done }
   const demoRun = useRef(0);
   const seenAlerts = useRef(null);
+  const inView = useRef(() => true);                         // is an alert's site in the area you picked?
   const globe = useRef(null);
   const [focus, setFocus] = useState(null); // null = landing page still showing
   const [landingPlace, setLandingPlace] = useState(null); // starting point picked on the landing page
@@ -147,7 +150,7 @@ export default function App() {
     dataError("Alerts");
     const ids = new Set(list.map((a) => a.alert_id));
     if (seenAlerts.current) {  // announce stop-work alerts that are new since the last poll
-      list.filter((a) => a.level === "stop_work" && !seenAlerts.current.has(a.alert_id)).forEach((a) => {
+      list.filter((a) => a.level === "stop_work" && !seenAlerts.current.has(a.alert_id) && inView.current(a)).forEach((a) => {
         toast(`⛔ STOP WORK at ${a.site_name}: ${a.message || categoryLabel(a.category, categories)}`, "stop");
         if (notifyOn) new Notification(`STOP WORK: ${a.site_name}`, { body: a.message || a.title, tag: String(a.alert_id) });
         navigator.vibrate?.([200, 100, 200]);
@@ -184,6 +187,7 @@ export default function App() {
   const selected = sites.find((s) => s.site_id === selectedId) || null;
   const select = useCallback((id) => {
     setSelectedId(id);
+    setInspectedLocation(null);
     setTab("site");
     const s = sites.find((x) => x.site_id === id);
     if (s) globe.current?.flyTo(s.lon, s.lat, 9);
@@ -252,7 +256,11 @@ export default function App() {
   useEffect(() => { if (canBrief && focus && due6pm()) setBriefing({ kind: "6pm" }); },
             [now.getMinutes(), identity, focus, canBrief]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const counts = { stop: alerts.filter((a) => a.level === "stop_work").length, warn: alerts.filter((a) => a.level === "warning").length };
+  const visibleSites = sitesWithin(sites, focus);
+  const inViewIds = new Set(visibleSites.map((s) => s.site_id));
+  const viewAlerts = focus && !focus.all ? alerts.filter((a) => inViewIds.has(a.site_id)) : alerts;
+  inView.current = (a) => !focus || focus.all || inViewIds.has(a.site_id);
+  const counts = { stop: viewAlerts.filter((a) => a.level === "stop_work").length, warn: viewAlerts.filter((a) => a.level === "warning").length };
   const feedProblems = (feedStatus?.feeds || []).filter((f) => f.status !== "current");
   const activeErrors = Object.entries(dataErrors).filter(([name, message]) => message
     && (name !== "Hazard pins" || showPins) && (name !== "NWS map" || warnOn));
@@ -261,14 +269,10 @@ export default function App() {
     && !dataErrors["Feed status"] && feedStatus?.feeds?.find((f) => f.name === "lightning")?.status === "current"
     && feedStatus?.feeds?.find((f) => f.name === "alerts")?.status === "current";
   const online = health && !apiError && !activeErrors.length && !feedProblems.length && alertsReliable;
-  const coverage = feedStatus?.coverage;
-  const incompleteRain = coverage && coverage.rain_week_ready < coverage.sites;
-  const incompleteWeather = coverage && (coverage.observations_current < coverage.sites || coverage.forecasts_current < coverage.sites);
   const oldStatus = feedStatus && now - new Date(feedStatus.checked_at) > 90000;
 
   // The landing page lets the user focus on an area (GPS or a dropped pin + radius). Until they choose, focus is
   // null and the Landing overlay is shown; after that the globe and ranking only show the in-range sites.
-  const visibleSites = sitesWithin(sites, focus);
   const handleLandingDone = (f) => {
     setFocus(f);
     if (f.all) {
@@ -282,6 +286,11 @@ export default function App() {
   return (
     <div className={`app ${focus ? "" : "landing-mode"}`}>
       <GlobeMap ref={globe} sites={focus ? visibleSites : []} lightning={lightning} selectedId={selectedId} onSelect={select}
+                inspectedLocation={focus ? inspectedLocation : null}
+                onLocation={(location) => {
+                  if (!focus || crewOpen) return;
+                  setSelectedId(null); setInspectedLocation(location); setTab("site");
+                }}
                 pinMode={!focus || pinMode} pin={focus ? pin : landingPlace}
                 onPin={(p) => focus ? (setPin(p), setPinMode(false), setTab("site")) : setLandingPlace({ ...p, label: "Dropped pin" })}
                 pins={showPins ? pins : null} warnings={warnOn ? warnings : null} radar={radar} me={me} sensor={sensor} />
@@ -356,7 +365,7 @@ export default function App() {
           Site rankings could not be refreshed. Previously received scores may be outdated.
         </div>
       )}
-      {(activeErrors.length > 0 || feedProblems.length > 0 || oldStatus || incompleteRain || incompleteWeather) && (
+      {(activeErrors.length > 0 || feedProblems.length > 0 || oldStatus) && (
         <details className="banner data-warning">
           <summary>Some live data is unavailable or incomplete · View details</summary>
           <ul>
@@ -365,19 +374,11 @@ export default function App() {
               {f.last_success && ` · last success ${new Date(f.last_success).toLocaleString()}`}
               {f.detail && <span className="small"> · {f.detail}</span>}</li>)}
             {oldStatus && <li>Feed status is out of date.</li>}
-            {incompleteRain && <li>Rainfall history incomplete at {coverage.sites - coverage.rain_week_ready} sites.
-              Flood and soil alerts may underestimate rainfall while history is unavailable.</li>}
-            {incompleteWeather && <li>Recent weather readings: {coverage.observations_current}/{coverage.sites} sites.
-              Recently fetched forecasts: {coverage.forecasts_current}/{coverage.sites} sites.
-              {coverage.forecasts_available != null && ` Forecast data available: ${coverage.forecasts_available}/${coverage.sites}.`}
-              Missing data does not mean low risk.</li>}
-            {coverage?.nearby_station_sites > 0 && <li>{coverage.nearby_station_sites} sites use a nearby reporting station.
-              Source station and distance are shown in the weather scanner.</li>}
           </ul>
         </details>
       )}
       </div>
-      <StopWorkBanner alerts={alerts} selectedId={selectedId} now={now} categories={categories} onSelect={select} reliable={alertsReliable} />
+      <StopWorkBanner alerts={viewAlerts} selectedId={selectedId} now={now} categories={categories} onSelect={select} reliable={alertsReliable} />
       {layersOpen && (
         <MapLayers layers={{ radar, warnings: warnOn, pins: showPins }} setLayer={setLayer} pinCount={pins.length}
                    warnings={warnings} onClose={() => setLayersOpen(false)} />
@@ -420,6 +421,7 @@ export default function App() {
             </section>
           ) : selected ? (
             <SiteCard summary={selected} horizon={horizon} categories={categories} alerts={alerts} now={now}
+                      alertsReliable={alertsReliable} lastAlertAt={lastAlertAt} onSelectNearby={select}
                       dev={health?.dev} refreshKey={refreshKey} onClose={() => setSelectedId(null)}
                       onReport={() => setCrewOpen(true)} onAiReport={() => setAiSite(selected)}
                       onCompliance={() => setComplianceSite(selected)} onChanged={refreshAll}
@@ -442,10 +444,21 @@ export default function App() {
                       onScenario={dev(api.startScenario, "Demo scenario running on this site.")}
                       onStrike={dev(api.fakeStrike, "Strike recorded 3 mi away: all-clear countdown restarted.")}
                       onClearScenario={dev(api.stopScenario, "Demo cleared.")} />
+          ) : inspectedLocation ? (
+            <section className="panel">
+              <header className="panel-head">
+                <div><h2>Selected location</h2>
+                  <p className="small muted">{inspectedLocation.lat.toFixed(5)}, {inspectedLocation.lon.toFixed(5)}</p></div>
+                <button className="icon-btn" onClick={() => setInspectedLocation(null)} aria-label="Close location">✕</button>
+              </header>
+              <NearbyAlerts location={inspectedLocation} alerts={alerts} categories={categories} now={now}
+                            reliable={alertsReliable} lastUpdated={lastAlertAt} onSelect={select} />
+            </section>
           ) : (
             <section className="panel empty">
-              <h2>Select a site</h2>
-              <p className="muted">Tap a dot on the globe or a row in the ranking. Dots are colored by hazard index:
+              <h2>Select a location</h2>
+              <p className="muted">Click anywhere on the map to check live alerts within 10 miles, or select a site for its details.
+                Dots are colored by hazard index:
                 Low, Moderate, High, Critical. Red rings pulse at sites under a stop-work alert; yellow flashes are
                 lightning in the last 30 minutes.</p>
               <button onClick={() => setCrewOpen(true)}>📍 Report a hazard anywhere</button>
@@ -453,7 +466,8 @@ export default function App() {
           )}
         </div>
         <div className={`tab-${tab === "alerts" ? "show" : "hide"}`}>
-          <AlertsPanel alerts={alerts} categories={categories} now={now} onSelect={select}
+          <AlertsPanel alerts={viewAlerts} categories={categories} now={now} onSelect={select}
+                       scope={focus && !focus.all ? `Sites in your area (${visibleSites.length})` : "All sites"}
                        notifyOn={notifyOn} onToggleNotify={toggleNotify} reliable={alertsReliable} lastUpdated={lastAlertAt} />
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
-import { band, categoryLabel, countdown, fmtScore, usd } from "../hazard.js";
+import { band, categoryLabel, fmtCrewHours, fmtProbability, fmtScore, usd } from "../hazard.js";
+import NearbyAlerts from "./NearbyAlerts.jsx";
 import WeatherScanner from "./WeatherScanner.jsx";
 import { scoreIsCurrent, SCORE_EXPLANATION } from "../freshness.js";
 
@@ -19,7 +20,7 @@ function floodZoneText(d) {
   return `FEMA flood zone ${d.fema_flood_zone}: minimal flood hazard`;
 }
 
-export default function SiteCard({ summary, horizon, categories, alerts, now, dev, onReport, onAiReport, onCompliance, saved, onToggleSave,
+export default function SiteCard({ summary, horizon, categories, alerts, now, alertsReliable, lastAlertAt, onSelectNearby, dev, onReport, onAiReport, onCompliance, saved, onToggleSave,
                                    onChanged,
                                    onScenario, onStrike, onClearScenario, refreshKey, onClose }) {
   const [detail, setDetail] = useState(null);
@@ -56,7 +57,6 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
   const cs = summary.category_scores || {};
   const meta = cs._meta || {};
   const cats = Object.entries(cs).filter(([k, v]) => k !== "_meta" && v.score >= 0.1).sort((a, b) => b[1].score - a[1].score);
-  const mine = alerts.filter((a) => a.site_id === id).sort((a, b) => (a.level === "stop_work" ? -1 : 1));
   const tz = summary.timezone;
   const [coordText, coordCls] = COORD[summary.coord_check] || ["", "muted"];
   const p = detail?.risk_profile;
@@ -91,6 +91,9 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
         </div>
       </header>
 
+      <NearbyAlerts location={summary} alerts={alerts} categories={categories} now={now}
+                    reliable={alertsReliable} lastUpdated={lastAlertAt} onSelect={onSelectNearby} />
+
       <p className="small muted">{SCORE_EXPLANATION}</p>
       {!scoreIsCurrent(summary, horizon, now) && <p className="warn small" role="status">
         Score date is out of date or unavailable for {horizon === "now" ? "today" : "tomorrow"}.
@@ -113,11 +116,12 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
           );
         })}
         <div className="score-tile">
-          <span className="muted small">Expected crew impact</span>
-          <strong className="big">{meta.expected_crew_hours_lost != null ? meta.expected_crew_hours_lost.toFixed(1) : "–"}<small> crew-h</small></strong>
+          <span className="muted small">Expected crew impact · {horizon === "now" ? "today" : "tomorrow"}</span>
+          <strong className="big">{fmtCrewHours(meta.expected_crew_hours_lost)}<small> crew-h</small></strong>
           <span className="small muted" title="Probability × hours lost per hazard × crew size × cost: all labeled assumptions">
             ≈ {usd(meta.expected_cost_usd)} · estimate*
           </span>
+          <span className="small muted">Model estimate; excludes live alert adjustments.</span>
         </div>
       </div>
 
@@ -127,32 +131,15 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
         <button onClick={onCompliance}>📋 Compliance</button>
       </div>
 
-      {mine.length > 0 && (
-        <section>
-          <h4>Active alerts ({mine.length})</h4>
-          <ul className="alert-list">
-            {mine.map((a) => (
-              <li key={a.alert_id} className={`alert alert--${a.level}`}>
-                <span className="alert-icon" aria-hidden="true">{a.level === "stop_work" ? "⛔" : "⚠"}</span>
-                <div>
-                  <strong>{a.title}</strong>
-                  <p className="small">{a.message}</p>
-                  {countdown(a.all_clear_at, now.getTime()) && (
-                    <p className="small mono">All-clear in {countdown(a.all_clear_at, now.getTime())}</p>
-                  )}
-                </div>
-                {a.image_url && <img src={a.image_url} alt="" className="thumb" loading="lazy" />}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
       <section>
         <h4>{horizon === "now" ? "Today" : "Tomorrow"}: what drives the score</h4>
+        {horizon === "now" && summary.live_floor != null && summary.live_floor >= summary.model_score && (
+          <p className="small">Live alerts set today's index to at least {fmtScore(summary.live_floor)}/10.
+            {" "}The model alone is {fmtScore(summary.model_score)}/10; the probabilities below describe the model.</p>
+        )}
         {meta.p_severe != null && (
           <p className="small">
-            Severe-outcome chance (death, injury, $1M+ damage or a worker injury): <strong>{(meta.p_severe * 100).toFixed(1)}%</strong>
+            Modeled severe-outcome chance (death, injury, $1M+ damage or a worker injury): <strong>{fmtProbability(meta.p_severe)}</strong>
             {" · "}
             {meta.percentile_for_site_month == null ? "" : meta.percentile_for_site_month >= 90
               ? <span className="warn">Unusual: higher than {Math.round(meta.percentile_for_site_month)}% of this site's days this month</span>
@@ -272,6 +259,7 @@ export default function SiteCard({ summary, horizon, categories, alerts, now, de
 
       <section>
         <h4>Crew reports ({crew.length})</h4>
+        {crew.length > 0 && <p className="small muted">Unverified crew observations. Review vague or test entries and dismiss them when appropriate.</p>}
         {crew.length === 0 ? <p className="muted small">No open reports at this site.</p> : (
           <ul className="crew-list">
             {crew.map((c) => (

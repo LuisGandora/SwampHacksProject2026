@@ -13,6 +13,10 @@ import time
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
+from db.setup_db import load_env
+
+load_env()  # .env -> os.environ (WEBHOOK_KEY, GEMINI_API_KEY, ...) before the jobs read them, as the API does
+
 from backend import briefings, crew_dispatch, daily_weather, fires, lightning, notify, nws, observations, rivers, tides, wildlife
 from ml import hazard_model
 from backend.db import connection, pool
@@ -43,6 +47,9 @@ RECORD = ("INSERT INTO worker_runs (job, last_run_at, last_success_at, last_erro
 def run(name):
     """Run one job and record the outcome in worker_runs (GET /data-status reads it)."""
     t = time.time()
+    with connection() as conn:  # mark it started, so a long first run (forecasts: several minutes) reads "starting"
+        conn.execute("INSERT INTO worker_runs (job, last_run_at) VALUES (%s, now()) "
+                     "ON CONFLICT (job) DO UPDATE SET last_run_at = now()", (name,))
     try:
         with connection() as conn:
             result = JOBS[name](conn)
@@ -77,7 +84,7 @@ def main():
     s.add_job(run, "cron", minute=5, args=["forecasts"], next_run_time=now + dt.timedelta(minutes=1))
     s.add_job(run, "cron", hour=11, minute=30, args=["daily_weather"])  # ~7:30 AM Eastern, yesterday is final
     s.add_job(run, "cron", minute=20, args=["scores"], next_run_time=now + dt.timedelta(minutes=2))  # after forecasts
-    s.add_job(run, "cron", minute="*/15", args=["briefings"])
+    s.add_job(run, "cron", minute="*/15", args=["briefings"], next_run_time=now + dt.timedelta(minutes=1))
     s.add_job(run, "interval", minutes=1, args=["notify"], next_run_time=now + dt.timedelta(seconds=30))
     print("Worker running. Ctrl+C to stop.", flush=True)
     s.start()

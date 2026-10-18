@@ -130,7 +130,7 @@ FEEDS = {  # worker job -> minutes it may go without a success before its data c
 COVERAGE = """
 SELECT count(*) AS sites,
        count(*) FILTER (WHERE o.last_obs > now() - interval '2 hours') AS observations_current,
-       count(*) FILTER (WHERE fc.issued > now() - interval '3 hours') AS forecasts_current,
+       count(*) FILTER (WHERE fc.issued > now() - interval '12 hours') AS forecasts_current,  -- NWS reissues grids every ~6-12 h; we fetch hourly
        count(*) FILTER (WHERE fc.future) AS forecasts_available,
        count(*) FILTER (WHERE o.days_7 >= 6) AS rain_week_ready,
        count(*) FILTER (WHERE s.weather_station_mi > 10) AS nearby_station_sites
@@ -147,7 +147,7 @@ _status_cache = {}
 @app.get("/data-status")
 def data_status():
     """Is the live data current? Each worker feed: current / stale (no success within ~3 runs) / failing (last run
-    errored) / never run, plus how many sites have recent readings, forecasts and a week of rain history. The
+    errored) / starting (first run still going) / never run, plus how many sites have recent readings, forecasts and a week of rain history. The
     dashboard only trusts "no alerts" and all-clear countdowns while lightning and alerts are current."""
     hit = _status_cache.get("v")
     if hit and time.monotonic() - hit[0] < 15:  # polled every 30 s by every open dashboard: share one answer
@@ -160,7 +160,8 @@ def data_status():
     for job, minutes in FEEDS.items():
         r = runs.get(job)
         ok = r and r["last_success_at"] and checked - r["last_success_at"] < dt.timedelta(minutes=minutes)
-        status = "never run" if not r else "failing" if r["last_error"] else "current" if ok else "stale"
+        status = ("never run" if not r else "failing" if r["last_error"] else "current" if ok
+                  else "starting" if not r["last_success_at"] else "stale")   # starting: first run still going
         feeds.append({"name": job, "status": status, "last_success": r and r["last_success_at"],
                       "detail": r and (r["last_error"] or (None if ok else "the worker hasn't updated this feed recently"))})
     out = {"checked_at": checked, "feeds": feeds, "coverage": coverage}

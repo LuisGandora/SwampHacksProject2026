@@ -22,16 +22,18 @@ latest AS (
            ST_Distance(g.geog, s.geog) / 1609.344 AS miles, c.stop_radius_mi
       FROM latest l JOIN river_gauges g USING (gauge_id) CROSS JOIN c
       JOIN sites s ON ST_DWithin(g.geog, s.geog, c.warn_radius_mi * 1609.344)
-     WHERE l.flood_category = ANY (%(flooding)s) OR l.forecast_flood_category = ANY (%(flooding)s)
+     WHERE (l.flood_category = ANY (%(flooding)s) OR l.forecast_flood_category = ANY (%(flooding)s))
 )
 SELECT count(raise_site_alert(site_id, 'flooding',
                               CASE WHEN flood_category IN ('minor', 'moderate', 'major') AND miles <= stop_radius_mi
                                    THEN 'stop_work' ELSE 'warning' END,
                               now(), stage_ft,
-                              CASE WHEN flood_category = ANY (%(flooding)s)
+                              CASE WHEN flood_category = 'action' THEN 'Action stage (prepare; flooding not confirmed) at ' || name
+                                   WHEN flood_category = ANY (%(flooding)s)
                                    THEN initcap(flood_category) || ' flooding at ' || name
+                                   WHEN forecast_flood_category = 'action' THEN 'Action stage forecast (prepare; flooding not confirmed) at ' || name
                                    ELSE initcap(forecast_flood_category) || ' flooding forecast at ' || name END
-                                  || ' (' || round(miles::numeric, 1) || ' mi away)',
+                                  || ' (' || round(miles::numeric, 1) || ' mi away; gauge condition, not confirmed site flooding)',
                               now() + interval '2 hours'))
   FROM hits
 """

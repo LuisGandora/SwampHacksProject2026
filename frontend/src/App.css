@@ -213,6 +213,7 @@ legend { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
 }
 @media (prefers-reduced-motion: reduce) { .marker--me::after { display: none; } }
 .marker--pin { width: 20px; height: 20px; background: var(--critical); border: 3px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); }
+.marker--inspection { background: var(--series); border: 3px solid #fff; box-shadow: 0 0 0 5px rgba(57, 135, 229, .3); }
 
 /* Sensor modes, after the reference's "sensor reskins". They tint everything, data included: use STD to read colors. */
 .globe.sensor-nvg canvas { filter: grayscale(1) brightness(1.35) sepia(1) hue-rotate(55deg) saturate(3.2) contrast(1.15); }
