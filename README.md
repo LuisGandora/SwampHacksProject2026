@@ -765,3 +765,7 @@ Start the API with `$env:PLANIT_DEV = "1"` to turn on:
 - Forecasts and observations keep 8 days (30 in the live database until `db.load_live_sites` runs), NWS alerts 180 days, and lightning 90 days (compressed after 2), to stay within the free tier.
 
 Alert/report consistency changes and validation commands: [dashboard feedback follow-up](docs/ALERT_CONSISTENCY.md).
+
+## License
+
+[MIT](LICENSE) © 2026 The Plan It By The Planet team (SwampHacks 2026). The public data sources keep their own terms (for example, CDC WONDER counts under 10 must stay suppressed).
