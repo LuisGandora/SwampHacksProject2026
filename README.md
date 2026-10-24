@@ -4,6 +4,7 @@
   SwampHacks 2026, Sperry Tech brief. Live weather and hazard intelligence for power-plant crews: instant stop-work alerts,
   a 6 PM briefing, and a plan for where to send crews and money first.<br/>
   Live at <a href="https://plan-it-by-the-planet.us"><b>plan-it-by-the-planet.us</b></a>
+  NOTE: As of 10/24, this website has been taken down
 </p>
 
 <p align="center">
